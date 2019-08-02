@@ -8,6 +8,12 @@
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.css' rel='stylesheet' />
 <style>
 body { margin:0; padding:0; }
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
 </style>
 </head>
 <body>
@@ -16,10 +22,14 @@ body { margin:0; padding:0; }
 <script>
 var map = new mapboxgl.Map({
 container: 'map', // container id
+hash: true, //add #position on URL
 style: './sstd.json', // stylesheet location
 center: [139.78148, 35.768793], // starting position [lng, lat]
 zoom: 4 // starting zoom
 });
+
+map.addControl(new mapboxgl.NavigationControl());
+
 </script>
  
 </body>

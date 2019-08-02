@@ -10,16 +10,16 @@
       ],
       "maxzoom": 18,
       "minzoom": 4,
-      "attribution": "’n—‰@’n}Vectori‰¼Ìj’ñ‹ŸÀŒ±"
+      "attribution": "åœ°ç†é™¢åœ°å›³Vectorï¼ˆä»®ç§°ï¼‰æä¾›å®Ÿé¨“"
     },
     "raster": {
-      "maxzoom": 8,
+      "maxZoom": 8,
       "tileSize": 256,
       "tiles": [
         "https://cyberjapandata.gsi.go.jp/xyz/earthhillshade/{z}/{x}/{y}.png"
       ],
       "type": "raster",
-      "attribution": "’n—‰@ƒ^ƒCƒ‹i‰A‰e‹N•š}j"
+      "attribution": "åœ°ç†é™¢ã‚¿ã‚¤ãƒ«ï¼ˆé™°å½±èµ·ä¼å›³ï¼‰"
     }
   },
   "sprite": "https://maps.gsi.go.jp/vector/sprite/std",
@@ -29,7 +29,7 @@
       "id": "background",
       "type": "background",
       "paint": {
-        "background-color": "rgb(239,239,0)"
+        "background-color": "rgb(239,239,239)"
       }
     },
     {
@@ -41,19 +41,7 @@
         "visibility": "visible"
       },
       "paint": {
-        "raster-opacity": {
-          "base": 1.5,
-          "stops": [
-            [
-              0,
-              0.6
-            ],
-            [
-              6,
-              0.1
-            ]
-          ]
-        }
+        "raster-opacity": 0.3
       }
     },
     {
@@ -76,21 +64,83 @@
 	  }
     },
     {
+      "id": "coastline",
+      "type": "line",
+      "source": "bv",
+      "source-layer": "coastline",
+      "paint": {
+        "line-color": "rgba(70, 138, 179, 1)"
+      }
+    },
+    {
+      "id": "river",
+      "type": "line",
+      "source": "bv",
+      "source-layer": "river",
+      "paint": {
+        "line-color": "rgba(21, 95, 175, 1)"
+      }
+    },
+    {
+      "id": "railway",
+      "type": "line",
+      "source": "bv",
+      "source-layer": "railway",
+      "paint": {
+        "line-width": 4,
+        "line-color": "rgba(21, 95, 175, 1)"
+      }
+    },
+    {
+      "id": "railway-outline",
+      "type": "line",
+      "source": "bv",
+      "source-layer": "railway",
+      "paint": {
+        "line-width": 2,
+        "line-color": "rgba(255, 255, 255, 1)",
+        "line-dasharray": [3, 3]
+      }
+    },
+    {
+      "id": "road",
+      "type": "line",
+      "source": "bv",
+      "source-layer": "road",
+      "paint": {
+        
+        "line-color": "rgba(175, 21, 21, 1)"
+      }
+    },
+    {
+      "id": "boundary",
+      "type": "line",
+      "source": "bv",
+      "source-layer": "boundary",
+      "paint": {
+        "line-color": "rgba(114, 21, 175, 1)",
+            "line-dasharray": [
+		      3,
+		      3
+		    ]
+      }
+    },
+    {
       "id": "symbol",
       "type": "symbol",
       "source": "bv",
       "source-layer": "symbol",
-      "maxzoom": 1,
       "layout": {
         "text-field": "{knj}",
-        "text-size": 13,
-        "text-transform": "uppercase",
-        "text-justify": "center"
+        "text-size": 15,
+        "text-anchor": "left",
+        "text-offset": [1,0],
+        "icon-image": "{äººå£100ä¸‡äººä»¥ä¸Š2-500}"
       },
       "paint": {
-        "text-color": "#633",
-        "text-halo-color": "rgba(255,255,255,0.7)",
-        "text-halo-width": 1
+        "text-color": "rgba(0,0,0,1)",
+        "text-halo-color": "rgba(255,255,255,1)",
+        "text-halo-width": 2
       }
     }
   ],
