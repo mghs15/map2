@@ -1,0 +1,98 @@
+{
+  "version": 8,
+  "name": "Vector",
+  "metadata": {},
+  "sources": {
+    "bv": {
+      "type": "vector",
+      "tiles": [
+      "https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf"
+      ],
+      "maxzoom": 18,
+      "minzoom": 4,
+      "attribution": "ínóùâ@ínê}VectorÅiâºèÃÅjíÒãüé¿å±"
+    },
+    "raster": {
+      "maxzoom": 8,
+      "tileSize": 256,
+      "tiles": [
+        "https://cyberjapandata.gsi.go.jp/xyz/earthhillshade/{z}/{x}/{y}.png"
+      ],
+      "type": "raster",
+      "attribution": "ínóùâ@É^ÉCÉãÅiâAâeãNïöê}Åj"
+    }
+  },
+  "sprite": "https://maps.gsi.go.jp/vector/sprite/std",
+  "glyphs": "https://maps.gsi.go.jp/xyz/noto-jp/{fontstack}/{range}.pbf",
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "rgb(239,239,0)"
+      }
+    },
+    {
+      "id": "raster",
+      "type": "raster",
+      "source": "raster",
+      "maxzoom": 6,
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "raster-opacity": {
+          "base": 1.5,
+          "stops": [
+            [
+              0,
+              0.6
+            ],
+            [
+              6,
+              0.1
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "waterarea",
+      "type": "fill",
+      "source": "bv",
+      "source-layer": "waterarea",
+      "filter": [
+        "all",
+        [
+          "==",
+          "ftCode",
+          55000
+        ]
+      ],
+	  "paint": {
+	    "fill-color": "rgba(200, 201, 232, 1)",
+	    "fill-opacity": 0.7,
+	    "fill-outline-color": "rgba(95, 107, 208, 1)"
+	  }
+    },
+    {
+      "id": "symbol",
+      "type": "symbol",
+      "source": "bv",
+      "source-layer": "symbol",
+      "maxzoom": 1,
+      "layout": {
+        "text-field": "{knj}",
+        "text-size": 13,
+        "text-transform": "uppercase",
+        "text-justify": "center"
+      },
+      "paint": {
+        "text-color": "#633",
+        "text-halo-color": "rgba(255,255,255,0.7)",
+        "text-halo-width": 1
+      }
+    }
+  ],
+  "id": "gsi-bv"
+}
