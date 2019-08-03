@@ -14,7 +14,7 @@
 - [js/src/map/layer-binaryvectortile.js](https://mghs15.github.io/map2/tool/js/src/map/layer-binaryvectortile.js) 
 
 ### 使い方
-使い方としては、各スタイルを読み込むとデベロッパーツールのコンソールにMapbox Style Specificationの"layers"に該当する部分の設定ファイルが出力されるので、
+使い方としては、各スタイルを読み込むとデベロッパーツールのコンソールにMapbox Style Specificationの["layers"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-layers)に該当する部分の設定ファイルが出力されるので、
 これをMapbox GL JSのスタイル設定ファイルにコピペしてあげればよい。
 
 ```
@@ -28,9 +28,12 @@
 テンプレートはこちら→https://github.com/mghs15/map2/template.json
 
 
-コピペ後は、以下の修正が必要
-- sourceに必要なid（gsibv-vectortile-source-1-5-18など）を持ったデータソースの設定をしてあげる
-- spriteファイルを適宜変更
+コピペ後の各style.jsonには、以下の修正が必要
+- ["sources"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-sources)に必要なid（gsibv-vectortile-source-1-5-18など）を持ったデータソースの設定をしてあげる
+- ["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-sprite)の設定を適宜変更
+- <gsi-vertical>タグを削除
+	- 削除ツールはこちら（perl製）→ https://github.com/mghs15/map2/perl/delete-gsi-vertical-tag.pl 
+	- 本当は["concat"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-concat)ごと削除したいが、JSONが崩れ、やる気をなくしたため保留。
 
 ### 今回ためしに作成したもの
 
@@ -57,8 +60,11 @@
 
 ## 課題
 1. 注記でHTMLが入っている場合、処理ができていない。
+→とりあえず、<gsi-vertical>タグを削除することにした。
 2. 記号をspriteファイルからうまく取り出せていない。
-3. オリジナルの「MySimple.json」で、フォントファイルの読み込みがうまくいかない→"text-font（layout property）"の設定が必要だったようだ。
+→どうやら、["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-sprite)では、自動的に sprite@2x.png のようにScale Factorが付与されるらしい。
+3. オリジナルの「MySimple.json」で、フォントファイルの読み込みがうまくいかない
+→"text-font（layout property）"の設定が必要だったようだ。
 
 
 
