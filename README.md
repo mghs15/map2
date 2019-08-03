@@ -17,13 +17,13 @@
 使い方としては、各スタイルを読み込むとデベロッパーツールのコンソールにMapbox Style Specificationの"layers"に該当する部分の設定ファイルが出力されるので、
 これをMapbox GL JSのスタイル設定ファイルにコピペしてあげればよい。
 
-`
+```
 "layers":[
 
 ここにコピペ
 
 ]
-`
+```
 
 テンプレートはこちら→https://github.com/mghs15/template.json
 
