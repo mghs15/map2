@@ -1,4 +1,4 @@
-# 地理院地図VectorのスタイルをシンプルなMapbox GL JSで実装する試み
+# 地理院地図Vectorのスタイルを<br>シンプルなMapbox GL JSで実装する試み
 実装例　https://mghs15.github.io/map2/map.html
 
 ## モチベーション
@@ -9,7 +9,9 @@
 ### ツールのURLとベースとしたサイト
 ツールのURL　https://mghs15.github.io/map2/tool
 
-[地理院地図Vectorのサイト](https://maps.gsi.go.jp/vector/)を無理やり改造した。
+[地理院地図Vectorのサイト](https://maps.gsi.go.jp/vector/)を無理やり改造した。変更ファイルは 以下の通り。
+- index.html
+- [js/src/map/layer-binaryvectortile.js](https://mghs15.github.io/map2/tool/js/src/map/layer-binaryvectortile.js) 
 
 ### 使い方
 使い方としては、各スタイルを読み込むとデベロッパーツールのコンソールにMapbox Style Specificationの"layers"に該当する部分の設定ファイルが出力されるので、
@@ -17,7 +19,9 @@
 
 `
 "layers":[
+
 ここにコピペ
+
 ]
 `
 
@@ -37,7 +41,6 @@
 		<td><a href="https://github.com/mghs15/sblank.json">白地図</a></td>
 	</tr>
 	<tr>
-		<td></td>
 		<td><a href="https://github.com/mghs15/sphoto.json">写真</a></td>
 		<td><a href="https://github.com/mghs15/slabel.json">写真＋注記の注記</a></td>
 		<td><a href="https://github.com/mghs15/sllabel.json">大きい注記の地図</a></td>
@@ -49,7 +52,7 @@
 	</tr>
 </table>
 
-※実装例　https://mghs15.github.io/map2/map.html　で表示できるものです。
+※実装例　https://mghs15.github.io/map2/map.html 　で表示できるものです。
 
 
 ## 課題
