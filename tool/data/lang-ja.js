@@ -2,8 +2,8 @@ if ( !GSIBV.CONFIG.LANG ) GSIBV.CONFIG.LANG = {};
 GSIBV.CONFIG.LANG.JA ={};
 
 GSIBV.CONFIG.LANG.JA.TITLE ={
-  "title" : "地理院地図Vector",
-  "subtitle" : "（試験公開）"
+  "title" : "公式でないです",
+  "subtitle" : "（ツール）"
 };
 
 

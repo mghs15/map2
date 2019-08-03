@@ -5,7 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0, ,user-scalable=no" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="description" content="">
-  <title>【試験公開】地理院地図Vector</title>
+  <title>tool</title>
+  <script type="text/javascript">
+    var myobject1 = {};
+    var mystring1 = "";
+  </script>
   <script src='./mapbox/0.52.0/mapbox-gl.js'></script>
   <link href='./mapbox/0.52.0/mapbox-gl.css' rel='stylesheet' />
   <script src='./js/perfect-scrollbar.min.js'></script>
@@ -95,6 +99,41 @@
   <script type="text/javascript">
     if (!GSIBV.application) { window.onload = function () { document.getElementById("incompatible").style.display = 'block'; }; }
   </script>
+
+  <script type="text/javascript">
+    function style_alert() {
+      console.log( document.getElementsByClassName("map"));
+      
+//      console.log( "GSIBV.Map" );
+//      console.log( GSIBV.Map ); //class
+
+      console.log( "GSIBV.Map.Layer" );
+      console.log( GSIBV.Map.Layer );
+      
+      console.log( "GSIBV.CONFIG" );
+      console.log( GSIBV.CONFIG );
+      
+      console.log( "GSIBV.Config" );
+      console.log( GSIBV.Config );
+      
+//      console.log( "GSIBV.VectorTileSource" );
+//      console.log( GSIBV.VectorTileSource ); //class
+      
+//      console.log( "GSIBV.Application" );
+//      console.log( GSIBV.Application ); //class
+
+
+//      console.log( 'MA.DOM.select(".map")' );
+//      console.log( MA.DOM.select(".map") );
+
+//      console.log( GSIBV.Map.map().getStyle() );
+//      console.log( this );
+//      console.log( this._map );//undefined
+//      console.log( mapOptions );// not defined
+//      console.log( this._map.getStyle());
+    }
+  </script>
+
 
 </head>
 <body>
