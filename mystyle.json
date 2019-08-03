@@ -23,8 +23,7 @@
     },
     "mapbox": {
       "url": "mapbox://mapbox.mapbox-streets-v8",
-      "type": "vector",
-      "attribution": "<a href='https://www.mapbox.com/about/maps/' target='_blank'>©Mapbox</a> <a href='https://www.openstreetmap.org/about/' target='_blank'>©OpenStreetMap</a>"
+      "type": "vector"
     },
     "raster": {
       "maxzoom": 8,
@@ -138,10 +137,40 @@
       }
     },
     {
+      "id": "railway-tunnel",
+      "type": "line",
+      "source": "bv",
+      "source-layer": "railway",
+      "filter":[
+        "any",
+          ["==", "railState", 2],
+          ["==", "railState", 3]
+      ],
+      "paint": {
+        "line-width": 3,
+        "line-color": "rgba(21, 95, 175, 1)",
+        "line-dasharray": [3, 3]
+      }
+    },
+    {
+      "id": "road",
+      "type": "line",
+      "source": "bv",
+      "source-layer": "road",
+      "paint": {
+        "line-color": "rgba(175, 21, 21, 1)"
+      }
+    },
+    {
       "id": "railway",
       "type": "line",
       "source": "bv",
       "source-layer": "railway",
+      "filter":[
+        "all",
+          ["!=", "railState", 2],
+          ["!=", "railState", 3]
+      ],
       "paint": {
         "line-width": 4,
         "line-color": "rgba(21, 95, 175, 1)"
@@ -152,20 +181,15 @@
       "type": "line",
       "source": "bv",
       "source-layer": "railway",
+      "filter":[
+        "all",
+          ["!=", "railState", 2],
+          ["!=", "railState", 3]
+      ],
       "paint": {
         "line-width": 2,
         "line-color": "rgba(255, 255, 255, 1)",
         "line-dasharray": [3, 3]
-      }
-    },
-    {
-      "id": "road",
-      "type": "line",
-      "source": "bv",
-      "source-layer": "road",
-      "paint": {
-        
-        "line-color": "rgba(175, 21, 21, 1)"
       }
     },
     {
@@ -226,7 +250,6 @@
       },
       "paint": {
         "text-color": ["case",
-        ["==", ["get", "annoCtg"], 110], "rgba(143,63,189,1)",
         ["==", ["get", "annoCtg"], 422], "rgba(0,139,25,1)",
         "rgba(0,0,0,1)"
         ],
@@ -278,7 +301,7 @@
                 "text-padding": 2,
                 "text-offset": [0, 0.75],
                 "text-anchor": "top",
-                "text-field": ["coalesce", ["get", "name_en"], ["get", "name"]],
+                "text-field": ["coalesce", ["get", "name_ja"], ["get", "name"]],
                 "text-max-width": 8
             },
             "paint": {
