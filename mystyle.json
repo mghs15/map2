@@ -58,6 +58,45 @@
         "raster-opacity": 0.3
       }
     },
+        {
+            "id": "landuse",
+            "type": "fill",
+            "source": "mapbox",
+            "source-layer": "landuse",
+            "minzoom": 5,
+            "filter": [
+                "match",
+                ["get", "class"],
+                ["airport", "hospital", "park", "pitch", "school"],
+                true,
+                false
+            ],
+            "layout": {},
+            "paint": {
+                "fill-color": [
+                    "match",
+                    ["get", "class"],
+                    ["airport"],
+                    "hsl(345, 6%, 87%)",
+                    ["hospital"],
+                    "hsl(0, 56%, 89%)",
+                    ["park", "pitch"],
+                    "hsl(78, 51%, 74%)",
+                    ["school"],
+                    "#ead6c8",
+                    "hsla(0, 0%, 0%, 0)"
+                ],
+                "fill-opacity": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    5,
+                    0,
+                    6,
+                    1
+                ]
+            }
+        },
     {
       "id": "waterarea",
       "type": "fill",
