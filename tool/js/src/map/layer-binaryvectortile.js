@@ -883,6 +883,30 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
           "finish layers(" + this._addMapboxLayerList.length + ")" , 
           ( (new Date()).getTime() - this._startTime ) +"ms"
         );
+        
+        /* 190803
+        console.log("this._addMapboxLayerList");
+        console.log(this._addMapboxLayerList);
+        console.log( this._addMapboxLayerList[0]["mapboxlayer"] );
+        console.log( this._addMapboxLayerList[0]["layer"] );
+        
+        console.log("JSON化");
+        console.log( JSON.stringify(this._addMapboxLayerList[0]["mapboxlayer"]) );
+        */
+        
+        myobject1 = {};
+        mystring1="";
+        
+        for(var i = 0; i < this._addMapboxLayerList.length; i++){
+                myobject1[i] = JSON.stringify(this._addMapboxLayerList[i]["mapboxlayer"]);
+                
+                var comma = ",";
+                if(i == 0){comma = "";}
+                mystring1 = mystring1 + comma + JSON.stringify(this._addMapboxLayerList[i]["mapboxlayer"]); //190803
+        }
+//        console.log( myobject1 );
+        console.log( mystring1 );
+        
         this.fire("finish");
         return;
       } else {
