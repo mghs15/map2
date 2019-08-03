@@ -50,9 +50,7 @@
       "source": "bv",
       "source-layer": "waterarea",
 	  "paint": {
-	    "fill-color": "rgba(200, 201, 232, 1)",
-	    "fill-opacity": 0.7,
-	    "fill-outline-color": "rgba(95, 107, 208, 1)"
+	    "fill-color": "rgba(200, 201, 232, 1)"
 	  }
     },
     {
@@ -127,8 +125,7 @@
         "text-size": 15,
         "text-anchor": "left",
         "text-offset": [2,0],
-        "text-font":["NotoSansCJKjp-Regular"],
-        "icon-image": "{人口100万人以上2-500}"
+        "text-font":["NotoSansCJKjp-Regular"]
       },
       "paint": {
         "text-color": "rgba(0,0,0,1)",
@@ -147,7 +144,7 @@
         "text-anchor": "left",
         "text-offset": [1,0],
         "text-font":["NotoSansCJKjp-Regular"],
-        "icon-image": "{標高点（測点）}"
+        "icon-image": "標高点（測点）"
       },
       "paint": {
         "text-color": "rgba(0,0,0,1)",
