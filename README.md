@@ -25,7 +25,7 @@
 ]
 ```
 
-テンプレートはこちら→https://github.com/mghs15/template.json
+テンプレートはこちら→https://github.com/mghs15/map2/template.json
 
 
 コピペ後は、以下の修正が必要
