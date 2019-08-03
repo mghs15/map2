@@ -20,10 +20,11 @@ body { margin:0; padding:0; }
  
 <div id='map'></div>
 <script>
+mapboxgl.accessToken = 'pk.eyJ1IjoibWdocyIsImEiOiJjampjaHVlaHYwdHViM3BsOXhzbm1qb2J1In0.mPZrZMJg6z4DZXGMv0zqEg';
 var map = new mapboxgl.Map({
 container: 'map', // container id
 hash: true, //add #position on URL
-style: './spale.json', // stylesheet location
+style: './mystyle.json', // stylesheet location
 center: [139.78148, 35.768793], // starting position [lng, lat]
 zoom: 4 // starting zoom
 });
