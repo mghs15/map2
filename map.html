@@ -22,15 +22,24 @@ body { margin:0; padding:0; }
 
 <style>
 #menu {
-position: absolute;
-background: #fff;
-padding: 10px;
-font-family: 'Open Sans', sans-serif;
+    position: absolute;
+    left:  0.5em;
+    top: 0.5em; 
+    padding: 0.2em 0.5em;
+    margin: 0 0;
+    background: #ddeeff;
+    box-shadow: 0px 0px 0px 5px #ddeeff;
+    border: dashed 3px #aaccff;
+    font-family: 'Open Sans', sans-serif;
+    width: 90%;
+    max-width: 350px;
 }
 </style>
 
 
 <div id='menu'>
+<h1 class="titlebox" style="font-size: 100%; margin: 0 0;">
+<a href="https://github.com/gsi-cyberjapan/gsimaps-vector-experiment" target="_blank">地理院地図Vector</a>のスタイルをシンプルな<a href="https://docs.mapbox.com/mapbox-gl-js/overview/" target="_blank">Mapbox GL JS</a>で実装する試み</h1>
 <input id='mysimple' type='radio' name='rtoggle' value='mysimple' checked='checked'>
 <label for='mysimple'>MySimple</label>
 <br>
@@ -65,7 +74,7 @@ center: [139.78148, 35.768793], // starting position [lng, lat]
 zoom: 4 // starting zoom
 });
 
-map.addControl(new mapboxgl.NavigationControl());
+map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
 var layerList = document.getElementById('menu');
 var inputs = layerList.getElementsByTagName('input');
