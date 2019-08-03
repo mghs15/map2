@@ -6,10 +6,10 @@
 
 ## 出来上がったツール
 
-### URLを改良元
+### ツールのURLとベースとしたサイト
 ツールのURL　https://mghs15.github.io/map2/tool
 
-[地理院地図Vectorのサイト](https://maps.gsi.go.jp/vector/)を無理やり改良した。
+[地理院地図Vectorのサイト](https://maps.gsi.go.jp/vector/)を無理やり改造した。
 
 ### 使い方
 使い方としては、各スタイルを読み込むとデベロッパーツールのコンソールにMapbox Style Specificationの"layers"に該当する部分の設定ファイルが出力されるので、
@@ -54,7 +54,7 @@
 
 ## 課題
 1. 注記でHTMLが入っている場合、処理ができていない。
-2. 記号がspriteファイルからうまく取り出せていない
+2. 記号をspriteファイルからうまく取り出せていない。
 
 
 
