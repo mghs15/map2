@@ -28,37 +28,37 @@
 ]
 ```
 
-テンプレートはこちら→https://github.com/mghs15/map2/template.json
+テンプレートはこちら→https://mghs15.github.io/map2template.json
 
 
 コピペ後の各style.jsonには、以下の修正が必要
 - ["sources"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-sources)に必要なid（gsibv-vectortile-source-1-5-18など）を持ったデータソースの設定をしてあげる
 - ["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-sprite)の設定を適宜変更
 - <gsi-vertical>タグを削除
-	- 削除ツールはこちら（perl製）→ https://github.com/mghs15/map2/perl/delete-gsi-vertical-tag.pl 
+	- 削除ツールはこちら（perl製）→ https://mghs15.github.io/map2perl/delete-gsi-vertical-tag.pl 
 	- 本当は["concat"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-concat)ごと削除したいが、JSONが崩れ、やる気をなくしたため保留。
 - ["icon-image"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#layout-symbol-icon-image)の値を整理
 	- "std///田"のようになっているので、"田"に直す。
-	- 修正ツールはこちら（perl製）→ https://github.com/mghs15/map2/perl/replace_sprite.pl 
+	- 修正ツールはこちら（perl製）→ https://mghs15.github.io/map2perl/replace_sprite.pl 
 
 
 ### 今回ためしに作成したもの
 
 <table>
 	<tr>
-		<td><a href="https://github.com/mghs15/sstd.json">標準地図</a></td>
-		<td><a href="https://github.com/mghs15/spale.json">淡色地図</a></td>
-		<td><a href="https://github.com/mghs15/sblank.json">白地図</a></td>
+		<td><a href="https://mghs15.github.io/map2sstd.json">標準地図</a></td>
+		<td><a href="https://mghs15.github.io/map2spale.json">淡色地図</a></td>
+		<td><a href="https://mghs15.github.io/map2sblank.json">白地図</a></td>
 	</tr>
 	<tr>
-		<td><a href="https://github.com/mghs15/sphoto.json">写真</a></td>
-		<td><a href="https://github.com/mghs15/slabel.json">写真＋注記の注記</a></td>
-		<td><a href="https://github.com/mghs15/sllabel.json">大きい注記の地図</a></td>
+		<td><a href="https://mghs15.github.io/map2sphoto.json">写真</a></td>
+		<td><a href="https://mghs15.github.io/map2slabel.json">写真＋注記の注記</a></td>
+		<td><a href="https://mghs15.github.io/map2sllabel.json">大きい注記の地図</a></td>
 	</tr>
 	<tr>
-		<td><a href="https://github.com/mghs15/sstd2.json">標準地図2</a></td>
-		<td><a href="https://github.com/mghs15/spale2.json">淡色地図2</a></td>
-		<td><a href="https://github.com/mghs15/sblank2.json">白地図2</a></td>
+		<td><a href="https://mghs15.github.io/map2sstd2.json">標準地図2</a></td>
+		<td><a href="https://mghs15.github.io/map2spale2.json">淡色地図2</a></td>
+		<td><a href="https://mghs15.github.io/map2sblank2.json">白地図2</a></td>
 	</tr>
 </table>
 

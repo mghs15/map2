@@ -10,7 +10,7 @@
       ],
       "maxzoom": 18,
       "minzoom": 4,
-      "attribution": "地理院地図Vector（仮称）提供実験"
+      "attribution": "<a href='https://github.com/gsi-cyberjapan/gsimaps-vector-experiment' target='_blank'>地理院地図Vector（仮称）提供実験</a>"
     },
     "raster": {
       "maxzoom": 8,
@@ -19,7 +19,7 @@
         "https://cyberjapandata.gsi.go.jp/xyz/earthhillshade/{z}/{x}/{y}.png"
       ],
       "type": "raster",
-      "attribution": "地理院タイル（陰影起伏図）"
+      "attribution": "<a href='https://maps.gsi.go.jp/development/ichiran.html#earthhillshade' target='_blank'>地理院タイル</a>"
     }
   },
   "sprite": "https://maps.gsi.go.jp/vector/sprite/std",

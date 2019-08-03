@@ -10,7 +10,7 @@
       ],
       "maxzoom": 18,
       "minzoom": 4,
-      "attribution": "地理院地図Vector（仮称）提供実験"
+      "attribution": "<a href='https://github.com/gsi-cyberjapan/gsimaps-vector-experiment' target='_blank'>地理院地図Vector（仮称）提供実験</a>"
     },
     "raster": {
       "maxzoom": 18,
@@ -19,7 +19,7 @@
         "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg"
       ],
       "type": "raster",
-      "attribution": "地理院タイル（全国最新写真）"
+      "attribution": "<a href='https://maps.gsi.go.jp/development/ichiran.html#seamlessphoto' target='_blank'>地理院タイル</a>"
     }
   },
   "sprite": "https://maps.gsi.go.jp/vector/sprite/std",

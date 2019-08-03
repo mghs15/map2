@@ -10,7 +10,7 @@
         "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg"
       ],
       "type": "raster",
-      "attribution": "地理院タイル（全国最新写真）"
+      "attribution": "<a href='https://maps.gsi.go.jp/development/ichiran.html#seamlessphoto' target='_blank'>地理院タイル</a>"
     }
   },
   "sprite": "https://maps.gsi.go.jp/vector/sprite/std",
