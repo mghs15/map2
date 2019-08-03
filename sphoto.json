@@ -1,0 +1,32 @@
+{
+  "version": 8,
+  "name": "Vector",
+  "metadata": {},
+  "sources": {
+    "raster": {
+      "maxzoom": 18,
+      "tileSize": 256,
+      "tiles": [
+        "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg"
+      ],
+      "type": "raster",
+      "attribution": "地理院タイル（全国最新写真）"
+    }
+  },
+  "sprite": "https://maps.gsi.go.jp/vector/sprite/std",
+  "glyphs": "https://maps.gsi.go.jp/xyz/noto-jp/{fontstack}/{range}.pbf",
+  "layers": [
+    {
+      "id": "raster",
+      "type": "raster",
+      "source": "raster",
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "raster-opacity": 1
+      }
+    }
+  ],
+  "id": "gsi-bv"
+}

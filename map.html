@@ -19,16 +19,77 @@ body { margin:0; padding:0; }
 <body>
  
 <div id='map'></div>
+
+<style>
+#menu {
+position: absolute;
+background: #fff;
+padding: 10px;
+font-family: 'Open Sans', sans-serif;
+}
+</style>
+
+
+<div id='menu'>
+<input id='mysimple' type='radio' name='rtoggle' value='mysimple' checked='checked'>
+<label for='mysimple'>MySimple</label>
+<br>
+<input id='sstd' type='radio' name='rtoggle' value='sstd'>
+<label for='sstd'>標準地図</label>
+<input id='spale' type='radio' name='rtoggle' value='spale'>
+<label for='spale'>淡色地図</label>
+<input id='sblank' type='radio' name='rtoggle' value='sblank'>
+<label for='sblank'>白地図</label>
+<br>
+<input id='sphoto' type='radio' name='rtoggle' value='sphoto'>
+<label for='sphoto'>写真</label>
+<input id='slabel' type='radio' name='rtoggle' value='slabel'>
+<label for='slabel'>写真＋注記</label>
+<input id='sllabel' type='radio' name='rtoggle' value='sllabel'>
+<label for='sllabel'>大きい文字</label>
+<br>
+<input id='sstd2' type='radio' name='rtoggle' value='sstd2'>
+<label for='sstd2'>標準地図2</label>
+<input id='spale2' type='radio' name='rtoggle' value='spale2'>
+<label for='spale2'>淡色地図2</label>
+<input id='sblank2' type='radio' name='rtoggle' value='sblank2'>
+<label for='sblank2'>白地図2</label>
+</div>
+
 <script>
 var map = new mapboxgl.Map({
 container: 'map', // container id
 hash: true, //add #position on URL
-style: './sstd.json', // stylesheet location
+style: './mysimple.json', // stylesheet location
 center: [139.78148, 35.768793], // starting position [lng, lat]
 zoom: 4 // starting zoom
 });
 
 map.addControl(new mapboxgl.NavigationControl());
+
+var layerList = document.getElementById('menu');
+var inputs = layerList.getElementsByTagName('input');
+ 
+function switchLayer(layer) {
+var layerId = layer.target.id;
+map.setStyle('./' + layerId +'.json');
+}
+ 
+for (var i = 0; i < inputs.length; i++) {
+inputs[i].onclick = switchLayer;
+}
+
+
+
+/*
+console.log(map);
+
+map.setStyle('./sstd.json');
+
+console.log(map.style);
+
+console.log(JSON.stringify(map.style.stylesheet));
+*/
 
 </script>
  
