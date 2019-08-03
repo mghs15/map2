@@ -36,11 +36,11 @@
 - ["sources"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-sources)に必要なid（gsibv-vectortile-source-1-5-18など）を持ったデータソースの設定をしてあげる
 - ["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-sprite)の設定を適宜変更
 - <gsi-vertical>タグを削除
-	- 削除ツールはこちら（perl製）→ https://mghs15.github.io/map2perl/delete-gsi-vertical-tag.pl 
+	- 削除ツールはこちら（perl製）→ https://github.com/mghs15/map2/blob/master/perl/delete-gsi-vertical-tag.pl 
 	- 本当は["concat"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-concat)ごと削除したいが、JSONが崩れ、やる気をなくしたため保留。
 - ["icon-image"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#layout-symbol-icon-image)の値を整理
 	- "std///田"のようになっているので、"田"に直す。
-	- 修正ツールはこちら（perl製）→ https://mghs15.github.io/map2perl/replace_sprite.pl 
+	- 修正ツールはこちら（perl製）→ https://github.com/mghs15/map2/blob/master/perl/replace_sprite.pl 
 
 
 ### 今回ためしに作成したもの
