@@ -127,6 +127,7 @@
         "text-size": 15,
         "text-anchor": "left",
         "text-offset": [2,0],
+        "text-font":["NotoSansCJKjp-Regular"],
         "icon-image": "{人口100万人以上2-500}"
       },
       "paint": {
@@ -145,6 +146,7 @@
         "text-size": 10,
         "text-anchor": "left",
         "text-offset": [1,0],
+        "text-font":["NotoSansCJKjp-Regular"],
         "icon-image": "{標高点（測点）}"
       },
       "paint": {
