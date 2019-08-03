@@ -72,7 +72,7 @@ Mapboxのサービスと合わせた例　https://mghs15.github.io/map2/map2.htm
 - "icon-image":"田"のように、アイコン名（sprite.jsonで定義されているもの）をシンプルにダブルクオーテーションで囲む形にすれば解決した。
 - どうやら、["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#sprite)では、自動的に sprite@2x.png のようにScale Factorが付与されるらしい。これに対応していないと、スマホ等での閲覧に支障があるかもしれない。
 3. オリジナルの「MySimple.json」で、フォントファイルの読み込みがうまくいかない
-- "text-font（layout property）"の設定が必要だったようだ。
+- ["text-font"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#layout-symbol-text-font)（layout property）の設定が必要だったようだ。
 
 
 
