@@ -2,7 +2,8 @@
 - 実装例　https://mghs15.github.io/map2/map.html
 - Mapboxのサービスと合わせた例　https://mghs15.github.io/map2/map2.html
 （[Mapbox](https://www.mapbox.com/about/maps/)の提供する[OpenStreetMap](https://www.openstreetmap.org/about/)のPOIとlanduseを上乗せ）
-※建物等は3Dにしていますが、あくまでイメージです。その他、細かい調整等は行っておりません。
+
+※建物は3Dにしていますが、あくまでイメージです。その他、細かい調整等は行っておりません。
 
 ## モチベーション
 [地理院地図Vector（仮称）提供実験](https://github.com/gsi-cyberjapan/gsimaps-vector-experiment)のスタイル設定ファイルは、そのままではMapbox GL JSのスタイル設定ファイル（[Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec/)）に利用できないため、なんとか簡単に変換するすべを考えてみた。
