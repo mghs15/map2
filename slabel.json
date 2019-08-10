@@ -3,7 +3,7 @@
   "name": "Vector",
   "metadata": {},
   "sources": {
-    "gsibv-vectortile-source-1-5-18": {
+    "gsibv-vectortile-source-1-4-17": {
       "type": "vector",
       "tiles": [
       "https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf"
