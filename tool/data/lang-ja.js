@@ -2,8 +2,8 @@ if ( !GSIBV.CONFIG.LANG ) GSIBV.CONFIG.LANG = {};
 GSIBV.CONFIG.LANG.JA ={};
 
 GSIBV.CONFIG.LANG.JA.TITLE ={
-  "title" : "公式でないです",
-  "subtitle" : "（ツール）"
+  "title" : "スタイル変換ツール",
+  "subtitle" : "（非公式）"
 };
 
 
@@ -173,6 +173,7 @@ GSIBV.CONFIG.LANG.JA.UI.EDITINPUT = {
   "rtlb" : "右上から左下",
   "cross" : "クロス",
   "dot" : "点",
+  "minus" : "横線",
 
   
   "selectimage" : "画像を選択",

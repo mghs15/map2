@@ -39,7 +39,7 @@
 ]
 ```
 
-テンプレートはこちら→https://mghs15.github.io/map2template.json
+テンプレートはこちら→https://mghs15.github.io/map2/template.json
 
 
 コピペ後の各style.jsonには、以下の修正が必要
