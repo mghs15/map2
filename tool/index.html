@@ -11,8 +11,9 @@
     var mystring1 = "";
     var spriteType = "";
     
+    /*
     function downloadStyle(){
-    	//SPりてファイル、レイヤIDには注意すること
+    	//Spriteファイル、レイヤIDには注意すること
 //	    var mystring1cp = Object.assign({}, mystring1);
 	    mystring1 = mystring1.replace(/std\/\/\//g, "");
 	    mystring1 = mystring1.replace(/pale\/\/\//g, "");
@@ -26,7 +27,9 @@
 	    console.log("生成URL= " + url);
 	    const a = document.getElementById('download');
 	    a.href = window.URL.createObjectURL(blob);
+	    console.log("直前に読み込んだスタイルを変換しました。");
     };
+    */
   </script>
   <script src='./mapbox/0.52.0/mapbox-gl.js'></script>
   <link href='./mapbox/0.52.0/mapbox-gl.css' rel='stylesheet' />
@@ -221,7 +224,7 @@
           <div id="style-download">
             <div>Mapbox GL JS用スタイル生成</div>
             <ol>
-              <li><a href="#" onclick="downloadStyle()">スタイルを生成</a></li>
+              <li><a id="createStyle">（選択なし）</a></li>
               <li><a id="download" download="style.json">ダウンロード</a></li>
             </ol>
             <div class="download-note">※直前にロードした地理院地図Vector用スタイルファイルをMapbox GL JS用に変換します。ラスタデータは含まれません。自分でロードしたスタイルも変換できます。詳細は<a href="https://github.com/mghs15/map2" target="_blank">こちら</a>。</div>

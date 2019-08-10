@@ -3,7 +3,7 @@
 - Mapboxのサービスと合わせた例　https://mghs15.github.io/map2/map2.html
 （[Mapbox](https://www.mapbox.com/about/maps/)の提供する[OpenStreetMap](https://www.openstreetmap.org/about/)のPOIとlanduseを上乗せ）
 
-※建物は3Dにしていますが、あくまでイメージです。その他、細かい調整等は行っておりません。
+※独自スタイルでは、建物を3D表示していますが、あくまでイメージです。その他、細かい調整等は行っておりません。
 
 ## モチベーション
 [地理院地図Vector（仮称）提供実験](https://github.com/gsi-cyberjapan/gsimaps-vector-experiment)のスタイル設定ファイルは、そのままではMapbox GL JSのスタイル設定ファイル（[Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec/)）に利用できないため、なんとか簡単に変換するすべを考えてみた。
@@ -21,8 +21,10 @@
 ### 使い方
 1. 上記サイトで、変換したいスタイルをロードする。
 	- おすすめの地図のほか、自分で作成したスタイルを読み込んでも良い。
-2. 「スタイルを生成」ボタンで、読み込んだスタイル情報から、Mapbox Gl JSが読み込める形のスタイルに変換処理行う。
-	- ただし、ラスタの情報や地理院地図Vector独自の実装については削除されるので注意。
+2. ロードが完了すると、自動的にMapbox Gl JSが読み込める形のスタイルへ変換処理を行う。
+	- 同時に、左のパネル中ほど、「ダウンロード」ボタンの左（場合によっては上）にロードしたスタイルのタイトルが（自分で作成したスタイルの場合は"（読込）"の文字も一緒に）表示される。
+	- たラスタの情報や地理院地図Vector独自の実装については削除されるので注意。
+	- 編集機能を用いてスタイルを変更しても、反映されないので注意。
 3. 「ダウンロード」ボタンを押すと、Mapbox Gl JSが読み込める形のstyle.jsonがダウンロードされる。
 4. ["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-sprite)に設定されたspriteファイルのURLは、おすすめ地図の「標準地図、注記＋写真、大きい文字、標準地図②」以外は淡色地図用になるので、自分でスタイルを読み込む場合等は、必要に応じて、手動で標準地図用に変換する。
 	- 標準地図用spriteファイルURL　https://cyberjapandata.gsi.go.jp/vector/sprite/std

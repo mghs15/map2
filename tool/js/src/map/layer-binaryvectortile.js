@@ -895,9 +895,11 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
         );
 
         /* 190803
+        console.log("this");
+        console.log(this);
+        
         console.log("this._id");
         console.log(this._id);
-        
         console.log("this._addMapboxLayerList");
         console.log(this._addMapboxLayerList);
         console.log( this._addMapboxLayerList[0]["mapboxlayer"] );
@@ -924,6 +926,34 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
         }
 //        console.log( myobject1 );
         console.log( mystring1 );
+        
+        /* 以下は、190810追加案 */
+        
+        
+        var mystring1cp = Object.assign({}, mystring1);
+	    mystring1 = mystring1.replace(/std\/\/\//g, "");
+	    mystring1 = mystring1.replace(/pale\/\/\//g, "");
+	    mystring1 = mystring1.replace(/<gsi-vertical>/g, "");
+	    mystring1 = mystring1.replace(/<\/gsi-vertical>/g, "");
+	    var mystring1json = "{\"version\": 8,\"name\": \"Vector\",\"metadata\": {},\"sources\": {\"gsibv-vectortile-source-1-4-17\": {\"type\": \"vector\",\"tiles\": [\"https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf\"],\"maxzoom\": 18, \"minzoom\": 4,\"attribution\": \"<a href='https://github.com/gsi-cyberjapan/gsimaps-vector-experiment' target='_blank'>地理院地図Vector（仮称）提供実験</a>\"}},\"sprite\": \"https://cyberjapandata.gsi.go.jp/vector/sprite/" + spriteType + "\", \"glyphs\": \"https://cyberjapandata.gsi.go.jp/xyz/noto-jp/{fontstack}/{range}.pbf\",\"layers\": [" + mystring1 + "  ],\"id\": \"gsi-bv\"}";
+//	    console.log(mystring1json);
+	    var blob = new Blob([mystring1json], {type: 'application\/json'});
+//	    console.log(blob);
+	    var url = URL.createObjectURL(blob);
+//	    console.log("生成URL= " + url);
+	    const a = document.getElementById('download');
+	    a.href = window.URL.createObjectURL(blob);
+        
+        var user="";
+        var regex = /gsi-user/;
+        var foundUserfile = this._id.match(regex);
+//        console.log(foundUserfile);
+        if(!(foundUserfile == null)){
+               user = "(読込)";
+        }
+        
+        document.getElementById('createStyle').innerHTML = this._title + user;
+        console.log("「" + this._title + user + "」の読込みと変換、ダウンロード準備が完了しました。「ダウンロード」ボタンからダウンロードしてください。");
         
         /* 190803 ここまで*/
 
