@@ -24,6 +24,9 @@
 2. 「スタイルを生成」ボタンで、読み込んだスタイル情報から、Mapbox Gl JSが読み込める形のスタイルに変換処理行う。
 - ただし、ラスタの情報や地理院地図Vector独自の実装については削除されるので注意。
 3. 「ダウンロード」ボタンを押すと、Mapbox Gl JSが読み込める形のstyle.jsonがダウンロードされる。
+4. ["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-sprite)に設定されたspriteファイルのURLは全て標準地図用になってしまうので、必要に応じて（単色地図系・白地図系）ならば、手動でpale用に変換する。
+- 標準地図用spriteファイルURL　https://cyberjapandata.gsi.go.jp/vector/sprite/std
+- 単色地図用spriteファイルURL　https://cyberjapandata.gsi.go.jp/vector/sprite/pale
 
 ### 手動での取出し
 上記の使い方がうまくいかなったとき等は下記の方法を試す。

@@ -2,7 +2,7 @@ if ( !GSIBV.CONFIG.LANG ) GSIBV.CONFIG.LANG = {};
 GSIBV.CONFIG.LANG.JA ={};
 
 GSIBV.CONFIG.LANG.JA.TITLE ={
-  "title" : "スタイル変換ツール",
+  "title" : "スタイル変換",
   "subtitle" : "（非公式）"
 };
 
