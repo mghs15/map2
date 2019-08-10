@@ -895,6 +895,9 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
         );
 
         /* 190803
+        console.log("this._id");
+        console.log(this._id);
+        
         console.log("this._addMapboxLayerList");
         console.log(this._addMapboxLayerList);
         console.log( this._addMapboxLayerList[0]["mapboxlayer"] );
@@ -905,7 +908,12 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
         */
         
         myobject1 = {};
-        mystring1="";
+        mystring1 = "";
+        spriteType = "pale"; //vpale, vblank, v2pale, v2blank
+        
+        if((this._id == "vstd")|(this._id == "vlabel")|(this._id == "lvlabel")|(this._id == "v2std")){
+                spriteType = "std";
+        }
         
         for(var i = 0; i < this._addMapboxLayerList.length; i++){
                 myobject1[i] = JSON.stringify(this._addMapboxLayerList[i]["mapboxlayer"]);

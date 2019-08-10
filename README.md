@@ -20,13 +20,13 @@
 
 ### 使い方
 1. 上記サイトで、変換したいスタイルをロードする。
-- おすすめの地図のほか、自分で作成したスタイルを読み込んでも良い。
+	- おすすめの地図のほか、自分で作成したスタイルを読み込んでも良い。
 2. 「スタイルを生成」ボタンで、読み込んだスタイル情報から、Mapbox Gl JSが読み込める形のスタイルに変換処理行う。
-- ただし、ラスタの情報や地理院地図Vector独自の実装については削除されるので注意。
+	- ただし、ラスタの情報や地理院地図Vector独自の実装については削除されるので注意。
 3. 「ダウンロード」ボタンを押すと、Mapbox Gl JSが読み込める形のstyle.jsonがダウンロードされる。
-4. ["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-sprite)に設定されたspriteファイルのURLは全て標準地図用になってしまうので、必要に応じて（単色地図系・白地図系）ならば、手動でpale用に変換する。
-- 標準地図用spriteファイルURL　https://cyberjapandata.gsi.go.jp/vector/sprite/std
-- 単色地図用spriteファイルURL　https://cyberjapandata.gsi.go.jp/vector/sprite/pale
+4. ["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-sprite)に設定されたspriteファイルのURLは、おすすめ地図のうち、「標準地図、注記＋写真、大きい文字、標準ん地図②」以外は淡色地図用になるので、必要に応じて、手動で標準地図用に変換する。
+	- 標準地図用spriteファイルURL　https://cyberjapandata.gsi.go.jp/vector/sprite/std
+	- 単色地図用spriteファイルURL　https://cyberjapandata.gsi.go.jp/vector/sprite/pale
 
 ### 手動での取出し
 上記の使い方がうまくいかなったとき等は下記の方法を試す。
@@ -81,12 +81,12 @@
 
 ## 課題
 1. 注記でHTMLが入っている場合、処理ができていない。
-- とりあえず、<gsi-vertical>タグを削除することにした。
+	- とりあえず、<gsi-vertical>タグを削除することにした。
 2. 記号をspriteファイルからうまく取り出せていない。
-- "icon-image":"田"のように、アイコン名（sprite.jsonで定義されているもの）をシンプルにダブルクオーテーションで囲む形にすれば解決した。
-- どうやら、["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#sprite)では、自動的に sprite@2x.png のようにScale Factorが付与されるらしい。これに対応していないと、スマホ等での閲覧に支障がある。
+	- "icon-image":"田"のように、アイコン名（sprite.jsonで定義されているもの）をシンプルにダブルクオーテーションで囲む形にすれば解決した。
+	- どうやら、["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#sprite)では、自動的に sprite@2x.png のようにScale Factorが付与されるらしい。これに対応していないと、スマホ等での閲覧に支障がある。
 3. オリジナルの「MySimple.json」で、フォントファイルの読み込みがうまくいかない
-- ["text-font"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#layout-symbol-text-font)（layout property）の設定が必要だったようだ。
+	- ["text-font"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#layout-symbol-text-font)（layout property）の設定が必要だったようだ。
 
 
 
