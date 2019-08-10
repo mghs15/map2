@@ -1092,7 +1092,7 @@ loading
   left: 0;
   top: 0;
   right: 0;
-  height: 345px;
+  height: 500px;
 }
 
 #left-panel #recommend .list {
@@ -1270,6 +1270,40 @@ loading
   padding-right: 10px;
 }
 
+/*スタイルのダウンロード*/
+/*他に、
+#left-panel #recommend
+#left-panel #layer-list
+のheightを調整すること。
+*/
+
+#left-panel #recommend #style-download {
+  position: relative;
+  background-color: #eee;
+  color: #000;
+  font-size: 10pt;
+  line-height: 20px;
+  padding-left: 15px;
+  padding-right: 10px;
+}
+
+#left-panel #recommend #style-download ol {
+  margin: 5px 0px 5px 0px;
+}
+
+#left-panel #recommend #style-download li {
+  display: inline-block;
+  background-color: #fff;
+  padding 0 0.5em 0 0.5em;
+  border: solid 2px #ddd;
+  border-radius: 3px;
+}
+
+#left-panel #recommend #style-download div.download-note {
+  font-size: 8pt;
+}
+
+
 /***********************************************
 レイヤー一覧
 ***********************************************/
@@ -1277,7 +1311,7 @@ loading
 #left-panel #layer-list {
   position: absolute;
   left: 0;
-  top: 345px;
+  top: 500px;
   right: 0;
   bottom: 0;
 }

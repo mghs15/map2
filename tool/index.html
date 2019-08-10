@@ -9,6 +9,22 @@
   <script type="text/javascript">
     var myobject1 = {};
     var mystring1 = "";
+    
+    function downloadStyle(){
+//	    var mystring1cp = Object.assign({}, mystring1);
+	    mystring1 = mystring1.replace(/std\/\/\//g, "");
+	    mystring1 = mystring1.replace(/pale\/\/\//g, "");
+	    mystring1 = mystring1.replace(/<gsi-vertical>/g, "");
+	    mystring1 = mystring1.replace(/<\/gsi-vertical>/g, "");
+	    var mystring1json = "{\"version\": 8,\"name\": \"Vector\",\"metadata\": {},\"sources\": {\"gsibv-vectortile-source-1-5-18\": {\"type\": \"vector\",\"tiles\": [\"https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf\"],\"maxzoom\": 18, \"minzoom\": 4,\"attribution\": \"<a href='https://github.com/gsi-cyberjapan/gsimaps-vector-experiment' target='_blank'>地理院地図Vector（仮称）提供実験</a>\"}},\"sprite\": \"https://cyberjapandata.gsi.go.jp/vector/sprite/std\", \"glyphs\": \"https://cyberjapandata.gsi.go.jp/xyz/noto-jp/{fontstack}/{range}.pbf\",\"layers\": [" + mystring1 + "  ],\"id\": \"gsi-bv\"}";
+	    console.log(mystring1json);
+	    var blob = new Blob([mystring1json], {type: 'application\/json'});
+	    console.log(blob);
+	    var url = URL.createObjectURL(blob);
+	    console.log("生成URL= " + url);
+	    const a = document.getElementById('download');
+	    a.href = window.URL.createObjectURL(blob);
+    };
   </script>
   <script src='./mapbox/0.52.0/mapbox-gl.js'></script>
   <link href='./mapbox/0.52.0/mapbox-gl.css' rel='stylesheet' />
@@ -200,6 +216,14 @@
             </li>
           </ul>
           <div class="note"></div>
+          <div id="style-download">
+            <div>Mapbox GL JS用スタイル生成</div>
+            <ol>
+              <li><a href="#" onclick="downloadStyle()">スタイルを生成</a></li>
+              <li><a id="download" download="style.json">ダウンロード</a></li>
+            </ol>
+            <div class="download-note">※直前にロードした地理院地図Vector用スタイルファイルをMapbox GL JS用に変換します。ラスタデータは含まれません。自分でロードしたスタイルも変換できます。詳細は<a href="https://github.com/mghs15/map2" target="_blank">こちら</a>。</div>
+          </div>
         </div>
         <button class="detail-button">詳細</button>
       </div>

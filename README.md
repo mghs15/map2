@@ -16,9 +16,19 @@
 [地理院地図Vectorのサイト](https://maps.gsi.go.jp/vector/)を無理やり改造した。変更ファイルは 以下の通り。
 - index.html
 - [js/src/map/layer-binaryvectortile.js](https://mghs15.github.io/map2/tool/js/src/map/layer-binaryvectortile.js) 
+- css/common.css
 
 ### 使い方
-使い方としては、各スタイルを読み込むとデベロッパーツールのコンソールにMapbox Style Specificationの["layers"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-layers)に該当する部分の設定ファイルが出力されるので、
+1. 上記サイトで、変換したいスタイルをロードする。
+- おすすめの地図のほか、自分で作成したスタイルを読み込んでも良い。
+2. 「スタイルを生成」ボタンで、読み込んだスタイル情報から、Mapbox Gl JSが読み込める形のスタイルに変換処理行う。
+- ただし、ラスタの情報や地理院地図Vector独自の実装については削除されるので注意。
+3. 「ダウンロード」ボタンを押すと、Mapbox Gl JSが読み込める形のstyle.jsonがダウンロードされる。
+
+### 手動での取出し
+上記の使い方がうまくいかなったとき等は下記の方法を試す。
+
+各スタイルを読み込むとデベロッパーツールのコンソールにMapbox Style Specificationの["layers"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-layers)に該当する部分の設定ファイルが出力されるので、
 これをMapbox GL JSのスタイル設定ファイルにコピペしてあげればよい。
 
 ```
@@ -63,7 +73,7 @@
 	</tr>
 </table>
 
-※実装例　https://mghs15.github.io/map2/map.html 　で表示できるものです。
+※実装例（ https://mghs15.github.io/map2/map.html ）で表示できるものです。
 
 
 ## 課題
@@ -71,7 +81,7 @@
 - とりあえず、<gsi-vertical>タグを削除することにした。
 2. 記号をspriteファイルからうまく取り出せていない。
 - "icon-image":"田"のように、アイコン名（sprite.jsonで定義されているもの）をシンプルにダブルクオーテーションで囲む形にすれば解決した。
-- どうやら、["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#sprite)では、自動的に sprite@2x.png のようにScale Factorが付与されるらしい。これに対応していないと、スマホ等での閲覧に支障があるかもしれない。
+- どうやら、["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#sprite)では、自動的に sprite@2x.png のようにScale Factorが付与されるらしい。これに対応していないと、スマホ等での閲覧に支障がある。
 3. オリジナルの「MySimple.json」で、フォントファイルの読み込みがうまくいかない
 - ["text-font"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#layout-symbol-text-font)（layout property）の設定が必要だったようだ。
 
