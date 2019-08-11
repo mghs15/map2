@@ -894,69 +894,91 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
           ( (new Date()).getTime() - this._startTime ) +"ms"
         );
 
-        /* 190803
+        /* 190803 ------------------------------------------------------------------------- */
+        /*
         console.log("this");
         console.log(this);
-        
+        console.log(GSIBV.CONFIG.VectorTileSourceList); // id用
+
         console.log("this._id");
         console.log(this._id);
         console.log("this._addMapboxLayerList");
         console.log(this._addMapboxLayerList);
+
         console.log( this._addMapboxLayerList[0]["mapboxlayer"] );
         console.log( this._addMapboxLayerList[0]["layer"] );
-        
+
         console.log("JSON化");
         console.log( JSON.stringify(this._addMapboxLayerList[0]["mapboxlayer"]) );
         */
         
-        myobject1 = {};
-        mystring1 = "";
-        spriteType = "pale"; //vpale, vblank, v2pale, v2blank
+        var myobject1 = {};
+        var mystring1 = "";
+        var spriteType = "pale"; //vpale, vblank, v2pale, v2blank
         
+        /* spriteのURL判別 */
         if((this._id == "vstd")|(this._id == "vlabel")|(this._id == "lvlabel")|(this._id == "v2std")){
                 spriteType = "std";
         }
         
+        /* Mapbox用レイヤ情報をまとめる */
+        var idSetAll = []; // id用
+        var idSet = []; // id用
         for(var i = 0; i < this._addMapboxLayerList.length; i++){
                 myobject1[i] = JSON.stringify(this._addMapboxLayerList[i]["mapboxlayer"]);
+                
+                idSetAll.push(this._addMapboxLayerList[i]["mapboxlayer"]["source"]);
                 
                 var comma = ",";
                 if(i == 0){comma = "";}
                 mystring1 = mystring1 + comma + JSON.stringify(this._addMapboxLayerList[i]["mapboxlayer"]); //190803
         }
-//        console.log( myobject1 );
-        console.log( mystring1 );
+        console.log( mystring1 ); //ここは必要
         
-        /* 以下は、190810追加案 */
+        /* source id の整理 */
+        idSet = Array.from(new Set(idSetAll));
+        console.log( idSet );
+        var setSourceId = ""; 
+        for(var i = 0; i < idSet.length; i++){
+                var comma = ",";
+                if(i == 0){comma = "";}
+                
+                var gsiSourceId = idSet[i].split("-");
+                var idMinzoom = gsiSourceId[4];
+                var idMaxzoom = gsiSourceId[5];
+        
+                setSourceId = setSourceId + comma + "\"" + idSet[i] + "\": {\"type\": \"vector\",\"tiles\": [\"https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf\"], \"maxzoom\": " 
+                + idMaxzoom + ", \"minzoom\": " + idMinzoom + ", \"attribution\": \"<a href='https://github.com/gsi-cyberjapan/gsimaps-vector-experiment' target='_blank'>地理院地図Vector（仮称）提供実験</a>\"}";
+                
+        }
+        setSourceId = "\"sources\": {" + setSourceId + "}";
         
         
+        /* spriteやタグの処理を行う　Mapbox用style.jsonに整形する */
         var mystring1cp = Object.assign({}, mystring1);
 	    mystring1 = mystring1.replace(/std\/\/\//g, "");
 	    mystring1 = mystring1.replace(/pale\/\/\//g, "");
 	    mystring1 = mystring1.replace(/<gsi-vertical>/g, "");
 	    mystring1 = mystring1.replace(/<\/gsi-vertical>/g, "");
-	    var mystring1json = "{\"version\": 8,\"name\": \"Vector\",\"metadata\": {},\"sources\": {\"gsibv-vectortile-source-1-4-17\": {\"type\": \"vector\",\"tiles\": [\"https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf\"],\"maxzoom\": 18, \"minzoom\": 4,\"attribution\": \"<a href='https://github.com/gsi-cyberjapan/gsimaps-vector-experiment' target='_blank'>地理院地図Vector（仮称）提供実験</a>\"}},\"sprite\": \"https://cyberjapandata.gsi.go.jp/vector/sprite/" + spriteType + "\", \"glyphs\": \"https://cyberjapandata.gsi.go.jp/xyz/noto-jp/{fontstack}/{range}.pbf\",\"layers\": [" + mystring1 + "  ],\"id\": \"gsi-bv\"}";
-//	    console.log(mystring1json);
+	    var mystring1json = "{\"version\": 8,\"name\": \"Vector\",\"metadata\": {}," + setSourceId + ", \"sprite\": \"https://cyberjapandata.gsi.go.jp/vector/sprite/" + spriteType + "\", \"glyphs\": \"https://cyberjapandata.gsi.go.jp/xyz/noto-jp/{fontstack}/{range}.pbf\",\"layers\": [" + mystring1 + "  ],\"id\": \"gsi-bv\"}";
+
 	    var blob = new Blob([mystring1json], {type: 'application\/json'});
-//	    console.log(blob);
 	    var url = URL.createObjectURL(blob);
-//	    console.log("生成URL= " + url);
 	    const a = document.getElementById('download');
 	    a.href = window.URL.createObjectURL(blob);
         
+        
         /* ユーザー読込ファイルかどうか判別 */
         var user="";
-//        var regex = /gsi-user/;
-//        var foundUserfile = this._id.match(regex);
-//        console.log(foundUserfile);
         if(this._isUserFileLayer){
                user = "(読込)";
         }
         
+        /* 変換したスタイルのタイトルを出力 */
         document.getElementById('createStyle').innerHTML = this._title + user;
         console.log("「" + this._title + user + "」の読込みと変換、ダウンロード準備が完了しました。「ダウンロード」ボタンからダウンロードしてください。");
         
-        /* 190803 ここまで*/
+        /* 190803 ここまで ------------------------------------------------------------------------- */
 
 
         this.fire("finish");
