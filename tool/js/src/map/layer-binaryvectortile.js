@@ -944,11 +944,12 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
 	    const a = document.getElementById('download');
 	    a.href = window.URL.createObjectURL(blob);
         
+        /* ユーザー読込ファイルかどうか判別 */
         var user="";
-        var regex = /gsi-user/;
-        var foundUserfile = this._id.match(regex);
+//        var regex = /gsi-user/;
+//        var foundUserfile = this._id.match(regex);
 //        console.log(foundUserfile);
-        if(!(foundUserfile == null)){
+        if(this._isUserFileLayer){
                user = "(読込)";
         }
         
