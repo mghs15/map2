@@ -1,0 +1,256 @@
+{
+  "version": 8,
+  "name": "MyStyle",
+    "metadata": {
+        "mapbox:origin": "basic-template",
+        "mapbox:autocomposite": true,
+        "mapbox:type": "template",
+        "mapbox:sdk-support": {
+            "js": "0.54.0",
+            "android": "7.4.0",
+            "ios": "4.11.0"
+        }
+    },
+  "sources": {
+    "bv": {
+      "type": "vector",
+      "tiles": [
+      "https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf"
+      ],
+      "maxzoom": 18,
+      "minzoom": 4,
+      "attribution": "<a href='https://github.com/gsi-cyberjapan/gsimaps-vector-experiment' target='_blank'>地理院地図Vector（仮称）提供実験</a>"
+    },
+    "mapbox": {
+      "url": "mapbox://mapbox.mapbox-streets-v8",
+      "type": "vector"
+    },
+    "raster": {
+      "maxzoom": 8,
+      "tileSize": 256,
+      "tiles": [
+        "https://cyberjapandata.gsi.go.jp/xyz/earthhillshade/{z}/{x}/{y}.png"
+      ],
+      "type": "raster",
+      "attribution": "<a href='https://maps.gsi.go.jp/development/ichiran.html#earthhillshade' target='_blank'>地理院タイル</a>"
+    }
+  },
+  "sprite": "mapbox://sprites/mghs/cjyv9s18w0ujj1cnklqxqce0g/629bpdwpqxu5j66f3aoku8h84",
+  "glyphs": "https://maps.gsi.go.jp/xyz/noto-jp/{fontstack}/{range}.pbf",
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "rgb(255,255,255)"
+      }
+    },
+    {
+      "id": "raster",
+      "type": "raster",
+      "source": "raster",
+      "maxzoom": 6,
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "raster-opacity": 0.3
+      }
+    },
+    {
+      "id": "waterarea",
+      "type": "fill",
+      "source": "bv",
+      "source-layer": "waterarea",
+	  "paint": {
+	    "fill-color": "rgba(200, 201, 232, 1)"
+	  }
+    },
+    {
+      "id": "coastline",
+      "type": "line",
+      "source": "bv",
+      "source-layer": "coastline",
+      "paint": {
+        "line-color": "rgba(70, 138, 179, 1)"
+      }
+    },
+    {
+      "id": "boundary",
+      "type": "line",
+      "source": "bv",
+      "source-layer": "boundary",
+      "paint": {
+        "line-color": "rgba(114, 21, 175, 1)",
+            "line-dasharray": [
+		      3,
+		      3
+		    ]
+      }
+    },
+    {
+      "id": "river",
+      "type": "line",
+      "source": "bv",
+      "source-layer": "river",
+      "paint": {
+        "line-color": "rgba(21, 95, 175, 1)"
+      }
+    },
+    {
+      "id": "railway-tunnel",
+      "type": "line",
+      "source": "bv",
+      "source-layer": "railway",
+      "filter":[
+        "any",
+          ["==", "railState", 2],
+          ["==", "railState", 3]
+      ],
+      "paint": {
+        "line-width": 3,
+        "line-color": "rgba(21, 95, 175, 1)",
+        "line-dasharray": [3, 3]
+      }
+    },
+    {
+      "id": "road",
+      "type": "line",
+      "source": "bv",
+      "source-layer": "road",
+      "paint": {
+        "line-color": "rgba(175, 175, 175, 1)"
+      }
+    },
+    {
+      "id": "railway",
+      "type": "line",
+      "source": "bv",
+      "source-layer": "railway",
+      "filter":[
+        "all",
+          ["!=", "railState", 2],
+          ["!=", "railState", 3]
+      ],
+      "paint": {
+        "line-width": 4,
+        "line-color": "rgba(21, 95, 175, 1)"
+      }
+    },
+    {
+      "id": "railway-outline",
+      "type": "line",
+      "source": "bv",
+      "source-layer": "railway",
+      "filter":[
+        "all",
+          ["!=", "railState", 2],
+          ["!=", "railState", 3]
+      ],
+      "paint": {
+        "line-width": 2,
+        "line-color": "rgba(255, 255, 255, 1)",
+        "line-dasharray": [3, 3]
+      }
+    },
+    {
+      "id": "building",
+      "type": "fill",
+      "source": "bv",
+      "source-layer": "building",
+      "paint": {
+        "fill-color": "rgba(233, 233, 233, 0.8)"
+      }
+    },
+    {
+      "id": "structurea",
+      "type": "fill",
+      "source": "bv",
+      "source-layer": "structurea",
+      "paint": {
+        "fill-color": "rgba(233, 233, 233, 0.8)"
+      }
+    },
+    {
+      "id": "symbol",
+      "type": "symbol",
+      "source": "bv",
+      "source-layer": "symbol",
+      "layout": {
+        "text-field": "{knj}",
+        "text-size": 15,
+        "text-anchor": "left",
+        "text-font":["NotoSansCJKjp-Regular"]
+      },
+      "paint": {
+        "text-color": "rgba(0,0,0,1)",
+        "text-halo-color": "rgba(255,255,255,1)",
+        "text-halo-width": 2
+      }
+    },
+    {
+      "id": "label",
+      "type": "symbol",
+      "source": "bv",
+      "source-layer": "label",
+      "layout": {
+        "text-field": "{knj}",
+        "text-size": ["case",
+        ["==", ["get", "annoCtg"], 110], 25,
+        ["==", ["get", "annoCtg"], 422], 15,
+        10
+        ],
+        "text-anchor": "left",
+        "text-font":["NotoSansCJKjp-Regular"]
+      },
+      "paint": {
+        "text-color": ["case",
+        ["==", ["get", "annoCtg"], 422], "rgba(0,139,25,1)",
+        "rgba(0,0,0,1)"
+        ],
+        "text-halo-color": "rgba(255,255,255,1)",
+        "text-halo-width": 2
+      }
+    },
+    {
+      "id": "elevation",
+      "type": "symbol",
+      "source": "bv",
+      "source-layer": "elevation",
+      "layout": {
+        "text-field": "{alti}",
+        "text-size": 10,
+        "text-anchor": "left",
+        "text-offset": [1,0],
+        "text-font":["NotoSansCJKjp-Regular"],
+        "icon-image": "circle-15",
+        "icon-size": 0.5
+      },
+      "paint": {
+        "text-color": "rgba(0,0,0,1)",
+        "text-halo-color": "rgba(255,255,255,1)",
+        "text-halo-width": 1
+      }
+    },
+    {
+      "id": "post-office",
+      "type": "symbol",
+      "source": "bv",
+      "source-layer": "symbol",
+      "filter": ["==", "ftCode", 3218],
+      "layout": {
+        "text-field": "〒",
+        "text-size": 20,
+        "text-anchor": "center",
+        "text-allow-overlap": true,
+        "text-font":["NotoSansCJKjp-Regular"]
+      },
+      "paint": {
+        "text-color": "rgba(206,0,0,1)",
+        "text-halo-color": "rgba(255,255,255,1)",
+        "text-halo-width": 3
+      }
+    }
+  ],
+  "id": "gsi-bv"
+}
