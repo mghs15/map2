@@ -63,19 +63,19 @@
 
 <table>
 	<tr>
-		<td><a href="https://mghs15.github.io/map2sstd.json">標準地図</a></td>
-		<td><a href="https://mghs15.github.io/map2spale.json">淡色地図</a></td>
-		<td><a href="https://mghs15.github.io/map2sblank.json">白地図</a></td>
+		<td><a href="https://mghs15.github.io/map2/sstd.json">標準地図</a></td>
+		<td><a href="https://mghs15.github.io/map2/spale.json">淡色地図</a></td>
+		<td><a href="https://mghs15.github.io/map2/sblank.json">白地図</a></td>
 	</tr>
 	<tr>
-		<td><a href="https://mghs15.github.io/map2sphoto.json">写真</a></td>
-		<td><a href="https://mghs15.github.io/map2slabel.json">写真＋注記の注記</a></td>
-		<td><a href="https://mghs15.github.io/map2sllabel.json">大きい注記の地図</a></td>
+		<td><a href="https://mghs15.github.io/map2/sphoto.json">写真</a></td>
+		<td><a href="https://mghs15.github.io/map2/slabel.json">写真＋注記の注記</a></td>
+		<td><a href="https://mghs15.github.io/map2/sllabel.json">大きい注記の地図</a></td>
 	</tr>
 	<tr>
-		<td><a href="https://mghs15.github.io/map2sstd2.json">標準地図2</a></td>
-		<td><a href="https://mghs15.github.io/map2spale2.json">淡色地図2</a></td>
-		<td><a href="https://mghs15.github.io/map2sblank2.json">白地図2</a></td>
+		<td><a href="https://mghs15.github.io/map2/sstd2.json">標準地図2</a></td>
+		<td><a href="https://mghs15.github.io/map2/spale2.json">淡色地図2</a></td>
+		<td><a href="https://mghs15.github.io/map2/sblank2.json">白地図2</a></td>
 	</tr>
 </table>
 
