@@ -1,0 +1,16 @@
+{
+  "tilejson": "2.2.0",
+  "tiles": ["https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf"],
+  "name": "gsi_mvt",
+  "format": "pbf",
+  "attribution": "gsi_vtile_attribution",
+  "maxzoom": 17,
+  "minzoom": 4,
+  "bounds": [-180, -85.0511, 180, 85.0511],
+  "center": [139.770832,35.689835,14],
+  "vector_layers": [{
+    "id": "coastline",
+    "description": "coastline",
+    "fields": {}
+  }]
+}
