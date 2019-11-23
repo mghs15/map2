@@ -931,7 +931,16 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
                 
                 var comma = ",";
                 if(i == 0){comma = "";}
-                mystring1 = mystring1 + comma + "\n" + JSON.stringify(this._addMapboxLayerList[i]["mapboxlayer"]); //190803 + 191122
+                var jsonLayerContent = JSON.stringify(this._addMapboxLayerList[i]["mapboxlayer"]);
+                
+                //縦書きの対応（text-writing-modeの適用）
+                /* 長符の対応ができないため保留
+                if (jsonLayerContent.indexOf('<gsi-vertical>') !== -1 ) { // 「&& jsonLayerContent.match(/\"text-field\":.*\u30fc/)」
+                  mystring1 = mystring1.replace(/\"text-field\":/g, "\"text-writing-mode\":[\"vertical\", \"horizontal\"],\"text-field\":");
+                }
+                */
+                
+                mystring1 = mystring1 + comma + "\n" + jsonLayerContent; //190803 + 191122
         }
         console.log( mystring1 ); //ここは必要
         
