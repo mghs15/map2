@@ -81,6 +81,27 @@
 
 ※実装例（ https://mghs15.github.io/map2/map.html ）で表示できるものです。
 
+## 背景用画像の出力
+
+上記のツールでは、建物のハッチング等、[fill-pattern](https://docs.mapbox.com/mapbox-gl-js/style-spec/#paint-fill-fill-pattern)で指定する画像は表示されないので、spriteとは別にfill-pattern用の画像を読み込む方法を採用することにした。
+
+### fill-pattern用の画像の準備
+
+地理院地図Vectorの内部処理で、fill-pattern用の画像が作成されているので、それらを出力するツールを作成した。
+fill-pattern用の画像が作成されるたびに、別のウィンドウで開かれるので、利用する際は注意してほしい。
+（また、ブラウザのポップアップを許可しないとなりませんが、セキュリティ上のリスクは自己責任でお願いします。）
+
+（ツールは後ほどアップ予定です。）
+
+### fill-pattern用の画像の読み込み
+
+spriteファイルに入っていない画像を、Styleで利用したい場合、[map.loadImage](https://docs.mapbox.com/mapbox-gl-js/api/#map#loadimage)と[map.addImage](https://docs.mapbox.com/mapbox-gl-js/api/#map#addimage)を利用すればよい。
+
+最終的に作成されたサンプルは以下の通り。結構地理院地図Vectorに近づいたと思います。
+- [標準地図](https://mghs15.github.io/gsi-vector-mapbox-gl-js/std.html#14.01/35.44575/139.9552)
+- [単色地図](https://mghs15.github.io/gsi-vector-mapbox-gl-js/pale.html#14.01/35.44575/139.9552)
+- [白地図](https://mghs15.github.io/gsi-vector-mapbox-gl-js/blank.html#14.01/35.44575/139.9552)
+
 
 ## 課題
 1. 注記でHTMLが入っている場合、処理ができていない。
@@ -90,8 +111,3 @@
 	- どうやら、["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#sprite)では、自動的に sprite@2x.png のようにScale Factorが付与されるらしい。これに対応していないと、スマホ等での閲覧に支障がある。
 3. オリジナルの「MySimple.json」で、フォントファイルの読み込みがうまくいかない
 	- ["text-font"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#layout-symbol-text-font)（layout property）の設定が必要だったようだ。
-
-
-
-
-
