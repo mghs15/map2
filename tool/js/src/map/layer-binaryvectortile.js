@@ -934,8 +934,8 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
                 var jsonLayerContent = JSON.stringify(this._addMapboxLayerList[i]["mapboxlayer"]);
                 
                 //縦書きの対応（text-writing-modeの適用）
-                /* 長符の対応ができないため保留
-                if (jsonLayerContent.indexOf('<gsi-vertical>') !== -1 ) { // 「&& jsonLayerContent.match(/\"text-field\":.*\u30fc/)」
+                /* 長符の対応ができない、DataDrivenな処理ができないため保留
+                if (jsonLayerContent.indexOf('<gsi-vertical>') > 0 ) { // 「&& jsonLayerContent.match(/\"text-field\":.*\u30fc/)」
                   mystring1 = mystring1.replace(/\"text-field\":/g, "\"text-writing-mode\":[\"vertical\", \"horizontal\"],\"text-field\":");
                 }
                 */
