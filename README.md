@@ -111,3 +111,7 @@ spriteファイルに入っていない画像を、Styleで利用したい場合
 	- どうやら、["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#sprite)では、自動的に sprite@2x.png のようにScale Factorが付与されるらしい。これに対応していないと、スマホ等での閲覧に支障がある。
 3. オリジナルの「MySimple.json」で、フォントファイルの読み込みがうまくいかない
 	- ["text-font"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#layout-symbol-text-font)（layout property）の設定が必要だったようだ。
+
+## その他参考文献
+https://developer.mozilla.org/ja/docs/Web/API/HTMLCanvasElement/toBlob
+
