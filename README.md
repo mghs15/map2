@@ -1,5 +1,6 @@
 # 地理院地図Vectorのスタイルを<br>シンプルなMapbox GL JSで実装する試み
 - 実装例　https://mghs15.github.io/map2/map.html
+- [改良版](https://github.com/mghs15/map2#fill-pattern%E7%94%A8%E3%81%AE%E7%94%BB%E5%83%8F%E3%81%AE%E8%AA%AD%E3%81%BF%E8%BE%BC%E3%81%BF)　
 - Mapboxのサービスと合わせた例　https://mghs15.github.io/map2/map2.html
 （[Mapbox](https://www.mapbox.com/about/maps/)の提供する[OpenStreetMap](https://www.openstreetmap.org/about/)のPOIとlanduseを上乗せ）
 
