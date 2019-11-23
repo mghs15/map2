@@ -931,7 +931,7 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
                 
                 var comma = ",";
                 if(i == 0){comma = "";}
-                mystring1 = mystring1 + comma + JSON.stringify(this._addMapboxLayerList[i]["mapboxlayer"]); //190803
+                mystring1 = mystring1 + comma + "\n" + JSON.stringify(this._addMapboxLayerList[i]["mapboxlayer"]); //190803 + 191122
         }
         console.log( mystring1 ); //ここは必要
         
