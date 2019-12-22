@@ -111,6 +111,9 @@ spriteファイルに入っていない画像を、Styleで利用したい場合
 ## 課題
 1. 注記でHTMLが入っている場合、処理ができていない。
 	- とりあえず、<gsi-vertical>タグを削除することにした。
+	- <gsi-vertical>タグは、地理院地図Vectorでの縦書き表示のために設定されているようである。
+	- 地理院地図Vectorではプラグインを利用して、データドリブンかつ日本語の縦書きを完全に表現できている。
+	- 一方、Mapbox GL JSでは、"text-writing-mode"で縦書きがサポートされたとはいえ、地理院地図Vectorでの表示を完璧に表現するのは難しそうである。→課題のさらなる整理は[こちら](https://github.com/mghs15/Note1/blob/master/mapbox-style.md#%E7%B8%A6%E6%9B%B8%E3%81%8D)
 2. 記号をspriteファイルからうまく取り出せていない。
 	- "icon-image":"田"のように、アイコン名（sprite.jsonで定義されているもの）をシンプルにダブルクオーテーションで囲む形にすれば解決した。
 	- どうやら、["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#sprite)では、自動的に sprite@2x.png のようにScale Factorが付与されるらしい。これに対応していないと、スマホ等での閲覧に支障がある。
