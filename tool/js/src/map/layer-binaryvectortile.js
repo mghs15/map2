@@ -895,23 +895,9 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
         );
 
         /* 190803 ------------------------------------------------------------------------- */
-        /*
-        console.log("this");
-        console.log(this);
-        console.log(GSIBV.CONFIG.VectorTileSourceList); // id用
-
-        console.log("this._id");
-        console.log(this._id);
-        console.log("this._addMapboxLayerList");
-        console.log(this._addMapboxLayerList);
-
-        console.log( this._addMapboxLayerList[0]["mapboxlayer"] );
-        console.log( this._addMapboxLayerList[0]["layer"] );
-
-        console.log("JSON化");
-        console.log( JSON.stringify(this._addMapboxLayerList[0]["mapboxlayer"]) );
-        */
+        /* Mapbox Style Spec準拠のStyleへの変換スクリプト --------------------------------- */
         
+        /* 事前準備 */
         var myobject1 = {};
         var mystring1 = "";
         var spriteType = "pale"; //vpale, vblank, v2pale, v2blank
@@ -933,12 +919,101 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
                 if(i == 0){comma = "";}
                 var jsonLayerContent = JSON.stringify(this._addMapboxLayerList[i]["mapboxlayer"]);
                 
-                //縦書きの対応（text-writing-modeの適用）
-                /* 長符の対応ができない、DataDrivenな処理ができないため保留
-                if (jsonLayerContent.indexOf('<gsi-vertical>') > 0 ) { // 「&& jsonLayerContent.match(/\"text-field\":.*\u30fc/)」
-                  mystring1 = mystring1.replace(/\"text-field\":/g, "\"text-writing-mode\":[\"vertical\", \"horizontal\"],\"text-field\":");
-                }
-                */
+                var verticalFrag = document.getElementById("verticalFragCheck").checked; //縦書きの対応をする場合はtrue
+                
+                //縦書きの対応（レイヤを縦書き用・横書き用に分離し、text-writing-modeの適用） --- 191223
+                if(verticalFrag){
+                    var textField = JSON.parse( JSON.stringify( this._addMapboxLayerList[i]["mapboxlayer"]["layout"] ) );
+                    
+                    //<gsi-vertical>がレイヤに含まれている場合に処理を行う
+                    if (jsonLayerContent.indexOf('<gsi-vertical>') > 0 ) {
+                        //test
+                        /*
+                        console.log(i);
+                        console.log(jsonLayerContent);
+                        console.log(this._addMapboxLayerList[i]["mapboxlayer"]);
+                        console.log(this._addMapboxLayerList[i]["mapboxlayer"]["layout"]["text-field"]);
+                        console.log(this._addMapboxLayerList[i]["mapboxlayer"]["filter"]);
+                        */
+                        
+                        
+                        //HorizontalとVerticalを分離
+                        /* これだと、ディープコピーができない。
+                        var jsonLayerObjectHorizontal = Object.assign({}, this._addMapboxLayerList[i]["mapboxlayer"]);
+                        var jsonLayerObjectVertical = Object.assign({}, this._addMapboxLayerList[i]["mapboxlayer"]);
+                        */
+                        /* そのため、以下のようにJSON文字列をパースする。*/
+                        var jsonLayerObjectHorizontal = JSON.parse(jsonLayerContent);
+                        var jsonLayerObjectVertical = JSON.parse(jsonLayerContent);
+                        
+                        
+                        //HorizontalとVertical、それぞれの条件をセット
+                        //メモ：　最初は、["!=",["get", "arrng"],2]としていて、validation？のエラーが出て困った。
+                        
+                        var jsonLayerFilterH = ["!=","arrng",2];
+                        var jsonLayerFilterV = ["==","arrng",2];
+                        
+                        
+                        //text-fieldを変換
+                        /* 以下のままでは、ほかの属性値を持つデータに対応できないので、次のように修正
+                        jsonLayerObjectHorizontal["layout"]["text-field"] = "{knj}";
+                        jsonLayerObjectVertical["layout"]["text-field"] = "{knj}";
+                        */
+                        
+                        if(textField["text-field"]){
+                        
+                            /*-------
+                            縦書きを含むtext-fieldは以下のような形式なので、決め打ちで3番目の配列を取り出す。
+                            "text-field":[
+                               "case",
+                               ["!=",["get","arrng"],2],
+                               ["get","knj"], //ここを取り出したい。
+                               ["concat","",["get","knj"],""]
+                            ]
+                            -------*/
+                            
+                            var textFieldName = textField["text-field"][2];
+                            
+                            //引数なしのslice()で配列の値渡し。
+                            jsonLayerObjectHorizontal["layout"]["text-field"] = textFieldName.slice();;
+                            jsonLayerObjectVertical["layout"]["text-field"] = textFieldName.slice();;
+                            
+                        }
+                        
+                        
+                        //text-writing-modeを追加
+                        
+                        jsonLayerObjectHorizontal["layout"]["text-writing-mode"] = ["horizontal"];
+                        jsonLayerObjectVertical["layout"]["text-writing-mode"] = ["vertical"];
+                        
+                        
+                        //filterを追加
+                        
+                        jsonLayerObjectHorizontal["filter"].push( jsonLayerFilterH );
+                        jsonLayerObjectVertical["filter"].push( jsonLayerFilterV );
+                        
+                        
+                        //id名をHorizontalとVerticalで重複しないよう変更
+                        
+                        jsonLayerObjectHorizontal["id"] = jsonLayerObjectHorizontal["id"] + "h";
+                        jsonLayerObjectVertical["id"] = jsonLayerObjectVertical["id"] + "v";
+                        
+                        
+                        //JSON文字列に変換
+                        
+                        var jsonLayerContentHorizontal = JSON.stringify(jsonLayerObjectHorizontal);
+                        var jsonLayerContentVertical = JSON.stringify(jsonLayerObjectVertical);
+                        
+                        jsonLayerContent = jsonLayerContentHorizontal + ",\n" + jsonLayerContentVertical;
+                        
+                        //test
+                        /*
+                        console.log(jsonLayerObjectHorizontal);
+                        console.log(jsonLayerObjectVertical);
+                        console.log(jsonLayerContent);
+                        */
+                    }
+                }//縦書きの対応のスクリプト ここまで
                 
                 mystring1 = mystring1 + comma + "\n" + jsonLayerContent; //190803 + 191122
         }
@@ -946,12 +1021,13 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
         
         /* source id の整理 */
         idSet = Array.from(new Set(idSetAll));
-        console.log( idSet );
+        console.log( idSet ); //例) ["gsibv-vectortile-source-1-4-17"]
         var setSourceId = ""; 
         for(var i = 0; i < idSet.length; i++){
                 var comma = ",";
                 if(i == 0){comma = "";}
                 
+                //sourceのIDにminzoomとmaxzoomの情報が含まれているので、それを取り出す。
                 var gsiSourceId = idSet[i].split("-");
                 var idMinzoom = gsiSourceId[4];
                 var idMaxzoom = gsiSourceId[5];
@@ -965,12 +1041,17 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
         
         /* spriteやタグの処理を行う　Mapbox用style.jsonに整形する */
         var mystring1cp = Object.assign({}, mystring1);
-	    mystring1 = mystring1.replace(/std\/\/\//g, "");
-	    mystring1 = mystring1.replace(/pale\/\/\//g, "");
-	    mystring1 = mystring1.replace(/<gsi-vertical>/g, "");
-	    mystring1 = mystring1.replace(/<\/gsi-vertical>/g, "");
+	    mystring1 = mystring1.replace(/std\/\/\//g, ""); // sprite
+	    mystring1 = mystring1.replace(/pale\/\/\//g, ""); // sprite
+	    
+	    if(!verticalFrag){ //縦書き対応している場合は不要
+	        mystring1 = mystring1.replace(/<gsi-vertical>/g, ""); //gsi-vertical
+	        mystring1 = mystring1.replace(/<\/gsi-vertical>/g, ""); //gsi-vertical
+	    }
+	    
 	    var mystring1json = "{\"version\": 8,\"name\": \"Vector\",\"metadata\": {}," + setSourceId + ", \"sprite\": \"https://cyberjapandata.gsi.go.jp/vector/sprite/" + spriteType + "\", \"glyphs\": \"https://cyberjapandata.gsi.go.jp/xyz/noto-jp/{fontstack}/{range}.pbf\",\"layers\": [" + mystring1 + "  ],\"id\": \"gsi-bv\"}";
 
+	    /* ダウンロード処理 */
 	    var blob = new Blob([mystring1json], {type: 'application\/json'});
 	    var url = URL.createObjectURL(blob);
 	    const a = document.getElementById('download');

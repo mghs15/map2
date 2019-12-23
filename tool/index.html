@@ -227,7 +227,13 @@
               <li><a id="createStyle">（選択なし）</a></li>
               <li><a id="download" download="style.json">ダウンロード</a></li>
             </ol>
-            <div class="download-note">※直前にロードした地理院地図Vector用スタイルファイルをMapbox GL JS用に変換します。ラスタデータは含まれません。自分でロードしたスタイルも変換できます。詳細は<a href="https://github.com/mghs15/map2" target="_blank">こちら</a>。</div>
+            <input type="checkbox" id="verticalFragCheck"><label for="verticalFragCheck">縦書き対応（試験版）</label>
+            <div class="download-note">
+              直前にロードした地理院地図Vector用スタイルファイルをMapbox GL JS用に変換します。
+              ラスタデータは含まれません。自分でロードしたスタイルも変換できます。
+              縦書き対応はチェック後にロードしたスタイルから反映されます（試験版で完全ではありません）。
+              詳細は<a href="https://github.com/mghs15/map2" target="_blank">こちら</a>。
+            </div>
           </div>
         </div>
         <button class="detail-button">詳細</button>
