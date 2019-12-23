@@ -33,7 +33,8 @@
 	- 淡色地図用spriteファイルURL　https://cyberjapandata.gsi.go.jp/vector/sprite/pale
 
 ### 手動での取出し
-上記の使い方がうまくいかなったとき等は下記の方法を試す。
+<details>
+<summary>上記の使い方がうまくいかなったとき等は下記の方法を試す。</summary>
 
 各スタイルを読み込むとデベロッパーツールのコンソールにMapbox Style Specificationの["layers"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-layers)に該当する部分の設定ファイルが出力されるので、
 これをMapbox GL JSのスタイル設定ファイルにコピペしてあげればよい。
@@ -59,6 +60,7 @@
 	- "std///田"のようになっているので、"田"に直す。
 	- 修正ツールはこちら（Perl製）→ https://github.com/mghs15/map2/blob/master/perl/replace_sprite.pl 
 
+</details>
 
 ### 今回ためしに作成したもの
 
