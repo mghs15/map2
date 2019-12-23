@@ -31,10 +31,14 @@
 4. ["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-sprite)に設定されたspriteファイルのURLは、おすすめ地図の「標準地図、注記＋写真、大きい文字、標準地図②」以外は淡色地図用になるので、自分でスタイルを読み込む場合等は、必要に応じて、手動で標準地図用に変換する。
 	- 標準地図用spriteファイルURL　https://cyberjapandata.gsi.go.jp/vector/sprite/std
 	- 淡色地図用spriteファイルURL　https://cyberjapandata.gsi.go.jp/vector/sprite/pale
+5. 「縦書き対応」にチェックを入れると、次にロードされるスタイルについて、地理院地図Vectorで縦書きの文字を縦書きとして表現できるように処理を行う。
 
 ### 手動での取出し
+
+上記の使い方がうまくいかなったとき等は下記の方法を試す。
+
 <details>
-<summary>上記の使い方がうまくいかなったとき等は下記の方法を試す。</summary>
+<summary>詳細</summary>
 
 各スタイルを読み込むとデベロッパーツールのコンソールにMapbox Style Specificationの["layers"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-layers)に該当する部分の設定ファイルが出力されるので、
 これをMapbox GL JSのスタイル設定ファイルにコピペしてあげればよい。
@@ -116,6 +120,8 @@ spriteファイルに入っていない画像を、Styleで利用したい場合
 	- `<gsi-vertical>`タグは、地理院地図Vectorでの縦書き表示のために設定されているようである。
 	- 地理院地図Vectorではプラグインを利用して、データドリブンかつ日本語の縦書きを実現しているようである。
 	- 一方、Mapbox GL JSでは、"text-writing-mode"で縦書きがサポートされたとはいえ、地理院地図Vectorでの表示を完璧に表現するのは難しそうである。→課題のさらなる整理は[こちら](https://github.com/mghs15/Note1/blob/master/mapbox-style.md#%E7%B8%A6%E6%9B%B8%E3%81%8D)
+	- 地理院地図Vectorで利用される`<gsi-vertical>`タグを利用し、変換ツール側の処理で`<gsi-vertical>`タグが含まれているスタイルレイヤについては、縦書き用のスタイルレイヤと横書き用のスタイルレイヤに分割することで、疑似的にデータ内の属性値に応じた縦書き・横書きの書き分けができた。→実際に、 [変換ツール](https://mghs15.github.io/map2/tool/)では、試験的に対応方法を実装。（ただし、長符「ー」の処理はMapbox GL JS自体の仕様なのでstyle.json側での対応は不可。）
+	- 上記の縦書き用スタイルレイヤと横書き用スタイルレイヤの分割について、実際のstyle.jsonの実装では、"filter"に`["==", "arrng", 2]`（または、`["!=", "arrng", 2]`）に追加することで、レイヤ分けをすることとした。
 2. 記号をspriteファイルからうまく取り出せていない。
 	- "icon-image":"田"のように、アイコン名（sprite.jsonで定義されているもの）をシンプルにダブルクオーテーションで囲む形にすれば解決した。
 	- どうやら、["sprite"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#sprite)では、自動的に sprite@2x.png のようにScale Factorが付与されるらしい。これに対応していないと、スマホ等での閲覧に支障がある。
