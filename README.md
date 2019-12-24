@@ -114,13 +114,14 @@ map.addImage(
 );
 ```
 
+### fill-pattern用の画像をPNGとして出力する
 
 <details>
 <summary>PNG画像として出力し、その画像を取り込んで利用する方法</summary>
 
 建物ハッチング等のパターン用の画像をPNGとして出力する必要がある場合の対応方法を紹介する。
 
-### fill-pattern用の画像の準備
+#### fill-pattern用の画像の準備
 
 地理院地図Vectorの内部処理で、fill-pattern用の画像が作成されているので、それらを出力するツールを作成した。
 
@@ -133,7 +134,7 @@ map.addImage(
 
 **ツールのURL**　https://mghs15.github.io/map2/vhatch/?png
 
-### fill-pattern用の画像の読み込み
+#### fill-pattern用の画像の読み込み
 
 spriteファイルに入っていない画像を、Styleで利用したい場合、[map.loadImage](https://docs.mapbox.com/mapbox-gl-js/api/#map#loadimage)と[map.addImage](https://docs.mapbox.com/mapbox-gl-js/api/#map#addimage)を利用すればよい。
 
