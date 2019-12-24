@@ -91,7 +91,7 @@
 ## 背景用画像の出力
 
 <details>
-<summary>PNG画像として出力し、それを[map.loadImage](https://docs.mapbox.com/mapbox-gl-js/api/#map#loadimage)と[map.addImage](https://docs.mapbox.com/mapbox-gl-js/api/#map#addimage)で利用する方法</summary>
+<summary>PNG画像として出力し、その画像を取り込んで利用する方法</summary>
 
 上記のツールでは、建物のハッチング等、[fill-pattern](https://docs.mapbox.com/mapbox-gl-js/style-spec/#paint-fill-fill-pattern)で指定する画像は表示されないので、spriteとは別にfill-pattern用の画像を読み込む方法を採用することにした。
 
