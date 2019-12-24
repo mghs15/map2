@@ -13,7 +13,7 @@
 ## 出来上がったツール
 
 ### ツールのURLとベースとしたサイト
-ツールのURL　https://mghs15.github.io/map2/tool
+**ツールのURL**　https://mghs15.github.io/map2/tool
 
 [地理院地図Vectorのサイト](https://maps.gsi.go.jp/vector/)を無理やり改造した。変更ファイルは 以下の通り。
 - index.html
@@ -95,7 +95,8 @@
 
 Mapbox GL JSでそのまま使えるJavascriptコードをコンソールログに出力するツールを作成した。
 
-ツールのURL　https://mghs15.github.io/map2/vhatch/
+**ツールのURL**　https://mghs15.github.io/map2/vhatch/
+
 （※アラートが出ますが、クエリ（URLの?以降の文字列）に何も指定していない限り、問題ありません。）
 
 出力形式は以下の通り。
@@ -130,7 +131,7 @@ map.addImage(
 開いた無数のウィンドウからひとつずつ画像をダウンロードしていくことになります……。
 （また、ブラウザのポップアップを許可しないとなりませんが、セキュリティ等、使用に伴うリスクは自己責任でお願いします。）
 
-ツールのURL　https://mghs15.github.io/map2/vhatch/?png
+**ツールのURL**　https://mghs15.github.io/map2/vhatch/?png
 
 ### fill-pattern用の画像の読み込み
 
