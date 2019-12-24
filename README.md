@@ -35,10 +35,8 @@
 
 ### 手動での取出し
 
-上記の使い方がうまくいかなったとき等は下記の方法を試す。
-
 <details>
-<summary>詳細</summary>
+<summary>上記の使い方がうまくいかなったときの対応方法</summary>
 
 各スタイルを読み込むとデベロッパーツールのコンソールにMapbox Style Specificationの["layers"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-layers)に該当する部分の設定ファイルが出力されるので、
 これをMapbox GL JSのスタイル設定ファイルにコピペしてあげればよい。
@@ -97,10 +95,8 @@
 
 Mapbox GL JSでそのまま使えるJavascriptコードをコンソールログに出力するツールを作成した。
 
-
 ツールのURL　https://mghs15.github.io/map2/vhatch/
 （※アラートが出ますが、クエリ（URLの?以降の文字列）に何も指定していない限り、問題ありません。）
-
 
 出力形式は以下の通り。
 
@@ -117,10 +113,11 @@ map.addImage(
 );
 ```
 
+
 <details>
 <summary>PNG画像として出力し、その画像を取り込んで利用する方法</summary>
 
-上記のツールでは、建物のハッチング等、[fill-pattern](https://docs.mapbox.com/mapbox-gl-js/style-spec/#paint-fill-fill-pattern)で指定する画像は表示されないので、spriteとは別にfill-pattern用の画像を読み込む方法を採用することにした。
+建物ハッチング等のパターン用の画像をPNGとして出力する必要がある場合の対応方法を紹介する。
 
 ### fill-pattern用の画像の準備
 
