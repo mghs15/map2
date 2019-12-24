@@ -90,6 +90,33 @@
 
 ## 背景用画像の出力
 
+### fill-pattern用の画像を配列（Uint8Array）として出力する
+上記のツールでは、建物のハッチング等、[fill-pattern](https://docs.mapbox.com/mapbox-gl-js/style-spec/#paint-fill-fill-pattern)で指定する画像は表示されないので、spriteとは別にfill-pattern用の画像準備する必要がある。
+
+一方でハッチング用の小さな画像を大量に管理するのはコストがかかる。最終的に、[map.addImage](https://docs.mapbox.com/mapbox-gl-js/api/#map#addimage)を利用して、ハッチング用のパターンとして取り込むため、map.addImageが対応している`{width: number, height: number, data: Uint8Array}`の形式で出力することにした。
+
+Mapbox GL JSでそのまま使えるJavascriptコードをコンソールログに出力するツールを作成した。
+
+
+ツールのURL　https://mghs15.github.io/map2/vhatch/
+（※アラートが出ますが、クエリ（URLの?以降の文字列）に何も指定していない限り、問題ありません。）
+
+
+出力形式は以下の通り。
+
+（以下はひとつのパターンのみだが、これがロードされたstyle.jsonに含まれる数だけ出力される。）
+
+```
+map.addImage(
+  "-gsibv-hatch-dot-4-20,90,255,1-", 
+  {
+    "width" : 4,
+    "height" : 4,
+    "data" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,90,255,255,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  }
+);
+```
+
 <details>
 <summary>PNG画像として出力し、その画像を取り込んで利用する方法</summary>
 
@@ -98,12 +125,15 @@
 ### fill-pattern用の画像の準備
 
 地理院地図Vectorの内部処理で、fill-pattern用の画像が作成されているので、それらを出力するツールを作成した。
+
+（上記のfill-pattern用の画像を配列（Uint8Array）として出力するツールと同じものですが、クエリに"?png"を指定すると、以下の通り、PNG画像として出力されます。）
+
 自分個人用に使いことを考えているので、使い勝手はよくないのでご了承ください。
 特に、**fill-pattern用の画像が作成されるたびに、別のウィンドウで開かれる**ので、利用する際は注意してほしい。
 開いた無数のウィンドウからひとつずつ画像をダウンロードしていくことになります……。
 （また、ブラウザのポップアップを許可しないとなりませんが、セキュリティ等、使用に伴うリスクは自己責任でお願いします。）
 
-ツールのURL　https://mghs15.github.io/map2/vhatch/
+ツールのURL　https://mghs15.github.io/map2/vhatch/?png
 
 ### fill-pattern用の画像の読み込み
 
