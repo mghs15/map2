@@ -86,7 +86,7 @@
 
 ※実装例（ https://mghs15.github.io/map2/map.html ）で表示できるものです。
 
-## 背景用画像の出力
+## ポリゴン塗り潰し（fill-pattern）用画像の出力
 
 ### fill-pattern用の画像を配列（Uint8Array）として出力する
 上記のツールでは、建物のハッチング等、[fill-pattern](https://docs.mapbox.com/mapbox-gl-js/style-spec/#paint-fill-fill-pattern)で指定する画像は表示されないので、spriteとは別にfill-pattern用の画像準備する必要がある。
