@@ -113,6 +113,12 @@ map.addImage(
   }
 );
 ```
+最終的に作成されたサンプルは以下の通り。結構地理院地図Vectorに近づいたと思います。
+- [標準地図](https://mghs15.github.io/gsi-vector-mapbox-gl-js/std.html#14.01/35.44575/139.9552)
+- [単色地図](https://mghs15.github.io/gsi-vector-mapbox-gl-js/pale.html#14.01/35.44575/139.9552)
+- [白地図](https://mghs15.github.io/gsi-vector-mapbox-gl-js/blank.html#14.01/35.44575/139.9552)
+
+※この3つのサンプルのレポジトリは[こちら](https://github.com/mghs15/gsi-vector-mapbox-gl-js)
 
 ### fill-pattern用の画像をPNGとして出力する
 
@@ -138,12 +144,12 @@ map.addImage(
 
 spriteファイルに入っていない画像を、Styleで利用したい場合、[map.loadImage](https://docs.mapbox.com/mapbox-gl-js/api/#map#loadimage)と[map.addImage](https://docs.mapbox.com/mapbox-gl-js/api/#map#addimage)を利用すればよい。
 
-最終的に作成されたサンプルは以下の通り。結構地理院地図Vectorに近づいたと思います。
-- [標準地図](https://mghs15.github.io/gsi-vector-mapbox-gl-js/std.html#14.01/35.44575/139.9552)
-- [単色地図](https://mghs15.github.io/gsi-vector-mapbox-gl-js/pale.html#14.01/35.44575/139.9552)
-- [白地図](https://mghs15.github.io/gsi-vector-mapbox-gl-js/blank.html#14.01/35.44575/139.9552)
+PNGが層をfill-patternに用いるサンプルは以下の通り。
+- [標準地図](https://mghs15.github.io/gsi-vector-mapbox-gl-js-png/std.html#14.01/35.44575/139.9552)
+- [単色地図](https://mghs15.github.io/gsi-vector-mapbox-gl-js-png/pale.html#14.01/35.44575/139.9552)
+- [白地図](https://mghs15.github.io/gsi-vector-mapbox-gl-js-png/blank.html#14.01/35.44575/139.9552)
 
-※この3つのサンプルのレポジトリは[こちら](https://github.com/mghs15/gsi-vector-mapbox-gl-js)
+※この3つのサンプルのレポジトリは[こちら](https://github.com/mghs15/gsi-vector-mapbox-gl-js-png)
 
 </details>
 
