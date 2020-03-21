@@ -1,6 +1,6 @@
 # 地理院地図Vectorのスタイルを<br>シンプルなMapbox GL JSで実装する試み
 
-<span style="color:#FF0000;">当レポジトリは、以下のレポジトリに移動しました。今後、このレポジトリ「map2」は更新しません。</span>
+**当レポジトリは、以下のレポジトリに移動しました。今後、このレポジトリ「map2」は更新しません。**
 https://github.com/mghs15/gsi-vector-style-converter
 
 <hr>
