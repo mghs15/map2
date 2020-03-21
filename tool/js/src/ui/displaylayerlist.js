@@ -80,9 +80,11 @@ GSIBV.UI.DisplayLayerListView = class extends GSIBV.UI.Base {
       this._container = this._options.container;
     }
 
-    try {
-      this._listScrollBar = new PerfectScrollbar(MA.DOM.find(this._container, ".list")[0]);
-    } catch (e) { }
+    if ( !GSIBV.CONFIG.MOBILE ) {
+      try {
+        this._listScrollBar = new PerfectScrollbar(MA.DOM.find(this._container, ".list")[0]);
+      } catch (e) { }
+    }
 
     MA.DOM.on(MA.DOM.find(this._container, ".list")[0], "ps-scroll-y",
       MA.bind(this._onScroll, this));
@@ -90,7 +92,7 @@ GSIBV.UI.DisplayLayerListView = class extends GSIBV.UI.Base {
     this._liTemplate = MA.DOM.find(this._ulElement, 'li')[0].cloneNode(true);
 
 
-    this.hide();
+    //this.hide();
     /*
     if ( this._editFilterMapMoveEndHandler ) {
         this._map.map.off( "moveend", this._editFilterMapMoveEndHandler);
@@ -123,6 +125,11 @@ GSIBV.UI.DisplayLayerListView = class extends GSIBV.UI.Base {
   }
 
   _onLayerAdd(e) {
+    if ( e.params.reason != "replace" && e.params.layer instanceof GSIBV.Map.Layer.FreeRelief) {
+      // 表示時以外、ユーザーの追加操作の場合のみ
+      this._onReliefEditButtonClick();
+    }
+
     var li = this._createRow(e.params.layer);
 
     var idx = -1;
@@ -147,7 +154,10 @@ GSIBV.UI.DisplayLayerListView = class extends GSIBV.UI.Base {
 
   _onLayerRemove(e) {
     var liList = MA.DOM.find(this._ulElement, "li");
-
+    
+    if ( e.params.layer instanceof GSIBV.Map.Layer.FreeRelief) {
+      if ( this._freeReliefDialog ) this._freeReliefDialog.hide();
+    }
     for (var i = 0; i < liList.length; i++) {
       if (!liList[i]._layer) continue;
       if (liList[i]._layer.id == e.params.layer.id) {
@@ -192,7 +202,7 @@ GSIBV.UI.DisplayLayerListView = class extends GSIBV.UI.Base {
       }
 
       var liList = MA.DOM.find( this._ulElement, "li" );
-      for( var j=0; j<liList.length; i++ ) {
+      for( var j=0; j<liList.length; j++ ) {
         var li = liList[j];
         if ( li._layer == layer) {
           this.showEditView(li, layer, true);
@@ -203,6 +213,15 @@ GSIBV.UI.DisplayLayerListView = class extends GSIBV.UI.Base {
       }
 
     }
+  }
+
+  hideStyleEditor() {
+    var liList = MA.DOM.find( this._ulElement, "li" );
+    for( var i=0; i<liList.length; i++ ) {
+      var li = liList[i];
+      if ( li._editLayerView ) li._editLayerView.hideStyleEditor();
+    }
+
   }
   _createRow(layer) {
     var li = [this._createRowOne(layer)];
@@ -260,10 +279,23 @@ GSIBV.UI.DisplayLayerListView = class extends GSIBV.UI.Base {
     if (layer.type == "binaryvector") {
       MA.DOM.on(MA.DOM.find(li, ".edit-button")[0], "click",
         MA.bind(this._onEditButtonClick, this, li, layer));
+      
+      MA.DOM.on(MA.DOM.find(li, ".save-button")[0], "click",
+        MA.bind(this._onSaveButtonClick, this, li, layer));
+
       MA.DOM.find(li, ".layer-edit-list-frame")[0].style.display = 'none';
       this.showEditView( li, layer );
+    
+    }else if (layer.type == "relief_free") {
+      MA.DOM.find(li, ".save-button")[0].style.display = 'none';
+      MA.DOM.on(MA.DOM.find(li, ".edit-button")[0], "click",
+        MA.bind(this._onReliefEditButtonClick, this, li, layer));
+      MA.DOM.find(li, ".layer-edit-list-frame")[0].style.display = 'none';
+      this.showEditView( li, layer );
+
     } else {
       MA.DOM.find(li, ".edit-button")[0].style.display = 'none';
+      MA.DOM.find(li, ".save-button")[0].style.display = 'none';
       MA.DOM.find(li, ".layer-edit-list-frame")[0].style.display = 'none';
     }
 
@@ -271,6 +303,7 @@ GSIBV.UI.DisplayLayerListView = class extends GSIBV.UI.Base {
     return li;
 
   }
+
 
   _refreshRow(li, layer) {
     if (layer.visible) {
@@ -501,81 +534,15 @@ GSIBV.UI.DisplayLayerListView = class extends GSIBV.UI.Base {
   }
 
   _onInfoButtonClick(li, layer) {
-
-    if (!this._descriptionPopupFrame) {
-      this._descriptionPopupFrame = MA.DOM.create('div');
-
-      MA.DOM.addClass(this._descriptionPopupFrame, "-gsibv-layerinfo-popup");
-      this._descriptionPopupFrame.style.position = 'absolute';
-      this._descriptionPopupFrame.style.display = 'none';
-      document.body.appendChild(this._descriptionPopupFrame);
+    if ( !this._infoWindow ) {
+      this._infoWindow = new GSIBV.UI.Dialog.LayerInfoWindow();
     }
+    var pos = MA.DOM.offset(li);
+    var size = MA.DOM.size(li);
+    pos.left += size.width;
+    this._infoWindow.show( layer, pos );
 
-    var html = '';
-    if (layer.html) {
-      html = layer.html;
-    }
-    if (layer.legendUrl) {
-      html += '<div><a target="_blank" href="' + layer.legendUrl + '">凡例を表示</a></div>';
-    }
-
-    if (html == '') return;
-
-    this._descriptionPopupFrame.innerHTML = html;
-
-
-    this._descriptionPopupFrame.style.visivility = 'hidden';
-    this._descriptionPopupFrame.style.display = '';
-
-    var size = MA.DOM.size(this._descriptionPopupFrame);
-    this._descriptionPopupFrame.style.display = 'none';
-    this._descriptionPopupFrame.style.visivility = 'visible';
-    this._descriptionPopupFrame.style.overflowY = "auto";
-
-    if (size.height > 300) {
-      this._descriptionPopupFrame.style.height = "300px";
-      size.height = 300;
-    } else {
-      this._descriptionPopupFrame.style.height = "auto";
-
-    }
-
-    var liPos = MA.DOM.offset(li);
-    var liSize = MA.DOM.size(li);
-    var windowSize = MA.DOM.size(MA.DOM.select("#main")[0]);
-    var pos = liPos;
-    pos.left += liSize.width - 32;
-
-    if (windowSize.height < pos.top + size.height) {
-      pos.top = windowSize.height - size.height - 2;
-    }
-    this._descriptionPopupFrame.style.left = pos.left + 'px';
-    this._descriptionPopupFrame.style.top = pos.top + 'px';
-    MA.DOM.fadeIn(this._descriptionPopupFrame, 300);
-
-
-    if (!this._descriptionPopupHideMouseDownHandler) {
-      this._descriptionPopupHideMouseDownHandler = MA.bind(function (e) {
-
-        var target = e.target;
-        var hit = false;
-        while (target) {
-          if (target == this._descriptionPopupFrame) {
-            hit = true;
-            break;
-          }
-          target = target.parentNode;
-        }
-
-        if (!hit) {
-          MA.DOM.fadeOut(this._descriptionPopupFrame, 200);
-          MA.DOM.off(document.body, "mousedown", this._descriptionPopupHideMouseDownHandler);
-          this._descriptionPopupHideMouseDownHandler = null;
-        }
-      }, this);
-      MA.DOM.on(document.body, "mousedown", this._descriptionPopupHideMouseDownHandler);
-    }
-
+    
   }
 
 
@@ -583,6 +550,37 @@ GSIBV.UI.DisplayLayerListView = class extends GSIBV.UI.Base {
     this.showEditView(li, layer);
   }
 
+  _onSaveButtonClick( li, layer) {
+    if ( layer.data.title == undefined)
+      layer.data.title = layer.title;
+
+    if ( this._saveDataDialog ) {
+      this._saveDataDialog.destroy();
+      this._saveDataDialog = null;
+    }
+    this._saveDataDialog = new GSIBV.UI.Dialog.SaveDataDialog();
+    this._saveDataDialog.on("buttonclick", MA.bind(function(layer,e){
+      layer.data.title = e.params.title;
+      layer.data.fileName = e.params.fileName;
+      layer.data.save(e.params.indent);
+    },this,layer));
+    this._saveDataDialog.data = layer.data;
+    this._saveDataDialog.show();
+  
+  }
+
+  _onReliefEditButtonClick(li,layer ) {
+    if ( !this._freeReliefDialog ) {
+      this._freeReliefDialog = new GSIBV.UI.Dialog.FreeRelief(this._map);
+    }
+    if ( this._freeReliefDialog.isVisible ) {
+      this._freeReliefDialog.hide();
+    } else {
+      this._freeReliefDialog.show();
+    }
+    
+
+  }
   
 
 

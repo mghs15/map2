@@ -160,7 +160,7 @@ GSIBV.UI.Input.Number = class extends GSIBV.UI.Input.Base {
       }
       if (this._hintText == "")
         this._hintText = "数値"
-      this._hintText += (this._type == "int" ? "(整数)" : "(少数可)");
+      this._hintText += (this._type == "int" ? "(整数)" : "(小数可)");
     }
   }
 
@@ -328,6 +328,7 @@ GSIBV.UI.Input.Array = class extends GSIBV.UI.Input.Base {
   constructor(input, options) {
     super(input, options);
   }
+  
   set value(value) {
     if  (value != undefined) {
       var val = '';
@@ -339,13 +340,23 @@ GSIBV.UI.Input.Array = class extends GSIBV.UI.Input.Base {
       this._input.value = "";
     }
     var result= this._check();
+    
     if ( result != undefined) this._input.value  = result;
   }
 
-  get value() {
-    return this._value ;
-
+  
+  _onFocus() {
+    this._showHint();
+    this._clearCheck();
+    //this._value = this._input.value;
+    setTimeout(MA.bind(function () { this._input.select(); }, this), 0);
+    this._timerId = setInterval(MA.bind(this._check, this), 1000);
   }
+  
+  get value() {
+    return this._value;
+  }
+
   _check() {
     var value = this._input.value;
     value = value.replace(/[．]/g, ".");

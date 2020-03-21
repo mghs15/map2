@@ -13,6 +13,7 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
     this._map = map;
     this._scrollContainer = scrollContainer;
     this._layer = layer;
+    this._sortManager = new GSIBV.UI.EditLayerView.SortManager( this._layer );
     this._container = container;
     this._defaultViewMode = 'tree';
     this._viewMode = '';
@@ -100,7 +101,7 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
   initialize() {
     this._filterInput = MA.DOM.find(this._container, "input[name=filter-query]")[0];
     this._menuButton = MA.DOM.find(this._container, "button.menu-button")[0];
-    this._saveButton = MA.DOM.find(this._container, "button.save-button")[0];
+    //this._saveButton = MA.DOM.find(this._container, "button.save-button")[0];
     this._listFrame = MA.DOM.find(this._container, ".contents")[0];
     this.viewMode = this._defaultViewMode;
 
@@ -119,7 +120,7 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
 
     }, this));
 
-    MA.DOM.on(this._saveButton, "click", MA.bind(this._onSaveButtonClick, this));
+    //MA.DOM.on(this._saveButton, "click", MA.bind(this._onSaveButtonClick, this));
     MA.DOM.on(this._menuButton, "click", MA.bind(this._onMenuButtonClick, this));
 
     MA.DOM.on(this._filterInput, "focus", MA.bind(this._onFilterInputFocus, this));
@@ -180,7 +181,7 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
 
   _onOwnerShow() {
     if ( this._styleEditor) {
-      this._styleEditor.setPosition({"left":300});
+      this._styleEditor.setPosition({"left":240});
     }
   }
 
@@ -192,18 +193,20 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
 
   _onContextMenuShow(e) {
     if ( this._styleEditor) {
-      this._styleEditor.setPosition({"bottom":e.params.height});
+      this._styleEditor.setPosition({"bottom":e.params.height + e.params.buttonHeight});
     }
   }
+  
   _onContextMenuRefresh(e) {
     if ( this._styleEditor) {
-      this._styleEditor.setPosition({"bottom":e.params.height,"noEffect":true});
+      this._styleEditor.setPosition({"bottom":e.params.height + e.params.buttonHeight,"noEffect":true});
     }
   }
+
   _onContextMenuHide(e) {
     
     if ( this._styleEditor) {
-      this._styleEditor.setPosition({"bottom":0});
+      this._styleEditor.setPosition({"bottom": e.params.height + e.params.buttonHeight});
     }
   }
 
@@ -236,6 +239,7 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
       this._mapMoveEndHandler = null;
     }
   }
+
   toggle() {
     if (MA.DOM.hasClass(this._container, "-ma-expand")) {
       this.hide();
@@ -284,7 +288,12 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
 
   _onMenuButtonClick() {
 
-    //this._class.showPopupMenu(this);
+    // 20190909
+    if (this._class._popupMenu && this._class._popupMenu .isVisible) {
+      GSIBV.UI.EditLayerView.hidePopupMenu();
+      return;
+    }
+
     if (!this._class._popupMenu ) {
       this._class._popupMenu = new GSIBV.UI.Popup.Menu ();
       this._class._popupMenu.on("select",MA.bind(function(e){
@@ -361,7 +370,6 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
   }
 
   refresh(force) {
-
     var filter = {
       query: this._filterInput.value,
       zoom: Math.floor(this._map.zoom)
@@ -371,7 +379,17 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
       this._filterInput.value,
       Math.floor(this._map.zoom)
     );
+    this._switchSort();
+    //getLength
+    if ( this._sortManager.roadRoot && this._sortManager.roadRoot._aList) {
+      this._refreshSort( this._sortManager.roadRoot._aList );
+    }
+    if ( this._sortManager.railwayRoot && this._sortManager.railwayRoot._aList) {
+      this._refreshSort( this._sortManager.railwayRoot._aList );
+    }
+
     if (!force && this._filter.equals(filter)) return;
+    
     this._filter = filter;
     this._filter.lang = GSIBV.application.lang;
     var hitCount = this._filter.execute(this._viewTree);
@@ -385,10 +403,106 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
 
     this._refreshVisibleStateList(this._layer.data.root);
 
+
     this.fire("refresh");
 
 
   }
+
+  _refreshSort(list) {
+    var z = Math.floor(this._map.zoom);
+    for( var i=0; i<list.length; i++ ) {
+      var item = list[i];
+      var len = 0;
+      if ( z >= 11 && z <= 16 ) len = item.item.getLength(z);
+
+      var sortButton = MA.DOM.find( item.dt, ".sort-button" );
+
+      // 例外ここから
+      if ( item.item.title =="市区町村道・その他") {
+        if ( z < 13) {
+          MA.DOM.removeClass( MA.DOM.find( item.dt, "a")[0], "directory" );
+          MA.DOM.addClass( MA.DOM.find( item.dt, "a")[0], "no-directory" );
+          if ( sortButton && sortButton.length > 0 )sortButton[0].style.display = "none";
+        } else {
+          MA.DOM.removeClass( MA.DOM.find( item.dt, "a")[0], "no-directory" );
+          MA.DOM.addClass( MA.DOM.find( item.dt, "a")[0], "directory" );
+          if ( sortButton && sortButton.length > 0 )sortButton[0].style.display = "";
+
+        }
+      }
+      // 例外ここまで
+
+      if ( sortButton && sortButton.length > 0 ) {
+        sortButton = sortButton[0];
+        if ( item.item.sortType != 0 ) 
+          MA.DOM.addClass( sortButton, "active");
+        else
+          MA.DOM.removeClass( sortButton, "active");
+      }
+      item.dt.style.display = ( len > 0 ? "": "none" );
+      if ( item.dt._childDD ) item.dt._childDD.style.display = ( len > 0 ? "": "none" );
+      this._refreshSort( item.list);
+    }
+
+  }
+
+  _switchSort() {
+    var z = Math.floor(this._map.zoom);
+
+    if (!this._sortManager._road) return;
+    // 鉄道
+    var railwaySortVisible = (this._sortManager.railwayRoot && this._sortManager.railwayRoot._aList && z >= 11 && z<=16 ? true : false );
+    
+    var sortButton = MA.DOM.find( this._sortManager._railway.__dt, ".sort-button")[0];
+    sortButton.style.display = ( z >= 11 && z<=16 ? "" : "none" );
+    if ( railwaySortVisible ) {
+      MA.DOM.addClass(sortButton,"active");
+    } else {
+      MA.DOM.removeClass(sortButton,"active");
+    }
+
+    for( var i=0; i< this._sortManager._railway.itemList.length; i++ ) {
+      var item = this._sortManager._railway.itemList[i];
+      item.__dt.style.display = ( !railwaySortVisible ? "" : "none" );
+      if ( item.__dt._childDD ) item.__dt._childDD.style.display = ( !railwaySortVisible ? "" : "none" );
+    }
+
+    if ( this._sortManager.railwayRoot && this._sortManager.railwayRoot._aList ) {
+      for( var i =0; i< this._sortManager.railwayRoot._aList.length; i++ ) {
+        var item = this._sortManager.railwayRoot._aList[i];
+        item.dt.style.display = ( railwaySortVisible ? "" : "none" );
+        item.dt._childDD.style.display = ( railwaySortVisible ? "" : "none" );
+      }  
+    }
+
+
+    // 道路
+    var roadSortVisible = (this._sortManager.roadRoot && this._sortManager.roadRoot._aList && z >= 11 && z<=16 ? true : false );
+    
+    var sortButton = MA.DOM.find( this._sortManager._road.__dt, ".sort-button")[0];
+    sortButton.style.display = ( z >= 11 && z<=16 ? "" : "none" );
+    if ( roadSortVisible ) {
+      MA.DOM.addClass(sortButton,"active");
+    } else {
+      MA.DOM.removeClass(sortButton,"active");
+    }
+    for( var i=0; i< this._sortManager._road.itemList.length; i++ ) {
+      var item = this._sortManager._road.itemList[i];
+      item.__dt.style.display = ( !roadSortVisible ? "" : "none" );
+      if ( item.__dt._childDD ) item.__dt._childDD.style.display = ( !roadSortVisible ? "" : "none" );
+    }
+
+    if ( this._sortManager.roadRoot && this._sortManager.roadRoot._aList ) {
+      for( var i =0; i< this._sortManager.roadRoot._aList.length; i++ ) {
+        var item = this._sortManager.roadRoot._aList[i];
+        item.dt.style.display = ( roadSortVisible ? "" : "none" );
+        item.dt._childDD.style.display = ( roadSortVisible ? "" : "none" );
+      }  
+    }
+
+  }
+
   _treeToList(destList, list) {
     for (var i = 0; i < list.length; i++) {
       var item = list[i];
@@ -496,10 +610,85 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
 
   }
 
+  _createSortTree(destList,  root ) {
+    var list = root.list;
+    
+    var dl = MA.DOM.create("dl");
+    for (var i = 0; i < list.length; i++) {
+      var dt = MA.DOM.create("dt");
+      var a = MA.DOM.create("a");
+      //a.setAttribute("href", "javascript:void(0);");
+      var span = MA.DOM.create("span");
+      MA.DOM.addClass( span, "title" );
+      span.innerHTML = this._getLangTitle(list[i]);
+      a.appendChild( span );
+      dt.appendChild(a);
+      dl.appendChild(dt);
+      var item = list[i];
+      item.__dt = dt;
+      dt.__item = item;
+
+      var viewItem = { item: item, dt: dt, list: [] };
+      this._createSortDirectory(viewItem.list, item, dl, dt, a, root);
+      item._viewList = viewItem.list;
+      destList.push(viewItem);
+
+    }
+    return dl;
+
+  }
+
+  _createSortDirectory(destList, item, dl, dt, a, root) {
+    var isDirectory = ( item.list.length > 0);
+    
+    this._createEditButton(item, dl, dt, a);
+    this._createVisibleButton(item, dl, dt, a);
+    if ( ! (  root instanceof GSIBV.UI.EditLayerView.SortManager.RailwayItem ) && isDirectory && item._sortTypeList.length > 1) {//!item.parent.parent ) {
+      this._createSortChildButton(item, dl, dt, a);
+    }
+
+
+    if ( isDirectory) MA.DOM.addClass(a, "directory");
+    else MA.DOM.addClass(a,"no-directory");
+
+
+    
+    var dd = MA.DOM.create("dd");
+    dt._childDD = dd;
+
+
+    dd.appendChild(this._createSortTree(destList, item));
+    dl.appendChild(dd);
+
+    if ( isDirectory ) {
+      MA.DOM.on(a, "click", MA.bind(function (a, dd,e) {
+        e.preventDefault();
+
+        if (MA.DOM.hasClass(dd, "-ma-expand")) {
+          MA.DOM.removeClass(a, "-ma-expand");
+          setTimeout(MA.bind(function (dd) {
+            MA.DOM.removeClass(dd, "-ma-expand");
+
+          }, this, dd), 0);
+        } else {
+          dd.style.display = '';
+          MA.DOM.addClass(a, "-ma-expand");
+          setTimeout(MA.bind(function (dd) {
+            MA.DOM.addClass(dd, "-ma-expand");
+          }, this, dd), 0);
+        }
+      }, this, a, dd));
+    }
+
+  }
+
   _createDirectory(destList, item, dl, dt, a) {
     
     this._createEditButton(item, dl, dt, a);
     this._createVisibleButton(item, dl, dt, a);
+
+
+
     MA.DOM.addClass(a, "directory");
     var span = MA.DOM.create("span");
     MA.DOM.addClass( span, "num" );
@@ -507,8 +696,23 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
     a.appendChild(span);
     var dd = MA.DOM.create("dd");
     dt._childDD = dd;
-    dd.appendChild(this._createTree(destList, item.itemList));
+
+
+    if ( item.title =="道路" ) {
+      this._sortManager._road = item;
+      this._createRoadSortButton(item, dl, dt, a, dd);
+      dd.appendChild(this._createTree(destList, item.itemList));
+    } else if ( item.title =="鉄道" ) {
+      this._sortManager._railway = item;
+      this._createRailwaySortButton(item, dl, dt, a, dd);
+      dd.appendChild(this._createTree(destList, item.itemList));
+    } else {
+      dd.appendChild(this._createTree(destList, item.itemList));
+    }
     dl.appendChild(dd);
+
+
+
 
     MA.DOM.on(a, "click", MA.bind(function (a, dd,e) {
       e.preventDefault();
@@ -529,7 +733,243 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
     }, this, a, dd));
 
   }
-  
+  _createSortChildButton( item, dl, dt, a ) {
+    if ( GSIBV.CONFIG.ReadOnly )return;
+    var sortButton = MA.DOM.create("button");
+    //visibleButton.setAttribute("href", "javascript:void(0);")
+    MA.DOM.addClass(sortButton, "sort-button");
+    //MA.DOM.addClass(visibleButton, "button");
+    dt.appendChild(sortButton);
+
+    MA.DOM.on(sortButton, "click", MA.bind(function (item,e) {
+      if ( item.sortType != 0 ) {
+        this._startSortChild(item, 0 );
+        //this._switchSort();
+        this.refresh();
+
+        return;
+      }
+
+      if ( this._sortPopup ) this._sortPopup.destroy();
+      this._sortPopup = new GSIBV.UI.Popup.Menu();
+      this._sortPopup.on("select", MA.bind(function(item, evt){
+        this._startSortChild(item, evt.params.item.id);
+        this.refresh();
+      }, this, item ));
+      var sortTypes = item.getSortTypeList();
+      var sortTypeId = item.sortType;
+
+      for( var i=0; i<sortTypes.length; i++ ) {
+        sortTypes[i].type="radio";
+        sortTypes[i].checked=(sortTypeId == sortTypes[i].id || sortTypeId == 0 && i == 0 );
+        sortTypes[i].name="editlayerview-sort";
+      }
+      this._sortPopup.items = sortTypes;
+      this._sortPopup.show( e.target );
+    }, this,item) );
+
+  }
+
+  _startSortChild(item, sortType) {
+    if ( item.sortType != sortType ) {
+      item.sortType = sortType;
+    } else return;
+
+    if ( item._viewList ) {
+      for( var i=0; i<item._viewList.length; i++ ) {
+        item._viewList[i].dt.parentNode.removeChild( item._viewList[i].dt);
+        item._viewList[i].dt._childDD.parentNode.removeChild( item._viewList[i].dt._childDD);
+        item._viewList.splice(i,1);
+        i--;
+      }
+    }
+    item.__dt._childDD.appendChild(this._createSortTree(item._viewList, item));
+  }
+
+  _createRoadSortButton( item, dl, dt, a, dd ) {
+
+    if ( GSIBV.CONFIG.ReadOnly )return;
+
+    var z = Math.floor( this._map.zoom );
+    var sortButton = MA.DOM.create("button");
+    //visibleButton.setAttribute("href", "javascript:void(0);")
+    MA.DOM.addClass(sortButton, "sort-button");
+    //MA.DOM.addClass(visibleButton, "button");
+    dt.appendChild(sortButton);
+    
+    MA.DOM.on(sortButton, "click", MA.bind(function (item,dd,e) {
+      
+      e.preventDefault();
+
+      if ( this._sortManager.roadRoot && this._sortManager.roadRoot._aList) {
+        for( var i=0; i<this._sortManager.roadRoot._aList.length; i++ ) {
+          var item = this._sortManager.roadRoot._aList[i];
+          var dta = item.dt;
+          var dda = dta._childDD;
+          dta.parentNode.removeChild(dta);
+          dda.parentNode.removeChild(dda);
+        }
+        this._sortManager.roadRoot = undefined;
+        //this._switchSort();
+        this.refresh(true);
+
+        return;
+      }
+
+      if ( this._sortPopup ) this._sortPopup.destroy();
+      this._sortPopup = new GSIBV.UI.Popup.Menu();
+      this._sortPopup.on("select", MA.bind(function(dd, evt){
+        this._startSortRoad(dd, evt.params.item.id);
+        //this._switchSort();
+        this.refresh();
+      }, this, dd ));
+
+      
+      if ( !this._sortManager.roadRoot ) {
+        this._sortManager.initializeRoad(sortType);
+      }
+      var sortTypes = this._sortManager.roadRoot.getSortTypeList();
+      var sortTypeId = this._sortManager.roadRoot ? this._sortManager.roadRoot.sortType : 0;
+
+      var items = [];
+      
+      for( var i=0; i<sortTypes.length; i++ ) {
+        var sortType = sortTypes[i];
+        items.push(
+          {"title":sortType.title, "checked": (sortTypeId==sortType.id), "type": "radio", "id": sortType.id, "name": "editlayerview-sort"}
+        );
+
+      }
+      /*
+      this._sortPopup.items = [
+        {"title":"道路分類", "checked": (sortTypeId==1), "type": "radio", "id": 1, "name": "editlayerview-sort"},
+        {"title":"幅員区分", "checked": (sortTypeId==2), "type": "radio", "id": 2, "name": "editlayerview-sort"},
+        {"title":"道路状態", "checked": (sortTypeId==3), "type": "radio", "id": 3, "name": "editlayerview-sort"}
+      ];
+      */
+      this._sortPopup.items = items;
+      this._sortPopup.show( e.target );
+      /*
+      if ( !this._sortManager ) {
+        this._sortManager = new GSIBV.UI.EditLayerView.SortManager( this._layer );
+      }
+      var destList = [];
+      dd.appendChild(this._createSortTree(destList, this._sortManager.roadRoot));
+      */
+      //var z = Math.floor( this._map.zoom );
+
+      //this.showStyleEditor( item );
+
+    }, this, item, dd));
+  }
+
+  _createRailwaySortButton( item, dl, dt, a, dd ) {
+
+    if ( GSIBV.CONFIG.ReadOnly )return;
+
+    var z = Math.floor( this._map.zoom );
+    var sortButton = MA.DOM.create("button");
+    //visibleButton.setAttribute("href", "javascript:void(0);")
+    MA.DOM.addClass(sortButton, "sort-button");
+    //MA.DOM.addClass(visibleButton, "button");
+    dt.appendChild(sortButton);
+    
+    MA.DOM.on(sortButton, "click", MA.bind(function (item,dd,e) {
+      
+      e.preventDefault();
+
+      if ( this._sortManager.railwayRoot && this._sortManager.railwayRoot._aList) {
+        for( var i=0; i<this._sortManager.railwayRoot._aList.length; i++ ) {
+          var item = this._sortManager.railwayRoot._aList[i];
+          var dta = item.dt;
+          var dda = dta._childDD;
+          dta.parentNode.removeChild(dta);
+          dda.parentNode.removeChild(dda);
+        }
+        this._sortManager.railwayRoot = undefined;
+        //this._switchSort();
+        this.refresh(true);
+
+        return;
+      }
+
+      if ( this._sortPopup ) this._sortPopup.destroy();
+      this._sortPopup = new GSIBV.UI.Popup.Menu();
+      this._sortPopup.on("select", MA.bind(function(dd, evt){
+        this._startSortRailway(dd, evt.params.item.id);
+        //this._switchSort();
+        this.refresh();
+      }, this, dd ));
+
+      
+      if ( !this._sortManager.railwayRoot ) {
+        this._sortManager.initializeRailway(sortType);
+      }
+      var sortTypes = this._sortManager.railwayRoot.getSortTypeList();
+      var sortTypeId = this._sortManager.railwayRoot ? this._sortManager.railwayRoot.sortType : 0;
+
+      var items = [];
+      
+      for( var i=0; i<sortTypes.length; i++ ) {
+        var sortType = sortTypes[i];
+        items.push(
+          {"title":sortType.title, "checked": (sortTypeId==sortType.id), "type": "radio", "id": sortType.id, "name": "editlayerview-sort"}
+        );
+
+      }
+      
+      this._sortPopup.items = items;
+      this._sortPopup.show( e.target );
+
+    }, this, item, dd));
+
+  }
+
+
+  _startSortRoad(dd, sortType) {
+    if ( !this._sortManager.roadRoot ) {
+      this._sortManager.initializeRoad(sortType);
+    } else {
+      if ( this._sortManager.roadRoot.sortType != sortType ) {
+        this._sortManager.roadRoot.sortType = sortType;
+      } else return;
+    }
+    if ( this._sortManager.roadRoot._aList) {
+      for( var i=0; i<this._sortManager.roadRoot._aList.length; i++ ) {
+        var item = this._sortManager.roadRoot._aList[i];
+        var dta = item.dt;
+        var dda = dta._childDD;
+        dta.parentNode.removeChild(dta);
+        dda.parentNode.removeChild(dda);
+      }
+      this._sortManager.roadRoot._aList=undefined;
+    }
+    this._sortManager.roadRoot._aList = [];
+    dd.appendChild(this._createSortTree(this._sortManager.roadRoot._aList, this._sortManager.roadRoot));
+  }
+
+  _startSortRailway(dd, sortType) {
+    if ( !this._sortManager.railwayRoot ) {
+      this._sortManager.initializeRailway(sortType);
+    } else {
+      if ( this._sortManager.railwayRoot.sortType != sortType ) {
+        this._sortManager.railwayRoot.sortType = sortType;
+      } else return;
+    }
+    if ( this._sortManager.railwayRoot._aList) {
+      for( var i=0; i<this._sortManager.railwayRoot._aList.length; i++ ) {
+        var item = this._sortManager.railwayRoot._aList[i];
+        var dta = item.dt;
+        var dda = dta._childDD;
+        dta.parentNode.removeChild(dta);
+        dda.parentNode.removeChild(dda);
+      }
+      this._sortManager.railwayRoot._aList=undefined;
+    }
+    this._sortManager.railwayRoot._aList = [];
+    dd.appendChild(this._createSortTree(this._sortManager.railwayRoot._aList, this._sortManager.railwayRoot));
+  }
+
   _createEditButton( item, dl, dt, a ) {
     
     if ( GSIBV.CONFIG.ReadOnly )return;
@@ -568,10 +1008,40 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
     MA.DOM.on(visibleButton, "click", MA.bind(function (item,e) {
       
       var z = Math.floor( this._map.zoom );
-
       item.setVisible( !item.getVisible(z),z );
       //item.visible = !item.visible;
+      //console.log( item );
 
+      
+      var refreshVisibleState = function(list,z,refreshVisibleState) {
+        if ( !list) return;
+        for( var i=0; i<list.length; i++ ) {
+          var item = list[i];
+          var dt = item.dt ? item.dt : item.__dt;
+
+          var visible = item.item ? item.item.getVisible(z) : item.getVisible(z);
+
+          if (!visible) {
+            MA.DOM.addClass(dt, "hidden");
+          } else {
+            MA.DOM.removeClass(dt, "hidden");
+          }
+          refreshVisibleState( item.list, z, refreshVisibleState);
+        }
+      };
+
+      var z = Math.floor( this._map.zoom );
+      
+      if ( item.title =="道路" || item.title =="鉄道") {
+        if ( this._sortManager.roadRoot && this._sortManager.roadRoot._aList) {
+          refreshVisibleState( this._sortManager.roadRoot._aList,z,refreshVisibleState );
+        }
+      } else if ( item instanceof GSIBV.UI.EditLayerView.SortManager.Item) {
+        refreshVisibleState( item.list,z,refreshVisibleState );
+        
+        this._refreshVisibleState(this._sortManager._road);
+        this._refreshVisibleState(this._sortManager._railway);
+      }
       this._refreshVisibleState(item);
 
     }, this, item));
@@ -579,7 +1049,7 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
   }
 
   _refreshVisibleState(item ) {
-
+    if ( !item) return;
     var z = Math.floor( this._map.zoom );
     while( item ){
       if (!item.getVisible(z)) {
@@ -603,6 +1073,9 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
     var z = Math.floor( this._map.zoom );
 
     for( var i=0; i<item.itemList.length; i++ ) {
+      if ( !item.itemList[i].__dt ) continue;
+
+
       if (!item.itemList[i].getVisible(z)) {
         MA.DOM.addClass(item.itemList[i].__dt, "hidden");
       } else {
@@ -613,15 +1086,33 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
 
   }
 
+  hideStyleEditor() {
+    if ( this._styleEditor  ) this._styleEditor .hide(true);
+  }
+
   showStyleEditor( item) {
-    if (!this._styleEditor) {
-      this._styleEditor = new GSIBV.UI.StyleEditor(this._map,{
-        "left" : this._owner.visible ? 300 : 0,
-        "bottom":this._contextMenu.height});
+    this._prevOwnerVisible = false;
+    if ( GSIBV.CONFIG.MOBILE && this._owner.visible ) {
+      this._owner.visible = false;
+      this._prevOwnerVisible = true;
     }
+    if (!this._styleEditor) {
+
+      this._styleEditor = new GSIBV.UI.StyleEditor(this._map,{
+        "left" : this._owner.visible ? 240 : 0,
+        "bottom":this._contextMenu.height + this._contextMenu.buttonHeight + 1});
+      
+        this._styleEditor.on("hide",MA.bind(function(){
+          if ( this._prevOwnerVisible )
+          this._owner.show();
+          this._prevOwnerVisible = false;
+        },this ) );
+    }
+    
     this._styleEditor.show(item, Math.floor(this._map.zoom));
 
   }
+
   _createItem(item, dl, dt, a) {
     
     this._createVisibleButton(item, dl, dt, a);
@@ -636,9 +1127,7 @@ GSIBV.UI.EditLayerView = class extends GSIBV.UI.Base {
       this.showStyleEditor( item );
     }, this, item));
 
-
   }
-
 
 };
 
@@ -683,6 +1172,7 @@ GSIBV.UI.EditLayerView.Filter = class {
     } else {
       this._queryList =[];
     }
+
 
     return this._execute(target);
   }

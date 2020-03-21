@@ -17,7 +17,8 @@ GSIBV.Map.Layer.FILTERS.push(function (l) {
     });
   }
 
-  if (l.url.match(/\.kml$/i)) {
+  var url = l.url.split("?")[0];
+  if (url.match(/\.kml$/i)) {
     return new GSIBV.Map.Layer.KML({
       "id": l.id,
       "title": l.title,

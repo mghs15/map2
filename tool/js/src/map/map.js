@@ -7,7 +7,18 @@ GSIBV.Map = class extends MA.Class.Base {
     this._container = container;
     this._layerList = new GSIBV.Map.LayerList(this);
     this._layerList.on("change", MA.bind(this._onLayerListChange, this));
+    this._layerList.on("order", MA.bind(this._onLayerOrderChange, this));
+    
     this._controlLayerList = new GSIBV.Map.LayerList(this);
+
+
+    
+    this._drawManager = new GSIBV.Map.Draw.Manager(this);
+    this._drawManager.on("listchange", MA.bind(this._onDrawManagerLayerListChange, this));
+    this._drawManager.enable();
+
+
+
     this._momoryPointsNum = 1;
     this._startUp = {
       zoom: 7,
@@ -26,9 +37,62 @@ GSIBV.Map = class extends MA.Class.Base {
     this._refreshBackground();
   }
 
+
   get map() { return this._map; }
   get layerList() { return this._layerList; }
   get ccontrolLayerList() { return this._controlLayerList; }
+  get drawManager() { return this._drawManager; }
+
+  set printMode( value) {
+    if ( value ) {
+      this._normalModeState = {
+        center:this._map.getCenter(),
+        pitch:this._map.getPitch(),
+        bearing:this._map.getBearing(),
+        centerCrossVisible : this.centerCrossVisible
+      };
+
+      if(!this._compassControl) {
+        this._compassControl = new GSIBV.Map.Control.CompassControl(this._map);
+      }
+      this._map.addControl(this._compassControl, 'bottom-right');
+      this._map.removeControl(this._navigationControl );
+      this._map.removeControl(this._resetPitchRotateControl );
+      this._map.removeControl(this._leftPanelToggleControl );
+      if ( this._gpsControl ) this._map.removeControl(this._gpsControl );
+      if ( this.centerCrossVisible ) {
+        this._centerCross.visible = false;
+      }
+    } else { 
+
+      if ( this._gpsControl ) this._map.addControl(this._gpsControl, 'bottom-right' );
+      this._map.addControl(this._navigationControl, 'bottom-right');
+      this._map.addControl(this._resetPitchRotateControl, 'bottom-right');
+      this._map.addControl(this._leftPanelToggleControl, 'top-left');
+      this._map.removeControl(this._compassControl );
+      if ( this._normalModeState) {
+        this._map.setCenter( this._normalModeState.center );
+        this._map.setPitch(this._normalModeState.pitch);
+        this._map.setBearing(this._normalModeState.bearing);
+        
+      
+        if ( this._normalModeState.centerCrossVisible ) {
+          this._centerCross.visible = true;
+        }
+
+      }
+
+
+    }
+    this._printMode = value;
+    this._map.resize();
+
+    this.fire( "printmodechange",{mode:this._printMode});
+  }
+
+  invalidate() {
+    this._map.resize();
+  }
 
   initialize(params) {
     if (typeof this._container == "string") {
@@ -95,12 +159,17 @@ GSIBV.Map = class extends MA.Class.Base {
       maxZoom: 17,
       center: this._startUp.center,
       boxZoom: false,
+      crossSourceCollisions: false,
+      preserveDrawingBuffer : GSIBV.CONFIG.MOBILE ? false : GSIBV.Config.usePreserveDrawingBuffer, // Mac Safariの印刷対応
       pitchWithRotate: true, // pitch可
+      touchZoomRotate : true,
       transformRequest : MA.bind(this._onTransformRequest,this)
     };
     if (this._localFont) {
       mapOptions["localIdeographFontFamily"] = this._localFont;
 
+    } else {
+      mapOptions["localIdeographFontFamily"] = false;
     }
 
     var map = new mapboxgl.Map(mapOptions);
@@ -112,18 +181,38 @@ GSIBV.Map = class extends MA.Class.Base {
 
     GSIBV.Map.ImageManager.create(map);
 
+    // スケールコントロール
     var scale = new mapboxgl.ScaleControl({
       maxWidth: 80,
       unit: 'metric'
     });
     map.addControl(scale, 'bottom-right');
+    this._scaleControl = scale;
 
+    // GPSコントロール
+    if ( GSIBV.CONFIG.MOBILE ) {
+      this._gpsControl = new GSIBV.Map.Control.GPSControl( map );
+      map.addControl(this._gpsControl, 'bottom-right');
+    }
+    // ズームコントロール
     var nav = new mapboxgl.NavigationControl({ showCompass: false });
     map.addControl(nav, 'bottom-right');
+    this._navigationControl = nav;
+    
 
+    // 回転リセットコントロール
     var resetPitchRotate = new GSIBV.Map.Control.ResetPitchRotateControl({});
     map.addControl(resetPitchRotate, 'bottom-right');
+    this._resetPitchRotateControl = resetPitchRotate;
 
+    // 左パネル表示コントロール
+    var leftPanelToggle = new GSIBV.Map.Control.LeftPanelControl({});
+    map.addControl(leftPanelToggle, 'top-left');
+
+    leftPanelToggle.on("click",MA.bind(function(){
+      this.fire("showleftpanel");
+    },this));
+    this._leftPanelToggleControl = leftPanelToggle;
 
     map.on("load", MA.bind(this._onLoad, this));
     map.on("move", MA.bind(this._onMove, this));
@@ -131,6 +220,9 @@ GSIBV.Map = class extends MA.Class.Base {
     map.on("click", MA.bind(this._onClick, this));
     map.on("contextmenu", MA.bind(this._onContextMenu, this));
     map.on("data", MA.bind(this._onDataLoad, this));
+
+
+   
     /*
     var debug = function() {
         var center = map.getCenter();
@@ -144,10 +236,20 @@ GSIBV.Map = class extends MA.Class.Base {
     debug();
     map.on("move",debug);
     */
+
     this._map = map;
+    
+    this._hanreiLoader = new GSIBV.Map.HanreiLoader( this, GSIBV.CONFIG.HANREILIST);
+
 
 
     this._fireMoveEvent("move");
+  }
+
+
+  set compassControlVisible(value) {
+    if ( !this._compassControl)return;
+    this._compassControl.visible = value;
   }
 
   _onTransformRequest(url, resourceType) {
@@ -181,6 +283,10 @@ GSIBV.Map = class extends MA.Class.Base {
     return this._map.getZoom();
   }
 
+  get centerCrossVisible() {
+    return this._centerCrossVisible;
+  }
+
   get searchResultLayer() {
     return this._searchResultLayer;
   }
@@ -195,6 +301,10 @@ GSIBV.Map = class extends MA.Class.Base {
     return this._spriteManager;
   }
 
+  get drawManager() {
+    return this._drawManager;
+  }
+
   _onLoad() {
 
     var list = this._spriteManager.getList();
@@ -207,6 +317,8 @@ GSIBV.Map = class extends MA.Class.Base {
     this._initializeMapControlLayers();
     this.fire("load");
 
+    
+    
   }
   _onDataLoad(e) {
   }
@@ -249,6 +361,7 @@ GSIBV.Map = class extends MA.Class.Base {
   }
 
   _onContextMenu(e) {
+    if ( this._printMode || this._drawManager.drawing)return;
     this.showPopupContextMenu(e.lngLat,{
       left:e.originalEvent.clientX, 
       top:e.originalEvent.clientY
@@ -302,6 +415,8 @@ GSIBV.Map = class extends MA.Class.Base {
         }
 
 
+        var sakuzuFeatures = {};
+
         for( var i=0; i<features.length; i++ ) {
           
           var item = {
@@ -310,8 +425,17 @@ GSIBV.Map = class extends MA.Class.Base {
           };
 
           var feature = features[i];
+          // 作図
+          if ( feature.properties  && feature.properties["-sakuzu-id"]) {
+            if ( sakuzuFeatures[ feature.properties["-sakuzu-id"]]) continue;
+            sakuzuFeatures[ feature.properties["-sakuzu-id"]] = true;
+            item.title = feature.properties["-sakuzu-title"];
+            menuItems.push(item);
+            continue;
+          }
+          //
           if (feature.layer.metadata ) {
-            if ( feature.layer.metadata.title ) {
+            if ( feature.layer.metadata.path ) {
               
               if ( vectorTile) {
                 var path = feature.layer.metadata.path;
@@ -326,13 +450,21 @@ GSIBV.Map = class extends MA.Class.Base {
               } else {
                 item.title = feature.layer.metadata.path ;
               }
+            } else if ( feature.layer.metadata.title) {
+              item.title = feature.layer.metadata.title;
             }
             
             if ( feature.layer.metadata["layer-id"] ) {
               item["layer-id"] = feature.layer.metadata["layer-id"];
             }
+          } else if ( feature.properties ) {
+            //console.log(feature);
+            if ( feature.properties["name"] ) {
+              item.title = feature.properties["name"];
+            }
           }
           
+          if ( item.title == langCaption["unknownobject"] ) continue;
           menuItems.push(item);
         }
       }
@@ -424,6 +556,7 @@ GSIBV.Map = class extends MA.Class.Base {
 
   _onClick(e) {
 
+    if ( this._drawManager.drawing)return;
 
     var featuresAll = [];
     var layerIdHash = {};
@@ -434,7 +567,7 @@ GSIBV.Map = class extends MA.Class.Base {
         var features = this._map.queryRenderedFeatures(new mapboxgl.Point(x, y));
         for (var i = 0; i < features.length; i++) {
           var feature = features[i];
-          if (layerIdHash[feature.layer.id] || (!feature.sourceLayer && !feature.properties["-gsibv-popupContent"])) continue;
+          if (layerIdHash[feature.layer.id] ) continue;// || (!feature.sourceLayer && !feature.properties["-gsibv-popupContent"])) continue;
           featuresAll.push(feature);
           layerIdHash[feature.layer.id] = true;
         }
@@ -444,6 +577,7 @@ GSIBV.Map = class extends MA.Class.Base {
     if (featuresAll.length > 0) {
       var html = '';
       for (var i = 0; i < featuresAll.length; i++) {
+        if ( i>0) return;
         if (featuresAll[i].properties["-gsibv-popupContent"]) {
           html = featuresAll[i].properties["-gsibv-popupContent"];
           break;
@@ -467,6 +601,7 @@ GSIBV.Map = class extends MA.Class.Base {
       this._map.flyTo({ center: center, zoom: zoom });
 
   }
+
   setView(latlng) {
     if ((latlng.lat || latlng.lat == 0) && (latlng.lng || latlng.lng == 0)) {
       this._map.setCenter([latlng.lng, latlng.lat]);
@@ -497,6 +632,13 @@ GSIBV.Map = class extends MA.Class.Base {
 
     this.fire("layerchange");
   }
+
+  _onLayerOrderChange() {
+    if ( this._drawManager ) this._drawManager.layerList.refreshLayerOrder();
+    this._controlLayerList.refreshLayerOrder();
+    this.fire("layerchange");
+  }
+
   _onLayerChange() {
     this.fire("layerchange");
   }
@@ -524,6 +666,10 @@ GSIBV.Map = class extends MA.Class.Base {
   }
 
 
+  _onDrawManagerLayerListChange() {
+    this._controlLayerList.refreshLayerOrder();
+  }
+
   addLayer(layer) {
     if (!this._vectorTileLoadHandler) {
       this._vectorTileLoadHandler = MA.bind(this._onVectorTileLoad, this);
@@ -536,22 +682,24 @@ GSIBV.Map = class extends MA.Class.Base {
     var result = this._layerList.add(layer);
 
 
-    this._controlLayerList.refreshLayerOrder();
+    //this._drawManager.layerList.refreshLayerOrder();
+    //this._controlLayerList.refreshLayerOrder();
 
     return result;
   }
 
   removeLayer(layer) {
-    this._layerList.remove(layer);
+    layer = this._layerList.remove(layer);
 
 
-
-    layer.off("loading", this._vectorTileLoadHandler);
-    layer.off("load", this._vectorTileLoadHandler);
-    layer.off("breakpoint", this._vectorTileLoadHandler);
-    layer.off("finish", this._vectorTileLoadHandler);
-
-    this._controlLayerList.refreshLayerOrder();
+    if ( layer) {
+      layer.off("loading", this._vectorTileLoadHandler);
+      layer.off("load", this._vectorTileLoadHandler);
+      layer.off("breakpoint", this._vectorTileLoadHandler);
+      layer.off("finish", this._vectorTileLoadHandler);
+    }
+    //this._drawManager.layerList.refreshLayerOrder();
+    //this._controlLayerList.refreshLayerOrder();
   }
 
 
@@ -578,6 +726,7 @@ GSIBV.Map = class extends MA.Class.Base {
       this._layerList.down(layer, Math.abs(inc));
 
 
+    if ( this._drawManager ) this._drawManager.layerList.refreshLayerOrder();
     this._controlLayerList.refreshLayerOrder();
   }
 
@@ -635,3 +784,137 @@ GSIBV.Map = class extends MA.Class.Base {
   }
 
 }
+
+
+
+GSIBV.Map.AutoPan = class extends MA.Class.Base {
+
+  constructor(map) {
+    super();
+    this._map = map;
+  }
+
+  stop() {
+    this.destroy();
+  }
+
+  _destroyTimer() {
+    if ( this._timer ) {
+      clearInterval( this._timer);
+      this._timer = undefined;
+    }
+  }
+
+  destroy() {
+    this._destroyTimer();
+
+    if ( this._mouseMoveHandler ) {
+      MA.DOM.off(this._map.getCanvasContainer(), "mousemove", this._mouseMoveHandler );
+      this._mouseMoveHandler = undefined;
+    }
+    if ( this._mouseOutHandler ) {
+      MA.DOM.off(this._map.getCanvasContainer(), "mouseleave", this._mouseOutHandler );
+      this._mouseOutHandler = undefined;
+    }
+    if ( this._mapMoveHandler ) {
+      this._map.off( "move", this._mapMoveHandler );
+      this._mapMoveHandler = undefined;
+    }
+  }
+
+  start() {
+    if ( !this._mouseMoveHandler ) {
+      this._mouseMoveHandler = MA.bind( this._onMouseMove, this );
+      MA.DOM.on(this._map.getCanvasContainer(), "mousemove", this._mouseMoveHandler );
+    }
+    if ( !this._mouseOutHandler ) {
+      this._mouseOutHandler = MA.bind( this._onMouseOut, this );
+      MA.DOM.on(this._map.getCanvasContainer(), "mouseleave", this._mouseOutHandler );
+    }
+    
+    if ( !this._mapMoveHandler ) {
+      this._mapMoveHandler = MA.bind( this._onMapMove, this );
+      this._map.on( "move", this._mapMoveHandler );
+    }
+  }
+
+  _onMouseOut() {
+    this._prevMousePos = undefined;
+    this._panInfo = undefined;
+    this._destroyTimer();
+  }
+
+  _onMouseMove(e) {
+    var map = this._map;
+    var offset = MA.DOM.offset(map.getContainer() );
+    var size = MA.DOM.size(map.getContainer() );
+
+    if ( offset.left > e.pageX || offset.left + size.width < e.pageX
+        || offset.top > e.pageY || offset.top + size.height < e.pageY ) {
+      this._panInfo = undefined;
+      this._destroyTimer();
+      this._prevMousePos = {
+        x : e.pageX,
+        y : e.pageY
+      };
+      return;
+    }
+
+    if ( this._prevMousePos ){
+      var panBy = {
+        x:0,
+        y:0
+      };
+
+      if (this._panInfo && this._prevMousePos.x == e.pageX ) {
+        panBy.x = this._panInfo.x;
+      }
+      if (this._panInfo && this._prevMousePos.y == e.pageY ) {
+        panBy.y = this._panInfo.y;
+      }
+
+      
+      if ( e.pageX < 50 && this._prevMousePos.x > e.pageX){ 
+        panBy.x = -128;
+      } else if ( e.pageX > offset.left+size.width - 50 && this._prevMousePos.x < e.pageX ) {
+        panBy.x = 128;
+      }
+      
+      if ( e.pageY < 50 && this._prevMousePos.y > e.pageY){ 
+        panBy.y = -128;
+      } else if ( e.pageY > offset.top+size.height - 50 && this._prevMousePos.y < e.pageY ) {
+        panBy.y = 128;
+      }
+
+
+      if ( panBy.x != 0 || panBy.y != 0) {
+        this._panInfo = panBy;
+        if ( !this._timer) {
+          this._pan();
+          this._timer = setInterval( MA.bind(this._pan,this) , 500);
+        }
+      } else {
+        this._panInfo = undefined;
+        this._destroyTimer();
+      }
+    }
+
+    this._prevMousePos = {
+      x : e.pageX,
+      y : e.pageY
+    };
+  }
+
+
+  _pan() {
+    if ( !this._panInfo ) return;
+    this._map.panBy( new mapboxgl.Point(this._panInfo.x,this._panInfo.y),undefined, {"from":"-auto-pan"});
+
+  }
+
+  _onMapMove(evt) {
+    if ( evt.from == "-auto-pan") {
+      this.fire("move");
+    }
+  }
+};

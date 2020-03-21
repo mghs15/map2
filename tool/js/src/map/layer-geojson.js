@@ -15,7 +15,8 @@ GSIBV.Map.Layer.FILTERS.push(function (l) {
     });
   }
 
-  if (!l.url.match(/\{z\}/i) && l.url.match(/\.geojson$/i)) {
+  var url = l.url.split("?")[0];
+  if (!url.match(/\{z\}/i) && url.match(/\.geojson$/i)) {
     return new GSIBV.Map.Layer.GeoJSON({
       "id": l.id,
       "title": l.title,

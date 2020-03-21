@@ -17,7 +17,8 @@ GSIBV.Map.Layer.FILTERS.push(function (l) {
     });
   }
 
-  if (l.url.match(/\{z\}/i) && l.url.match(/\.(jpg|jpeg|bmp|png)$/i)) {
+  var url = l.url.split("?")[0];
+  if (url.match(/\{z\}/i) && url.match(/\.(jpg|jpeg|bmp|png)$/i)) {
     return new GSIBV.Map.Layer.Raster({
       "id": l.id,
       "title": l.title,
@@ -98,14 +99,14 @@ GSIBV.Map.Layer.Raster = class extends GSIBV.Map.Layer {
     //map.map.style.sourceCaches[this.mapid]._source.reparseOverscaled=true;
     //map.map.style.sourceCaches[this.mapid]._source.tileSize=512;
 
-
+    var maxZoom = (this.maxzoom ? this.maxzoom + 1 : 19);
 
     map.map.addLayer({
       "id": this.mapid,
       "type": "raster",
       "source": this.mapid,
       "minzoom": this.minzoom ? this.minzoom : 2,
-      "maxzoom": this.maxzoom ? this.maxzoom + 1 : 19,
+      "maxzoom": maxZoom,
       "paint": {
         "raster-opacity": 1,
         "raster-resampling": "nearest"

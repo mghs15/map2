@@ -20,6 +20,16 @@ GSIBV.UI.ContextMenu = class extends GSIBV.UI.Base {
     return size.height;
   }
 
+  get buttonHeight() {
+    if (MA.DOM.hasClass(this._container, "-ma-expand")) {
+      return 0;
+    }
+
+    var size = MA.DOM.size(this._toggleButton);
+    return size.height;
+
+  }
+
   _onLangChange() {
 
     var lang = GSIBV.application.lang;
@@ -43,6 +53,7 @@ GSIBV.UI.ContextMenu = class extends GSIBV.UI.Base {
     } else {
       this._container = this._options.container;
     }
+    MA.DOM.find( this._container,".controls")[0].style.display = 'block';
 
     this._layerInfoView = MA.DOM.select(".context-menu-layer-info")[0];
     this._layerInfoView.style.display = 'none';
@@ -79,6 +90,7 @@ GSIBV.UI.ContextMenu = class extends GSIBV.UI.Base {
     //map.addControl(resetRotate, 'bottom-right');
     this._onLangChange();
     if (visible) this.show();
+    this._updateHint();
   }
 
   _onCenterModeClick() {
@@ -357,12 +369,16 @@ GSIBV.UI.ContextMenu = class extends GSIBV.UI.Base {
       this._container.style.height = size.height + "px";
       var control = MA.DOM.select(".mapboxgl-ctrl-bottom-right")[0];
       control.style.bottom = size.height + "px";
-      this.fire( "refresh", {height:size.height});
+      this.fire( "refresh", {height:size.height, buttonHeight:0});
     } else {
 
       this._container.style.marginBottom = '-' + size.height + 'px';
       this._container.style.height = size.height + "px";
-      this.fire( "refresh", {height:0});
+      
+    
+      size = MA.DOM.size(this._toggleButton);
+
+      this.fire( "refresh", {height:0, buttonHeight:size.height});
     }
 
   }
@@ -377,16 +393,60 @@ GSIBV.UI.ContextMenu = class extends GSIBV.UI.Base {
     this._container.addEventListener('transitionend', handler);
 
   }
+
+  _updateHint() {
+    try {
+      var HINT = GSIBV.CONFIG.LANG.JA.UI.CONTEXTMENU_HINT;
+      if (MA.DOM.hasClass(this._container, "-ma-expand-full")) {
+        this._toggleButton.setAttribute("title", HINT["expand-full"] );
+      } else if (MA.DOM.hasClass(this._container, "-ma-expand")) {
+        this._toggleButton.setAttribute("title", HINT["expand"] );
+      } else {
+        this._toggleButton.setAttribute("title", HINT["close"] );
+      }
+    } catch(ex) {
+
+    }
+  }
+
   _onToggleClick() {
+    
+    this._featuresFrame.style.visibility = 'hidden';
     if (!MA.DOM.hasClass(this._container, "-ma-expand")) {
       this.show();
+    } else if (!MA.DOM.hasClass(this._container, "-ma-expand-full")) {
+      this._featuresFrame.style.visibility = 'visible';
+      this.show(true);
     } else {
       this.hide();
     }
   }
-  show() {
+  show(full) {
 
     this._start();
+    
+    if ( full ) {
+      MA.DOM.addClass(this._container, "-ma-expand-full");
+
+      if ( !GSIBV.CONFIG.MOBILE )
+        MA.DOM.find( this._container,".controls")[0].style.display = 'block';
+      var trList = MA.DOM.find(this._container, "tr.row");
+      for( var i=0; i< trList.length; i++) {
+        trList[i].style.display = 'block';
+      }
+    } else {
+      
+      MA.DOM.removeClass(this._container, "-ma-expand-full");
+      MA.DOM.find( this._container,".controls")[0].style.display = 'none';
+      var trList = MA.DOM.find(this._container, "tr.row");
+      for( var i=0; i< trList.length; i++) {
+        if ( MA.DOM.hasClass(trList[i],"elevation"))
+          trList[i].style.display = 'block';
+        else
+        trList[i].style.display = 'none';
+      }
+    }
+    
     var size = MA.DOM.size(MA.DOM.find(this._container, ".context-menu-content")[0]);
     this._container.style.marginBottom = '-' + size.height + 'px';
     this._container.style.height = size.height + "px";
@@ -403,19 +463,22 @@ GSIBV.UI.ContextMenu = class extends GSIBV.UI.Base {
     }, this);
     this._container.addEventListener('transitionend', handler);
 
-    this.fire("show", {height:size.height});
+    this.fire("show", {height:size.height, buttonHeight:0});
+
 
 
     var control = MA.DOM.select(".mapboxgl-ctrl-bottom-right")[0];
     control.style.transition = "bottom 200ms";
     control.style.bottom = size.height + "px";
-
+    this._updateHint();
   }
 
   hide() {
 
     this._stop();
     var size = MA.DOM.size(this._container);
+
+    MA.DOM.removeClass(this._container, "-ma-expand-full");
 
     this._container.style.transition = 'margin-bottom 300ms';
     this._container.style.marginBottom = '-' + size.height + 'px';
@@ -428,11 +491,16 @@ GSIBV.UI.ContextMenu = class extends GSIBV.UI.Base {
     this._container.addEventListener('transitionend', handler);
 
     MA.DOM.removeClass(this._container, "-ma-expand");
-    this.fire("hide");
+
+    
+    var buttonSize = MA.DOM.size(this._toggleButton);
+
+    this.fire("hide", {height:0, buttonHeight:buttonSize.height});
 
     var control = MA.DOM.select(".mapboxgl-ctrl-bottom-right")[0];
     control.style.transition = "bottom 200ms";
     control.style.bottom = 0;
+    this._updateHint();
 
   }
 
@@ -457,6 +525,13 @@ GSIBV.UI.ContextMenu = class extends GSIBV.UI.Base {
 
     for (var i = 0; i < features.length; i++) {
       var feature = features[i];
+      
+      var feature = features[i];
+      // 作図
+      if ( feature.properties  && feature.properties["-sakuzu-id"]) {
+        continue;
+      }
+
       var li = this._makeFeatureRow(feature, frame);
 
       if (li) ul.appendChild(li);
@@ -468,8 +543,8 @@ GSIBV.UI.ContextMenu = class extends GSIBV.UI.Base {
     this._featuresFrame.appendChild(frame);
 
 
-
     this._featuresFrame.style.display = '';
+    
 
     try {
       frame._scrollBar = new PerfectScrollbar(frame);
@@ -510,6 +585,8 @@ GSIBV.UI.ContextMenu = class extends GSIBV.UI.Base {
         }
         title = pathParts.join("-");
       }
+    } else {
+      return undefined;
     }
     a.innerHTML = title;
     li.appendChild(a);

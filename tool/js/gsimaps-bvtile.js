@@ -1,5 +1,28 @@
+
+
+
+/************************************************************************
+ モバイル判定
+************************************************************************/
+if (location.pathname.indexOf(GSIBV.CONFIG.MOBILE_FILENAME) < 0) {
+  if (
+    navigator.userAgent.indexOf('iPhone') > 0 ||
+    navigator.userAgent.indexOf('iPad') > 0 ||
+    navigator.userAgent.indexOf('iPod') > 0 ||
+    navigator.userAgent.indexOf('Android') > 0
+  ) {
+    var hash = location.hash;
+    if (!hash || hash.indexOf("&frommobile") < 0) {
+      location.href = GSIBV.CONFIG.MOBILEURL + hash;
+    }
+  }
+}
+
+
 //縦書きプラグイン有効
 mapboxgl.setRTLTextPlugin('./mapbox-rtlplugin/vertical-text.js');
+
+console.log( "mapbox" + mapboxgl.version  );
 
 GSIBV.Config = {
 
@@ -10,7 +33,7 @@ GSIBV.Config = {
     }
   ],
   defaultView: {
-    "leftPanel": true
+    "leftPanel": !GSIBV.CONFIG.MOBILE
   },
   localFont: "'sans-serifi', 'MS Gothic', 'Hiragino Kaku Gothic Pro', sans-serif"
 };
@@ -19,6 +42,36 @@ GSIBV.Config = {
   GSIBV.Config.useLocalFont = false;
 //}
 
+// ブラウザ判定
+var userAgent = window.navigator.userAgent.toLowerCase();
+GSIBV.BROWSER = {};
+
+// Firefox、Safariで印刷させるための設定
+GSIBV.BROWSER.USEPRESERVEDRAWINGBUFFER = [
+  "SAFARI", "FIREFOX"
+];
+if(userAgent.indexOf('msie') != -1 ||　userAgent.indexOf('trident') != -1) {
+  GSIBV.BROWSER.IE = true;
+} else if(userAgent.indexOf('edge') != -1) {
+  GSIBV.BROWSER.EDGE = true;
+} else if(userAgent.indexOf('chrome') != -1) {
+  GSIBV.BROWSER.CHROME = true;
+} else if(userAgent.indexOf('safari') != -1) {
+  GSIBV.BROWSER.SAFARI = true;
+} else if(userAgent.indexOf('firefox') != -1) {
+  GSIBV.BROWSER.FIREFOX = true;
+} else if(userAgent.indexOf('opera') != -1) {
+  GSIBV.BROWSER.OPERA = true;
+}
+
+// Firefox、Safariで印刷させるための設定
+GSIBV.Config.usePreserveDrawingBuffer = false;
+for( var key in GSIBV.BROWSER) {
+  if ( GSIBV.BROWSER.USEPRESERVEDRAWINGBUFFER.indexOf(key) >= 0 ) {
+    GSIBV.Config.usePreserveDrawingBuffer = true;
+    break;
+  }
+}
 
 
 /***************************************
@@ -37,6 +90,19 @@ GSIBV.Application = class extends MA.Class.Base {
   constructor() {
     super();
 
+    this._tooltipManager = new GSIBV.Application.TooltipManager(this);
+
+    // ファイルのドロップ受入
+    if ( !this._windowDragOverHandler  ) {
+      this._windowDragOverHandler = MA.bind( this._onWindowDragOver, this );
+      window.addEventListener("dragover", this._windowDragOverHandler, false);
+    }
+
+    if ( !this._windowDragDropHandler  ) {
+      this._windowDragDropHandler = MA.bind( this._onWindowDragDrop, this );
+      window.addEventListener("drop", this._windowDragDropHandler, false);
+    }
+
     this._lang = "ja";
     
     /*
@@ -48,16 +114,29 @@ GSIBV.Application = class extends MA.Class.Base {
     */
 
     this._hashManager = new GSIBV.HashManager(this, GSIBV.Config.defaultLayers, GSIBV.Config.defaultView);
+    
     this._lang = this._hashManager.initialParams["lang"];
+    GSIBV.Map.Layer.FreeRelief.DataManager.instance.data = this._hashManager.initialParams["reliefdata"];
 
     if ( this._hashManager.initialParams["lang"] != undefined &&
         this._hashManager.initialParams["lang"] != "" )
       this._lang = this._hashManager.initialParams["lang"];
 
-    this._layersJSON= new GSIBV.LayersJSON (GSIBV.CONFIG.GSIMAPLAYERS,"https://maps.gsi.go.jp/");
+    var layersJSONTopUrl = location.protocol + "//" + location.host + location.pathname;
+    
+    if ( layersJSONTopUrl.match(/\.[^.\/]+$/g)) {
+      layersJSONTopUrl = layersJSONTopUrl.replace(/\/[^\/]*\.[^.\/]+$/g, "/");
+    }
+    this._layersJSON= new GSIBV.LayersJSON (GSIBV.CONFIG.GSIMAPLAYERS,layersJSONTopUrl);
     this._layerTreeDialog = new GSIBV.UI.Dialog.LayerTree();
     this._layerTreeDialog.layersJSON = this._layersJSON;
     this._layerTreeDialog.on("select", MA.bind(this._onGSIMAPLayerSelect,this));
+    this._layerTreeDialog.on("area", MA.bind(this._onGSIMAPLayerArea,this));
+    this._layerTreeDialog.on("hide",MA.bind(function(){
+      if ( !GSIBV.CONFIG.MOBILE ) return;
+      this._leftPanel.show();
+    },this));
+
     this._layersJSON.on("layerload", MA.bind(this._onLayerTreeLayerLoad, this));
 
     this._mainMenu = new GSIBV.UI.MainMenu(this,{
@@ -105,11 +184,18 @@ GSIBV.Application = class extends MA.Class.Base {
   }
   set lang(lang) { this._lang = lang; this._initializeLang();}
 
+  get started() { return this._started;}
+  get tooltipManager() { return this._tooltipManager; }
+
   /*------------------------------------------
       メソッド
   ------------------------------------------*/
   // 初期化
   initialize() {
+
+    if ( GSIBV.CONFIG.MOBILE ) {
+      MA.DOM.addClass(MA.DOM.select("#main")[0],"mobile");
+    }
 
     this._initializeTitle();
     MA.DOM.select("#main")[0].style.display = 'block';
@@ -147,7 +233,6 @@ GSIBV.Application = class extends MA.Class.Base {
 
     this._contextMenu.initialize();
     this._leftPanel.contextMenu = this._contextMenu;
-
     this._leftPanel.initialize({
       recommendData: GSIBV.CONFIG.RECOMMEND
     },
@@ -173,13 +258,27 @@ GSIBV.Application = class extends MA.Class.Base {
       this.start();
     }, this));
 
+    this._map.on("showleftpanel", MA.bind(function(){
+      this._leftPanel.show();
+    },this));
     this._map.on("vectortile", MA.bind(this._onVectorTileLoad, this));
     this._hashManager.initialize(this._map, this._leftPanel);
     this._map.initialize(this._hashManager.initialParams);
 
     this._hashManager.on("change", MA.bind(this._onHashChange, this));
+    this._map.on("printmodechange", MA.bind(function(evt){
+      try {
+        if ( evt.params.mode) {
+          GSIBV.UI.Dialog.Modeless.Manager.get().hide();
+        } else {
+          GSIBV.UI.Dialog.Modeless.Manager.get().show();
+        }
+      }catch(ex){}
+    },this) );
 
     this._contextMenu.map = this._map;
+
+
   }
   _onVectorTileLoad(e) {
 
@@ -224,19 +323,26 @@ GSIBV.Application = class extends MA.Class.Base {
   }
   // 開始
   start() {
+    
     this._leftPanel.recommendSelector.map = this._map;
     this._leftPanel.displayLayerListView.map = this._map;
     this._initializeInitialLayers();
+    this._started=true;
+    this.fire("start");
+
   }
 
   _onHashChange(e) {
+    if ( !e.params || !e.params.center) return;
     this._map.flyTo(e.params.center, e.params.zoom);
   }
   
   _initializeInitialLayers() {
     if (!this._hashManager.initialParams || !this._hashManager.initialParams.ls) return;
     this._unknownLayers = {};
-
+    // 確認ダイアログ
+    
+    
     for (var i = 0; i < this._hashManager.initialParams.ls.length; i++) {
       var info = this._hashManager.initialParams.ls[i];
       var visible = true;
@@ -264,6 +370,32 @@ GSIBV.Application = class extends MA.Class.Base {
 
   }
 
+  _checkConfirm(layer) {
+    for( var key in GSIBV.CONFIG.CONFIRM_LAYERS ){
+      var item = GSIBV.CONFIG.CONFIRM_LAYERS[key];
+      var idx = item.layers.indexOf(layer.id);
+      if ( idx >= 0 ) {
+
+        return this.showLayerConfirm(layer, item);
+      }
+    }
+
+    if ( layer.parent.title == "指定緊急避難場所") {
+      return this.showEvacConfirm( 
+        MA.bind(function(layer){
+          var layer = GSIBV.Map.Layer.generate(layer);
+          if (layer) this._map.addLayer(layer);
+        },this, layer),
+        
+        MA.bind(function(layer){
+          this._map.removeLayer(layer);
+        },this, layer)
+
+      );
+    }
+
+    return true;
+  }
   _onLayerTreeLayerLoad(e) {
     if ( !this._unknownLayers ) {
       e.params.loadNext = false;
@@ -272,8 +404,10 @@ GSIBV.Application = class extends MA.Class.Base {
     var layer = e.params.layer;
     if ( this._unknownLayers[layer.id]) {
       delete this._unknownLayers[layer.id];
-      var layer = GSIBV.Map.Layer.generate(layer);
-      if (layer) this._map.addLayer(layer);
+      if ( this._checkConfirm(layer) ) {
+        var layer = GSIBV.Map.Layer.generate(layer);
+        if (layer) this._map.addLayer(layer);
+      }
     }
     
     if ( Object.keys(this._unknownLayers).length> 0 )
@@ -283,9 +417,131 @@ GSIBV.Application = class extends MA.Class.Base {
 
   }
 
+  // 印刷画面開始
+  print() {
+    if ( this._sakuzuDialog) {
+      this._sakuzuDialog.showConfirm( MA.bind(function(){ this._print();},this));
+      return;
+    }
+
+    this._print();
+  }
+
+  _print() {
+    this._leftPanel.displayLayerListView.hideStyleEditor();
+    var html = MA.DOM.select("html")[0];
+
+    html.style.height = 'auto';
+    html.style.overflowX = 'auto';
+    html.style.overflowY = 'auto';
+    
+    document.body.style.height = 'auto';
+    document.body.style.overflowX = 'visible';
+    document.body.style.overflowY = 'visible';
+
+    MA.DOM.addClass(MA.DOM.select("#main")[0],"print");
+
+    this._map.printMode = true;
+    this._map.compassControlVisible = false;
+
+    this._printCancelHandler =  MA.bind(function(){
+      this.exitPrint();
+    },this );
+    
+    this._printHandler =  MA.bind(function(){
+      window.print();
+    },this );
+
+    
+    this._printSizeChangeHandler =  MA.bind(function(){
+      this._resetPrintPaperSize();
+    },this );
+
+
+    
+    this._visibleCompassHandler =  MA.bind(function(){
+      this._resetPrintCompassVisible();
+    },this );
+
+    MA.DOM.on( MA.DOM.select( ".print-header .size")[0], "change", this._printSizeChangeHandler );
+    MA.DOM.on( MA.DOM.select( ".print-header .print")[0], "click", this._printHandler );
+    MA.DOM.on( MA.DOM.select( ".print-header .back")[0], "click", this._printCancelHandler );
+    MA.DOM.on( MA.DOM.select( "#gsi_print_directionsign")[0], "click", this._visibleCompassHandler );
+    
+    
+    this._resetPrintPaperSize();
+    this._resetPrintCompassVisible();
+  }
+
+  _resetPrintCompassVisible() {
+    
+    var elem = MA.DOM.select( "#gsi_print_directionsign")[0];
+    this._map.compassControlVisible = elem.checked;
+  }
+
+  _resetPrintPaperSize() {
+
+    var elem = MA.DOM.select( ".print-header .size")[0];
+    
+    var size = GSIBV.CONFIG.PAPERSIZE[elem.value];
+    if ( !size) return;
+
+    MA.DOM.select("#main.print .content")[0].style.width = size.w + "px";
+    MA.DOM.select("#main.print .content")[0].style.height = size.h + "px";
+    this._map.invalidate();
+
+  }
+
+  exitPrint() {
+    
+    MA.DOM.select("#main.print .content")[0].style.width = "auto";
+    MA.DOM.select("#main.print .content")[0].style.height = "auto";
+
+    MA.DOM.off( MA.DOM.select( ".print-header .back")[0], "click", this._printCancelHandler  );
+    MA.DOM.off( MA.DOM.select( ".print-header .print")[0], "click", this._printHandler  );
+    MA.DOM.off( MA.DOM.select( ".print-header .size")[0], "change", this._printSizeChangeHandler );
+    MA.DOM.off( MA.DOM.select( "#gsi_print_directionsign")[0], "click", this._visibleCompassHandler );
+    
+    var html = MA.DOM.select("html")[0];
+
+    html.style.height = '100%';
+    html.style.overflow = 'hidden';
+    
+    document.body.style.height = '100%';
+    document.body.style.overflow = 'hidden';
+
+    MA.DOM.removeClass(MA.DOM.select("#main")[0],"print");
+
+    this._map.printMode = false;
+
+  }
+
+  
   /*------------------------------------------
       イベントハンドラ
   ------------------------------------------*/
+  _onWindowDragOver(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    evt.dataTransfer.dropEffect = ( this._started  ? "copy" : "uninitialized" );
+    
+  }
+
+  _onWindowDragDrop(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    if ( !this._started ) return;
+
+
+    var loader = new GSIBV.LocalFileLoader(evt.dataTransfer.files);
+    loader.on("load", MA.bind(function(evt){
+      this.fire("filedrop", evt.params);
+    },this));
+    loader.load();
+  }
+
+
+
   // 検索リクエスト
   _onSearchRequest(e) {
     switch (e.params.type) {
@@ -333,7 +589,126 @@ GSIBV.Application = class extends MA.Class.Base {
 
   }
 
-  // 現在の地理院地図でのURL
+  // 作図
+  startSakuzu() {
+    /*
+    if ( !this._sakuzuPanel ) {
+      this._sakuzuPanel = new GSIBV.UI.Sakuzu.Panel( this._map.drawManager,{
+        container : "#sakuzu-panel"
+      });
+    }
+    this._sakuzuPanel.toggle();
+    */
+
+    if ( !this._sakuzuDialog ) {
+      this._sakuzuDialog = new GSIBV.UI.Dialog.SakuzuDialog(this._map.drawManager);
+    }
+    this._sakuzuDialog.show();
+  }
+
+  // 指定緊急避難場所確認
+  showEvacConfirm( okProc, cancelProc ) {
+    if( this._evacOK) {
+      return true;
+    }
+    var proc = MA.bind( function(okProc,cancelProc){
+      
+      if( this._evacOK) {
+        okProc();
+        this._confirmQue.shift();
+        return this._showNextConfirm();
+      }
+      var confirm = new GSIBV.UI.Dialog.Confirm();
+      confirm.on("ok", MA.bind(function(proc){
+        this._evacOK = true; proc();
+        this._confirmQue.shift();
+        this._showNextConfirm();
+      },this,okProc));
+      confirm.on("cancel", MA.bind(function(proc){
+        if ( proc ) proc();
+        this._confirmQue.shift();
+        this._showNextConfirm();
+      },this,cancelProc));
+      confirm.show("免責事項・ご利用上の注意",MA.DOM.select( "#template .evac")[0].cloneNode(true));
+
+    },this, okProc, cancelProc );
+    
+
+    if ( !this._confirmQue)this._confirmQue = [];
+
+
+    this._confirmQue.push( proc);
+
+    if ( this._confirmQue.length == 1 )
+      this._showNextConfirm();
+
+
+    return false;
+  }
+
+  _showNextConfirm() {
+    if ( !this._confirmQue || this._confirmQue.length<=0) return;
+    var proc = this._confirmQue[0];
+    proc();
+  }
+
+  showLayerConfirm(layer, confirmInfo) {
+    if ( confirmInfo.ok) return true;
+
+    var proc = MA.bind( function(layer,confirmInfo){
+      if ( confirmInfo.ok) {
+        this._confirmQue.shift();
+        return this._showNextConfirm();
+      }
+      var confirm = new GSIBV.UI.Dialog.Confirm();
+      confirm.on("ok", MA.bind(function(layer,confirmInfo){
+        confirmInfo.ok = true;
+        var layer = GSIBV.Map.Layer.generate(layer);
+        if (layer) this._map.addLayer(layer);
+        this._confirmQue.shift();
+        this._showNextConfirm();
+      },this,layer,confirmInfo));
+
+      confirm.on("cancel", MA.bind(function(layer,confirmInfo){
+        this._map.removeLayer(layer.id);
+        this._confirmQue.shift();
+        this._showNextConfirm();
+      },this,layer,confirmInfo));
+      
+      confirm.show(confirmInfo.title, confirmInfo.message);
+
+    },this, layer, confirmInfo );
+    
+
+    if ( !this._confirmQue)this._confirmQue = [];
+
+
+    this._confirmQue.push( proc);
+
+    if ( this._confirmQue.length == 1 )
+      this._showNextConfirm();
+
+
+
+    return false;
+  }
+
+  // 自然災害伝承碑ダイアログ
+  showDsloretDialog( data ) {
+    var dialog = new GSIBV.UI.Dialog.Dsloret();
+    dialog.show( data);
+  }
+
+  // PC版URL
+  getPCUrl() {
+    return GSIBV.CONFIG.URL + this._hashManager.makeHash( false, true) + "&frommobile";;
+  }
+  // モバイル版URL
+  getMobileUrl() {
+    return GSIBV.CONFIG.MOBILEURL + this._hashManager.makeHash(true);
+  }
+
+  // 地理院地図でのURL
   getGSIMapsUrl() {
     var result = "https://maps.gsi.go.jp/";
     if ( !this._map ) return result;
@@ -368,6 +743,11 @@ GSIBV.Application = class extends MA.Class.Base {
       if ( layersHash != "" ) {
         hash += "&ls=" + encodeURIComponent(layersHash);
         hash+= "&disp=" + dispHash;
+      }
+      
+      var relief = GSIBV.Map.Layer.FreeRelief.DataManager.instance.text;
+      if ( relief) {
+        hash += "&reliefdata=" + relief;
       }
     }
     result += "#" + hash;
@@ -426,7 +806,8 @@ GSIBV.Application = class extends MA.Class.Base {
         var layer = new GSIBV.Map.Layer.BinaryVectorTile({
           "id": MA.getId("gsi-userfile-"),
           "title": data.title,
-          "user" : true
+          "user" : true,
+          "maxNativeZoom" : data.maxNativeZoom
         });
         layer.data = data;
         this._map.addLayer(layer);
@@ -454,6 +835,14 @@ GSIBV.Application = class extends MA.Class.Base {
 
   // 地理院地図データ一覧表示
   _onShowSelectLayerPopup() {
+    if ( this._layerTreeDialog.isVisible ) {
+      this._layerTreeDialog.hide();
+      return;
+    }
+    
+    
+    if ( GSIBV.CONFIG.MOBILE ) this._leftPanel.hide();//close();
+
     this._layerTreeDialog.show();
     this._layersJSON.load();
   }
@@ -474,6 +863,10 @@ GSIBV.Application = class extends MA.Class.Base {
 
   }
 
+  // 範囲を選択された時
+  _onGSIMAPLayerArea(e) {
+    this._map.flyTo(e.params.area, e.params.area.zoom);
+  }
   // レイヤー削除要求
   _onRequestLayerRemove(e) {
     this._map.removeLayer(e.params.layer);
@@ -536,7 +929,11 @@ GSIBV.HashManager = class extends MA.Class.Base {
 
     }, this));
 
+    GSIBV.Map.Layer.FreeRelief.DataManager.instance.on("change", MA.bind(function () {
+      this._refresh();
 
+    }, this));
+    
   }
 
   _onHashChabge() {
@@ -544,6 +941,7 @@ GSIBV.HashManager = class extends MA.Class.Base {
 
       this._parse(window.location.hash);
       this._currentHash = window.location.hash;
+      this.fire("change");
     }
   }
 
@@ -568,7 +966,49 @@ GSIBV.HashManager = class extends MA.Class.Base {
     }
   }
 
+  makeHash(withoutLeftPanel, forceLeftPanel) {
+    var hash = "#" + this.getPosition();
+
+    if ( this._app.lang != "ja") {
+      hash += "&lang=" + this._app.lang;
+
+    } 
+    var layers = this._map.layers;
+
+    if (layers.length > 0) {
+
+      var layersHash = "";
+      var dispHash = "";
+      for (var i = 0; i < layers.length; i++) {
+        var layer = layers[i];
+        if ( layer.isUserFileLayer ) continue;
+        layersHash += (layersHash != "" ? "|" : "") + layer.id;
+        if (layer.opacity < 1)
+          layersHash += "," + (Math.floor(layer.opacity * 100) / 100);
+        dispHash += (layer.visible ? "1" : "0");
+      }
+
+      hash += "&ls=" + encodeURIComponent(layersHash);
+      hash += "&disp=" + dispHash;
+
+    }
+
+
+    if ( forceLeftPanel || ( !withoutLeftPanel && this._leftPanel.visible ) ) {
+      hash += "&";
+      hash += "d=l";
+    }
+
+    var relief = GSIBV.Map.Layer.FreeRelief.DataManager.instance.text;
+    if ( relief) {
+      hash += "&reliefdata=" + relief;
+    }
+
+    return hash;
+  }
+
   _refresh() {
+    /*
     var center = this._map.center;
     var zoom = this._map.zoom;
 
@@ -606,6 +1046,8 @@ GSIBV.HashManager = class extends MA.Class.Base {
 
 
     }
+    */
+   this._currentHash = this.makeHash();
 
     window.location.replace(this._currentHash);
   }
@@ -684,6 +1126,16 @@ GSIBV.HashManager = class extends MA.Class.Base {
       }
     }
 
+    pattern = /reliefdata\=([^&]+)/;
+    result = hash.match(pattern);
+    if (result) {
+      params["reliefdata"] = GSIBV.Map.Layer.FreeRelief.decodeElevationDataText(result[1])
+      
+    }
+    
+    
+
+
     if (params) this.fire("change", params);
 
     return params;
@@ -692,7 +1144,119 @@ GSIBV.HashManager = class extends MA.Class.Base {
 
 }
 
+/***************************************
+    GSIBV.Application
+    バイナリベクトルタイルアプリケーション
+***************************************/
+GSIBV.Application.TooltipManager = class extends MA.Class.Base {
 
+  constructor(app) {
+    super();
+    this._application = app;
+  }
+
+  add(elem, message) {
+    if ( !this._elements) {
+      this._elements = [];
+    }
+
+    var info = this.getByElem( elem );
+    if ( info ) {
+      info.message = message;
+      return;
+    }
+
+    info = this._createInfo( elem, message );
+    this._elements.push( info );
+  }
+
+  getByElem( elem) {
+    if ( !this._elements ) return null;
+
+    for( var i=0; i<this._elements.length; i++ ) {
+      var info = this._elements[i];
+      if ( info.elem == elem ) {
+        return info;
+      }
+    }
+
+    return null;
+  }
+
+  _createInfo( elem, message) {
+    if (!this._mouseOverHandler) {
+      this._mouseOverHandler = MA.bind( this._onMouseOver, this );
+    }
+    if (!this._mouseOutHandler) {
+      this._mouseOutHandler = MA.bind( this._onMouseOut, this );
+    }
+
+    MA.DOM.on( elem, "mouseenter", this._mouseOverHandler);
+    MA.DOM.on( elem, "mouseleave", this._mouseOutHandler);
+
+    var info = {
+      elem : elem,
+      message : message,
+    };
+
+    elem._tooltipMessage = message;
+    return info;
+  }
+
+  _onMouseOver(evt) {
+    if (!evt.target._tooltipMessage) return;
+    var message = evt.target._tooltipMessage;
+
+
+    this._showTooltip(evt.target, message);
+  }
+
+  _onMouseOut(evt) {
+    this._hideTooltip();
+  }
+
+  _showTooltip(elem, message) {
+    this._createTooltip();
+    var pos = MA.DOM.offset(elem);
+    var size = MA.DOM.size(elem);
+
+    this._container.innerHTML = message;
+    var visible = ( this._container.style.display == "none");
+    
+    this._container.style.visibility = "hidden";
+    this._container.style.display = "block";
+  
+
+    var tipSize = MA.DOM.size(this._container);
+    this._container.style.visibility = "visible";
+    this._container.style.display = "none";
+
+    pos.top += size.height+ 4;
+    pos.left = pos.left + (size.width /2 ) - (tipSize.width/2);
+
+    if ( pos.left< 0 ) pos.left = 0;
+
+    this._container.style.left = pos.left + "px";
+    this._container.style.top = pos.top + "px";
+
+    MA.DOM.fadeIn( this._container,300);
+  }
+
+  _hideTooltip() {
+    if ( !this._container ) return;
+    MA.DOM.fadeOut( this._container,100);
+  }
+
+  _createTooltip() {
+    if ( this._container) return;
+    this._container = MA.DOM.create("div");
+    MA.DOM.addClass( this._container, "-gsibv-tooltip");
+    this._container.style.display = "none";
+
+    document.body.appendChild( this._container );
+
+  }
+};
 
 GSIBV.application = new GSIBV.Application();
 

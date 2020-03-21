@@ -49,6 +49,9 @@ GSIBV.VectorTileData.MapboxLayerGenerator = class {
       var maxzoom = parseFloat(draw.maxzoom) + 1;
 
       var source = draw.source;
+      var s = JSON.parse(JSON.stringify( source.mapboxSource ) );
+      var sourceId = source.id + "-" + s.minzoom + "-" + s.maxzoom; 
+      /*
       var sources = source.mapboxSource;
       var sourceId = source.id;
       var hit  =false;
@@ -65,6 +68,7 @@ GSIBV.VectorTileData.MapboxLayerGenerator = class {
       if (!hit) {
         sourceId += "-" + sources[sources.length-1].minzoom + "-" + sources[sources.length-1].maxzoom;
       }
+      */
 
       var result = {
         "metadata": {

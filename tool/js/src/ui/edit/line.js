@@ -101,7 +101,6 @@ GSIBV.UI.Edit.Line = class extends GSIBV.UI.Edit.Base {
     this._lineDasharrayInput =  new GSIBV.UI.Input.Array(
       MA.DOM.find(this._container, "input[name=line-dasharray]")[0] );
     this._lineDasharrayInput.value = this.drawStyle.getValue("line-dasharray");
-
     // line-offset
     /*
     this._lineOffsetInput = new GSIBV.UI.Input.Number(

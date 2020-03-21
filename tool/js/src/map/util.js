@@ -1,4 +1,26 @@
 GSIBV.Map.Util = {}
+GSIBV.Map.Util.reliefRound = function(val){
+  var nsign = val < 0 ? -1 : 1;
+
+  var iv = Math.floor(val);
+  if (val < 0){
+    iv = Math.ceil(val);
+  }
+
+  var sv = Math.round( (Math.abs(val) - Math.abs(iv)) * 10) / 10;
+  var res = 0;
+  if (sv < 0.3){
+    res = iv;
+  }
+  else if (sv < 0.8){
+    res = iv + ( 0.5 * nsign );
+  }else{
+    res =  iv + ( 1 * nsign );
+  }
+
+  return res;
+};
+
 
 GSIBV.Map.Util.latLngToDMS = function (latLng, useSymbol ) {
 
@@ -436,26 +458,37 @@ GSIBV.Map.Util.ElevationLoader = class extends MA.Class.Base {
       {
         "title": "DEM5A",
         "url": "https://cyberjapandata.gsi.go.jp/xyz/dem5a_png/{z}/{x}/{y}.png",
-        "minzoom": 15,
-        "maxzoom": 15
+        "minzoom": 9,
+        "maxzoom": 15,
+        "fixed": 1
       },
       {
         "title": "DEM5B",
         "url": "https://cyberjapandata.gsi.go.jp/xyz/dem5b_png/{z}/{x}/{y}.png",
-        "minzoom": 15,
-        "maxzoom": 15
+        "minzoom": 9,
+        "maxzoom": 15,
+        "fixed": 1
+      },
+      {
+        "title": "DEM5C",
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/dem5c_png/{z}/{x}/{y}.png",
+        "minzoom": 9,
+        "maxzoom": 15,
+        "fixed": 1
       },
       {
         "title": "DEM10B",
         "url": "https://cyberjapandata.gsi.go.jp/xyz/dem_png/{z}/{x}/{y}.png",
-        "minzoom": 1,
-        "maxzoom": 14
+        "minzoom": 9,
+        "maxzoom": 14,
+        "fixed": 0
       },
       {
         "title": "DEMGM",
         "url": "https://cyberjapandata.gsi.go.jp/xyz/demgm_png/{z}/{x}/{y}.png",
         "minzoom": 8,
-        "maxzoom": 14
+        "maxzoom": 8,
+        "fixed": 0
       }
     ];
 
@@ -536,6 +569,36 @@ GSIBV.Map.Util.ElevationLoader = class extends MA.Class.Base {
     this._load(this._current);
   }
   _makeUrlList() {
+
+    var list = [];
+    var buffList =[];
+    for( var i=0; i<=15; i++) {
+      buffList.push([]);
+    }
+    for (var i = 0; i < this._demUrlList.length; i++) {
+      var demUrl = this._demUrlList[i];
+      if (demUrl.maxzoom < demUrl.minzoom) {
+        var buff = demUrl.maxzoom;
+        demUrl.maxzoom = demUrl.minzoom;
+        demUrl.minzoom = buff;
+      }
+      var minzoom = demUrl.minzoom;
+      for (var z = demUrl.maxzoom; z >= minzoom; z--) {
+        buffList[z].push({
+          "title": demUrl.title,
+          "zoom": z,
+          "url": demUrl.url,
+          "fixed": demUrl.fixed
+        });
+      }
+    }
+
+    for( var i=buffList.length-1; i>=0; i-- ) {
+      for( var j = 0; j<buffList[i].length; j++) {
+        list.push(buffList[i][j]);
+      }
+    }
+    /*
     var list = [];
     for (var i = 0; i < this._demUrlList.length; i++) {
       var demUrl = this._demUrlList[i];
@@ -552,7 +615,7 @@ GSIBV.Map.Util.ElevationLoader = class extends MA.Class.Base {
         });
       }
     }
-
+    */
     return list;
   }
 
@@ -566,7 +629,7 @@ GSIBV.Map.Util.ElevationLoader = class extends MA.Class.Base {
       this._img = null;
     }
   }
-  _load(current) {
+  _load(current, valueError) {
     this._destroyImage();
 
     if (this._current != current) return;
@@ -581,6 +644,14 @@ GSIBV.Map.Util.ElevationLoader = class extends MA.Class.Base {
     }
 
     var url = this._current.urlList.shift();
+    
+    if ( valueError && url.title=="DEMGM") {
+      this.fire("finish", {
+        h: undefined,
+        pos: current.pos
+      });
+      return;
+    }
 
     var tileInfo = this._getTileInfo(this._current.pos.lat, this._current.pos.lng, url.zoom);
 
@@ -637,7 +708,8 @@ GSIBV.Map.Util.ElevationLoader = class extends MA.Class.Base {
       })
     }
     else {
-      this._onImgLoadError(url, current, tileInfo, img);
+      //this._onImgLoadError(url, current, tileInfo, img);
+      this._load(current, true);
     }
   }
 
@@ -763,7 +835,7 @@ GSIBV.Map.Util.AddrLoader = class extends MA.Class.Base {
       var properties = hitFeature.properties;
       try {
         var code = parseInt(properties["行政コード"]);
-        var muni = GSIBV.MUNI_ARRAY[""+code];
+        var muni = GSI.MUNI_ARRAY[""+code];
         if ( muni ) {
           if ( title == null ) title = "";
           var muniParts = muni.split( ",");

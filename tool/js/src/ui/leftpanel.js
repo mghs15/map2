@@ -48,10 +48,10 @@ GSIBV.UI.LeftPanel = class extends GSIBV.UI.Base {
     });
     this._recommendSelector.on("change", MA.bind(this._onRecommendChange, this));
 
-    // 表示中リスト表示切替
+    // 表示中リスト表示切替 2020/03/03廃止
     this._showDisplayLayerListButton = MA.DOM.find( this._container, ".detail-button" )[0];
     MA.DOM.on(this._showDisplayLayerListButton,"click", MA.bind(this._onShowDisplayLayerListButtonClick, this));
-
+    this._showDisplayLayerListButton.style.display = "none";
 
     // 表示中リスト
     this._displayLayerListView = new GSIBV.UI.DisplayLayerListView({
@@ -61,14 +61,19 @@ GSIBV.UI.LeftPanel = class extends GSIBV.UI.Base {
     });
     this._displayLayerListView.on("layerremove", MA.bind(this._onRequestLayerRemove, this));
 
-    // 新規データ
-    this._newDataButton = MA.DOM.find(this._container, "button.new-data-button")[0];
-    MA.DOM.on(this._newDataButton, "click", MA.bind(this._onNewDataButtonClick, this));
+    // 新規データ 2020/03/03廃止
+    //this._newDataButton = MA.DOM.find(this._container, "button.new-data-button")[0];
+    //MA.DOM.on(this._newDataButton, "click", MA.bind(this._onNewDataButtonClick, this));
 
-    // ファイルを開く
-    this._openDataButton = MA.DOM.find(this._container, "button.open-data-button")[0];
-    MA.DOM.on(this._openDataButton, "click", MA.bind(this._onOpenDataButtonClick, this));
+    // ファイルを開く 2020/03/03廃止
+    //this._openDataButton = MA.DOM.find(this._container, "button.open-data-button")[0];
+    //MA.DOM.on(this._openDataButton, "click", MA.bind(this._onOpenDataButtonClick, this));
 
+    // デザインを追加
+    this._addStyleButton = MA.DOM.find(this._container, "button.style-add-button")[0];
+    MA.DOM.on(this._addStyleButton, "click", MA.bind(this._onAddStyleButtonClick, this));
+
+    
     // レイヤー選択
     this._selectLayerButton = MA.DOM.find(this._container, "button.select-layer-button")[0];
     MA.DOM.on(this._selectLayerButton, "click", MA.bind(this._onSelectLayerButtonClick, this));
@@ -78,6 +83,12 @@ GSIBV.UI.LeftPanel = class extends GSIBV.UI.Base {
     MA.DOM.on(this._toggleButton, "click", MA.bind(this._onToggleButtonClick, this));
 
 
+    
+    if ( GSIBV.CONFIG.MOBILE ) {
+      try {
+        this._listScrollBar = new PerfectScrollbar(MA.DOM.find(this._container, ".scroll")[0]);
+      } catch (e) { }
+    }
     if (visible) this.show();
   }
 
@@ -88,17 +99,17 @@ GSIBV.UI.LeftPanel = class extends GSIBV.UI.Base {
     this._container.style.marginLeft = '0px';
     MA.DOM.addClass(this._container, "-ma-expand");
     if (this._contextMenu) {
-      this._contextMenu.left = 300;
+      this._contextMenu.left = 240;
     }
     this.fire("show");
   }
 
-  hide() {
+  hide(noEffect) {
     var size = MA.DOM.size(this._container);
 
     this._container.style.transition = 'margin-left 300ms';
+    
     this._container.style.marginLeft = '-' + size.width + 'px';
-
     var elem = this._container;
     var handler = function (e) {
       MA.DOM.removeClass(elem, "-ma-expand");
@@ -115,6 +126,14 @@ GSIBV.UI.LeftPanel = class extends GSIBV.UI.Base {
 
     this.fire("hide");
 
+  }
+
+  set visible (value) {
+    if ( value) {
+      this.show();
+    } else {
+      this.hide(true);
+    }
   }
 
   get visible() { return (MA.DOM.hasClass(this._container, "-ma-expand") ? true : false); }
@@ -151,6 +170,43 @@ GSIBV.UI.LeftPanel = class extends GSIBV.UI.Base {
     this.fire("showselectlayer");
   }
 
+  _onAddStyleButtonClick() {
+
+    if ( this._popupMenu ) {
+      if ( this._popupMenu.isVisible ) {
+        this._popupMenu.hide();
+        return;
+      }
+      this._popupMenu.destroy();
+    }
+
+    this._popupMenu = new GSIBV.UI.Popup.Menu ();
+    this._popupMenu.on("select",MA.bind(function(e){
+      switch(e.params.item.id){
+        case "new":
+          this.fire("newdata");
+          break;
+        case "open":
+          this.fire("opendata");
+          break;
+      }
+    }, this ) );
+
+    
+    this._popupMenu.items = [
+      {
+        "id":"new", "title":"新しい地図デザインを作成",
+        "class" : "-gsibv-popupmenu-newfile"
+      }, 
+      {
+        "id":"open", "title":"地図デザインファイルを開く",
+        "class" : "-gsibv-popupmenu-openfile"
+      }
+    ];
+
+    this._popupMenu.show(this._addStyleButton,"right");
+
+  }
   _onRecommendChange(e) {
     this.fire("recommendchange", e.params)
   }

@@ -118,6 +118,7 @@ GSIBV.LayersJSON.Layer = class extends GSIBV.LayerInfo {
   constructor(owner, parent, data) {
     super(parent);
     this._owner = owner;
+    this._options = {};
     if (data) {
       if (data.title) this._title = data.title;
       if (data.id) this._id = data.id;
@@ -129,9 +130,18 @@ GSIBV.LayersJSON.Layer = class extends GSIBV.LayerInfo {
       if (data.html) this._html = data.html;
       if (data.legendUrl) this._legendUrl = data.legendUrl;
       if (data.url) this._url = data.url;
+      if (data.area) this._area = data.area;
+      if (data.opacity != undefined) this._opacity = data.opacity;
 
+      for( var key in data ) {
+        this._options [key] = data[key];
+      }
     }
 
+  }
+
+  get options() {
+    return this._options;
   }
   clone(parent) {
     var result = new GSIBV.LayersJSON.Layer(parent);
@@ -153,8 +163,7 @@ GSIBV.LayersJSON.MultiLayer = class extends GSIBV.LayersJSON.Layer {
       for (var i = 0; i < data.entries.length; i++) {
         var item = data.entries[i];
         if (item.type != "Layer") continue;
-
-        this._children.push(new GSIBV.LayersJSON.Layer(this, item));
+        this._children.push(new GSIBV.LayersJSON.Layer(owner, this, item));
       }
     }
   }
@@ -192,13 +201,15 @@ GSIBV.LayersJSON.Directory = class extends GSIBV.LayerDirectoryInfo {
     
     if (data) {
       if (data.title) this._title = data.title;
-      if (data.src) {
-        this._src = data.src;
-        this._initSrc();
-      }
+      if (data.iconUrl) this._iconUrl = data.iconUrl;
+      if (data.html) this._html = data.html;
 
       this._entries = this._parseEntries( data.entries, this.url );
 
+      if ((!this._entries || this._entries.length == 0 ) && data.src) {
+        this._src = data.src;
+        this._initSrc();
+      }
     }
   }
 
@@ -207,6 +218,12 @@ GSIBV.LayersJSON.Directory = class extends GSIBV.LayerDirectoryInfo {
   }
   get url() {
     return ( this._url != undefined ? this._url : this._parent.url );
+  }
+  get iconUrl() {
+    return ( this._iconUrl );
+  }
+  get html() {
+    return ( this._html );
   }
 
   _initSrc() {
@@ -218,12 +235,14 @@ GSIBV.LayersJSON.Directory = class extends GSIBV.LayerDirectoryInfo {
       var src = this._src[i];
       if (src.indexOf("./") == 0) {
         var srcURL = this.url;
+        
         var urlParts = srcURL.split("/");
         urlParts.pop();
         this._src[i] = src.replace("./", urlParts.join("/") + "/");
+        
       } else if (src.indexOf("../") == 0) {
   
-        console.log(this.url);
+        //console.log(this.url);
       } else if ( src.indexOf("//") != 0 && src.indexOf("http://") != 0  && src.indexOf("https://") != 0) {
         var srcURL = this._owner.url;
         var urlParts = srcURL.split("/");

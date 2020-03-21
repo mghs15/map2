@@ -11,10 +11,12 @@ GSIBV.UI.Dialog.Base = class extends MA.Class.Base {
 
   }
 
+  get align() { return this._align; }
   get zIndex() { return this._zIndex; }
   set zIndex(zIndex) {
     this.setZIndex(zIndex);
   }
+
 
   setZIndex(zIndex) {
     this._zIndex = zIndex;
@@ -62,17 +64,26 @@ GSIBV.UI.Dialog.Base = class extends MA.Class.Base {
 
   }
 
+  get isVisible() {
+    if ( !this._frame ) return false;
+    return !(this._frame.style.display == 'none');
+  }
+
   _showFrame(frame) {
     if (!frame) return;
-    MA.DOM.fadeIn(frame, 300);
+    
+    this._finished = false;
+    MA.DOM.zoomFadeIn(frame, 200);
   }
 
   hide() {
     this._hideFrame(this._frame);
+    this.fire("hide");
   }
   _hideFrame(frame) {
     if (!frame) return;
-    MA.DOM.fadeOut(frame, 300);
+    this._finished = true;
+    MA.DOM.zoomFadeOut(frame, 200);
   }
 
 
@@ -114,6 +125,10 @@ GSIBV.UI.Dialog.Base = class extends MA.Class.Base {
   }
 
   _onButtonClick(btnInfo) {
+    if( this._finished ) {
+      this.hide();
+      return;
+    }
     var info = { "id": btnInfo.id, "cancel": false };
 
     this.fire("buttonclick", info);
@@ -192,6 +207,15 @@ GSIBV.UI.Dialog.Modeless = class extends GSIBV.UI.Dialog.Base {
     this.refreshPosition();
   }
 
+  get left() {
+    return this._position.left;
+  }
+  set left(value) {
+    if ( !value ) return;
+    this._position.left = value;
+    this.refreshPosition();
+  }
+
   refreshPosition() {
     
     if ( !this._frame ) return;
@@ -231,7 +255,13 @@ GSIBV.UI.Dialog.Modeless = class extends GSIBV.UI.Dialog.Base {
     MA.DOM.on(this._header, "mousedown",
       MA.bind(this._onHandleMouseDown, this, this._header)
     );
+    MA.DOM.on(this._header, "touchstart",
+      MA.bind(this._onHandleMouseDown, this, this._header)
+    );
     MA.DOM.on(this._frame, "mousedown",
+      MA.bind(this._onMouseDown, this)
+    );
+    MA.DOM.on(this._frame, "touchstart",
       MA.bind(this._onMouseDown, this)
     );
     
@@ -251,7 +281,8 @@ GSIBV.UI.Dialog.Modeless = class extends GSIBV.UI.Dialog.Base {
 
   _showFrame(frame) {
     if (!frame) return;
-    MA.DOM.fadeIn(frame, 300,this._opacity);
+
+    MA.DOM.zoomFadeIn(frame, 200,this._opacity);
   }
 
   hide() {
@@ -259,6 +290,11 @@ GSIBV.UI.Dialog.Modeless = class extends GSIBV.UI.Dialog.Base {
     this._manager.remove(this);
   }
 
+  _hideFrame(frame) {
+    if (!frame) return;
+    this._finished = true;
+    MA.DOM.zoomFadeOut(frame, 200);
+  }
   _createResizeHandle(frame) {
 
     var $this = this;
@@ -428,6 +464,9 @@ GSIBV.UI.Dialog.Modeless = class extends GSIBV.UI.Dialog.Base {
 
     if (e.preventDefault) e.preventDefault();
 
+    if ( newSize.width ) {
+      this._width = newSize.width;
+    }
     this._resize();
     return false;
   }
@@ -443,8 +482,31 @@ GSIBV.UI.Dialog.Modeless = class extends GSIBV.UI.Dialog.Base {
     this._dragState = null;
   }
 
+  _getCursorOffsetPosition(e) {
+    var offset = MA.DOM.offset( this._frame,
+      this._manager.frame);
+    if ( e.touches && e.touches.length ) {
+      return {
+        x: e.touches[0].pageX - offset.left,     
+        y: e.touches[0].pageY - offset.top
+      };
+    } else {
+      return {
+        x: e.pageX - offset.left,     
+        y: e.pageY - offset.top
+      };
+    }
+  }
+  _getCursorPagePosition(e) {
+    return ( e.touches && e.touches.length > 0  ?  {x:e.touches[0].pageX, y:e.touches[0].pageY} : {x:e.pageX, y: e.pageY} )
+  }
 
   _onHandleMouseDown( handle,  e) {
+    if( e.target == this._closeButton) {
+      return;
+    }
+
+    this._manager.add( this );
     this._dragState = { "mode": "drag" };
 
     this._dragState.clientMousePosition = MA.DOM.offset(
@@ -452,12 +514,14 @@ GSIBV.UI.Dialog.Modeless = class extends GSIBV.UI.Dialog.Base {
       this._frame
     );
 
-    this._dragState.clientMousePosition.left += parseFloat(e.offsetX);
-    this._dragState.clientMousePosition.top += parseFloat(e.offsetY);
+    var pos = this._getCursorOffsetPosition( e);
+    this._dragState.clientMousePosition.left = parseFloat(pos.x);
+    this._dragState.clientMousePosition.top = parseFloat(pos.y);
 
+    pos = this._getCursorPagePosition(e);
     this._dragState.pageMousePosition = {
-      left: e.pageX,
-      top: e.pageY
+      left: pos.x,
+      top: pos.y
     };
 
     this._handleMouseMoveHandler = MA.bind(this._onHandleMouseMove, this, handle);
@@ -465,6 +529,8 @@ GSIBV.UI.Dialog.Modeless = class extends GSIBV.UI.Dialog.Base {
 
     MA.DOM.on(document, "mousemove", this._handleMouseMoveHandler);
     MA.DOM.on(document, "mouseup", this._handleMouseUpHandler);
+    MA.DOM.on(document, "touchmove", this._handleMouseMoveHandler);
+    MA.DOM.on(document, "touchend", this._handleMouseUpHandler);
     if (e.preventDefault) e.preventDefault();
     return false;
 
@@ -474,21 +540,26 @@ GSIBV.UI.Dialog.Modeless = class extends GSIBV.UI.Dialog.Base {
     if (!this._dragState || this._dragState.mode != "drag") {
       MA.DOM.off(document, "mousemove", this._handleMouseMoveHandler);
       MA.DOM.off(document, "mouseup", this._handleMouseUpHandler);
+      MA.DOM.off(document, "touchmove", this._handleMouseMoveHandler);
+      MA.DOM.off(document, "touchend", this._handleMouseUpHandler);
       return true;
     }
-
-    this._updatePosition(e.pageX, e.pageY);
-    if (e.preventDefault) e.preventDefault();
+    var pos = this._getCursorPagePosition(e);
+    this._updatePosition(pos.x, pos.y);
+    if (!e.touches && e.preventDefault) e.preventDefault();
     return false;
 
   }
 
   _onHandleMouseUp(handle, e) {
-
-    this._updatePosition(e.pageX, e.pageY, true);
+    
+    var pos = this._getCursorPagePosition(e);
+    this._updatePosition(pos.x, pos.y);
 
     MA.DOM.off(document, "mousemove", this._handleMouseMoveHandler);
     MA.DOM.off(document, "mouseup", this._handleMouseUpHandler);
+    MA.DOM.off(document, "touchmove", this._handleMouseMoveHandler);
+    MA.DOM.off(document, "touchend", this._handleMouseUpHandler);
     this._dragState = null;
   }
 
@@ -500,12 +571,12 @@ GSIBV.UI.Dialog.Modeless = class extends GSIBV.UI.Dialog.Base {
 
 
     if ( this._dragState &&this._dragState.pageMousePosition ) {
-      var left = parseInt(position.left
-        + (mousePageX - this._dragState.pageMousePosition.left)
+      var left = parseInt(0 //position.left
+        + (mousePageX - this._dragState.clientMousePosition.left)
       );
 
-      var top = parseInt(position.top
-        + (mousePageY - this._dragState.pageMousePosition.top)
+      var top = parseInt(0//position.top
+        + (mousePageY - this._dragState.clientMousePosition.top)
       );
       this.setPosition(left, top, adjust);
       this._dragState.pageMousePosition = {
@@ -519,6 +590,7 @@ GSIBV.UI.Dialog.Modeless = class extends GSIBV.UI.Dialog.Base {
 
     if (!pos) pos = this.getPosition();
 
+    if ( this._frame.style.display == "none") return pos;
     var frameSize = MA.DOM.size(this._manager.frame);
     var size = MA.DOM.size(this._frame);
 
@@ -548,8 +620,12 @@ GSIBV.UI.Dialog.Modeless = class extends GSIBV.UI.Dialog.Base {
 
     }
 
-    this._frame.style.left = left + 'px';
-    this._frame.style.top = top + 'px';
+    this.position = {
+      left :left,
+      top : top
+    };
+    //this._frame.style.left = left + 'px';
+    //this._frame.style.top = top + 'px';
 
   }
 
@@ -563,6 +639,7 @@ GSIBV.UI.Dialog.Modeless.Manager = class extends MA.Class.Base {
     this._dialogs = [];
     this._startZIndex = 10000;
     this._frame = MA.DOM.select("#main")[0];
+
   }
   get frame() { 
     if (!this._frame) 
@@ -576,6 +653,27 @@ GSIBV.UI.Dialog.Modeless.Manager = class extends MA.Class.Base {
 
     return GSIBV.UI.Dialog.Modeless.Manager._instance;
 
+  }
+
+
+  get count() {
+    return this._dialogs.length;
+  }
+
+  show() {
+    for( var i=0; i<this._dialogs.length; i++ ) {
+      this._dialogs[i]._frame.style.display = "";
+      this._dialogs[i]._frame.style.transform = "scale(1)";
+      this._dialogs[i]._frame.style.opacity = 1;
+      this._dialogs[i].adjust(null, true);
+    }
+    this.refresh();
+  }
+
+  hide() {
+    for( var i=0; i<this._dialogs.length; i++ ) {
+      this._dialogs[i]._frame.style.display = "none";
+    }
   }
 
   refresh() {
@@ -615,9 +713,15 @@ GSIBV.UI.Dialog.Modeless.Manager = class extends MA.Class.Base {
   }
 
   _onWindowResize() {
+    var frameSize = MA.DOM.size( this.frame);
     for( var i=0; i<this._dialogs.length; i++ ) {
-      this._dialogs[i].adjust(null, true);
+      var dlg = this._dialogs[i];
+      if ( dlg.align == "right" && this._frameSize ) {
+        dlg.left += (frameSize.width - this._frameSize.width );
+      }
+      dlg.adjust(null, true);
     }
+    this._frameSize = frameSize;
   }
 
   remove(dlg) {
@@ -669,14 +773,14 @@ GSIBV.UI.Dialog.Modal = class extends GSIBV.UI.Dialog.Base {
   show() {
     this._manager.add(this);
     this._createBlind();
-    this._showFrame(this._blind);
-
+    
+    MA.DOM.fadeIn(this._blind, 200,this._opacity);
     super.show();
   }
 
   hide() {
     super.hide();
-    this._hideFrame(this._blind);
+    MA.DOM.fadeOut(this._blind, 200);
     this._manager.remove(this);
   }
   _create() {
@@ -756,8 +860,12 @@ GSIBV.UI.Dialog.Alert = class extends GSIBV.UI.Dialog.Modal {
     super();
     this._dialogs = [];
     this._frameClass = ["alert"];
+    this._hideAroundClick = false; 
   }
 
+  set autoDestroy(autoDestroy) {
+    this._autoDestroy = autoDestroy;
+  }
 
   show(title, msg, buttons) {
     this._title = title;
@@ -766,6 +874,27 @@ GSIBV.UI.Dialog.Alert = class extends GSIBV.UI.Dialog.Modal {
     super.show();
 
   }
+  
+  hide() {
+    super.hide();
+    if ( this._autoDestroy ) {
+      setTimeout(MA.bind(function(){
+        this.destroy();
+      },this),1000);
+    }
+  }
+
+  
+  _createBlind() {
+    super._createBlind();
+    MA.DOM.on( this._blind, "click", MA.bind(function(){
+      if ( this._hideAroundClick) {
+        this.hide();
+      }
+    }, this) );
+  }
+
+
   _beforeShow() {
     var frameSize = this.size;
     var size = this._getContentsSize();
@@ -793,4 +922,42 @@ GSIBV.UI.Dialog.Alert = class extends GSIBV.UI.Dialog.Modal {
     }
 
   }
+};
+
+
+
+GSIBV.UI.Dialog.Confirm = class extends GSIBV.UI.Dialog.Alert {
+
+  constructor(){
+    super();
+    this._frameClass = ["confirm"];
+    this._autoDestroy = true;
+  }
+
+  show(title, msg) {
+    var buttons = [
+      {
+        id : "ok",
+        title : "OK"  
+      },
+      {
+        id : "cancel",
+        title : "キャンセル"  
+      }
+    ];
+    super.show(title, msg, buttons);
+  }
+
+  _onButtonClick(btnInfo) {
+
+    if ( btnInfo.id == "ok") {
+      this.fire("ok");
+    } else {
+      this.fire("cancel");
+    }
+    this.hide();
+  }
+
+  
+
 };

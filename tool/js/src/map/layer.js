@@ -41,6 +41,22 @@ GSIBV.Map.LayerList = class extends MA.Class.Base {
   }
 
   add(layer) {
+
+    if (!(layer instanceof GSIBV.Map.Layer.Unknown)) {
+      // 確認ダイアログ表示
+      for( var key in GSIBV.CONFIG.CONFIRM_LAYERS ){
+        var item = GSIBV.CONFIG.CONFIRM_LAYERS[key];
+        var idx = item.layers.indexOf(layer.id);
+        if ( idx >= 0 ) {
+  
+          if ( !GSIBV.application.showLayerConfirm(layer, item) ) {
+            return;
+          }
+        }
+      }
+      
+    }
+
     if (this._hash[layer.id]) {
       if (this._hash[layer.id] instanceof GSIBV.Map.Layer.Unknown) {
 
@@ -61,7 +77,7 @@ GSIBV.Map.LayerList = class extends MA.Class.Base {
             this.refreshLayerOrder();
             this.fire("remove", { "layer": oldLayer });
             this.fire("change", { "type": "remove", "layer": oldLayer });
-            this.fire("add", { "layer": layer });
+            this.fire("add", { "layer": layer, "reason":"replace" });
             this.fire("change", { "type": "add", "layer": layer });
             break;
           }
@@ -74,7 +90,7 @@ GSIBV.Map.LayerList = class extends MA.Class.Base {
     if (!layer._add(this._map)) return null;
     this._initLayerEvents(layer);
     this._hash[layer.id] = layer;
-    this._list.push(layer);
+    this._addToList( layer );
     this.refreshLayerOrder();
     //console.log( this._map.map.getStyle());
     this.fire("add", { "layer": layer });
@@ -83,6 +99,9 @@ GSIBV.Map.LayerList = class extends MA.Class.Base {
 
   }
 
+  _addToList( layer ) {
+    this._list.push(layer);
+  }
 
   remove(layer) {
     layer = this.find(layer);
@@ -160,7 +179,7 @@ GSIBV.Map.LayerList = class extends MA.Class.Base {
       this._list[i].moveToFront();
     }
 
-    this.fire("change", { "type": "move" });
+    this.fire("order", { "type": "move" });
   }
 }
 
@@ -184,12 +203,14 @@ GSIBV.Map.Layer = class extends MA.Class.Base {
     if (options) {
       if (options.visible != undefined) this._visible = options.visible;
       if (options.opacity != undefined) this._opacity = options.opacity;
+      if (options.opacity != undefined) this._defaultOpacity = options.opacity;
       if (options.id) this._id = options.id;
       if (options.title) this._title = options.title;
       if (options.html) this._html = options.html;
       if (options.legendUrl) this._legendUrl = options.legendUrl;
       if (options.minzoom != undefined) this._minzoom = options.minzoom;
       if (options.maxzoom != undefined) this._maxzoom = options.maxzoom;
+      if (options.maxNativeZoom != undefined) this._maxNativeZoom = options.maxNativeZoom;
     }
   }
 
@@ -205,6 +226,7 @@ GSIBV.Map.Layer = class extends MA.Class.Base {
 
 
   get type() { return this._type; };
+  get map() { return this._map; };
   get added() { return (this._map ? true : false); }
   get id() { return this._id; }
   get title() { return this._title; }
@@ -213,6 +235,7 @@ GSIBV.Map.Layer = class extends MA.Class.Base {
   get legendUrl() { return this._legendUrl; }
   get minzoom() { return this._minzoom; }
   get maxzoom() { return this._maxzoom; }
+  get maxNativeZoom() { return this._maxNativeZoom; }
   get mapid() {
     if (this._mapid == "") {
       this._mapid = "__gsibv_layer__" + GSIBV.Map.Layer.getUnqNumber();

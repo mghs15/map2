@@ -1,6 +1,5 @@
 GSIBV.Map.Layer.TYPES["multi"] = "複数レイヤ";
 GSIBV.Map.Layer.FILTERS.push(function (l) {
-
   if ((l._type && ( l._type == "multi" || l._type == "layerset") ) || l.isMulti) {
 
     var layer = new GSIBV.Map.Layer.Multi({
@@ -20,7 +19,6 @@ GSIBV.Map.Layer.FILTERS.push(function (l) {
     if ( !list ) list = l.layers;
     if (list) {
       for (var i = 0; i < list.length; i++) {
-
         for (var j = 0; j < GSIBV.Map.Layer.FILTERS.length; j++) {
           var childLayer = GSIBV.Map.Layer.FILTERS[j](list[i]);
           if (childLayer) {
@@ -86,7 +84,13 @@ GSIBV.Map.Layer.Multi = class extends GSIBV.Map.Layer {
   setOpacity(opacity) {
     opacity = opacity != undefined ? opacity : 1;
     for( var i=0; i<this._children.length; i++ ) {
-      this._children[i].setOpacity( opacity);
+
+      var layer = this._children[i];
+      var op=opacity;
+      if ( layer._defaultOpacity != undefined ) {
+        op *= layer._defaultOpacity;
+      }
+      layer.setOpacity( op);
     }
     this._opacity = opacity;
   }

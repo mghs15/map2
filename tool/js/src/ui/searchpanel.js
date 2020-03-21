@@ -40,8 +40,8 @@ GSIBV.UI.SearchPanel = class extends GSIBV.UI.Base {
 
     this._prefList = [];
     var prefHash = {};
-    for (var key in GSIBV.MUNI_ARRAY) {
-      var parts = GSIBV.MUNI_ARRAY[key].split(',');
+    for (var key in GSI.MUNI_ARRAY) {
+      var parts = GSI.MUNI_ARRAY[key].split(',');
 
       var pref = prefHash[parts[0]];
 

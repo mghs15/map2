@@ -244,8 +244,40 @@ GSIBV.VectorTileData.SymbolDrawStyle = class extends GSIBV.VectorTileData.DrawSt
       var textField2 = ["get", textField];
 
       if (this._info.textFieldRound) {
-        textField2 =
-          ["to-string", ["/", ["round", ["*", ["to-number", ["get", textField]], this._info.textFieldRound]], this._info.textFieldRound]];
+        var roundnum = Math.log10(this._info.textFieldRound);
+        
+        if(roundnum > 0 && Number.isInteger(roundnum)){
+        
+          var zerotext = ".";
+          for(var i = 0;  i < roundnum;  i++  ){
+            zerotext = zerotext + "0";
+          }
+        
+          textField2 =
+            ["to-string",
+              ["case",
+                ["!", ["has", textField]],
+                ["to-string", ""],
+                ["==", ["get", textField], ""],
+                ["to-string", ""],
+                ["in", ".",
+                  ["to-string", ["/", ["round", ["*", ["to-number", ["get", textField]], this._info.textFieldRound]], this._info.textFieldRound]]
+                ], 
+                ["to-string", ["/", ["round", ["*", ["to-number", ["get", textField]], this._info.textFieldRound]], this._info.textFieldRound]],
+                ["concat", 
+                  ["to-string", ["/", ["round", ["*", ["to-number", ["get", textField]], this._info.textFieldRound]], this._info.textFieldRound]],
+                  zerotext
+                ]
+              ]
+            ];
+          
+        }else{
+          
+          textField2 =
+            ["to-string", ["/", ["round", ["*", ["to-number", ["get", textField]], this._info.textFieldRound]], this._info.textFieldRound]];
+          
+        }
+
         result["text-field"] = textField2;
 
       }

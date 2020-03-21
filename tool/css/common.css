@@ -81,7 +81,8 @@ select::-ms-expand {
 
 
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
   background: none;
   border: none;
 }
@@ -143,6 +144,8 @@ select::-ms-expand {
 #main {
   display: none;
 }
+
+
 
 input[type=radio].normalcheck, input[type=checkbox].normalcheck {
   display: inline-block;
@@ -239,6 +242,19 @@ a.button:hover {
   box-shadow: 0 0 1px 1px rgb(79, 178, 218);
 }
 
+.-gsibv-mapmenu-button-label {
+  position: absolute;
+  bottom: 1px;
+  font-size: 11px;
+  text-align: center;
+  left: 2px;
+  right: 2px;
+  background-color:rgba(0,0,0,0.5);
+  color:#fff;
+  white-space: nowrap;
+}
+
+
 button {
   display: inline-block;
   text-decoration: none;
@@ -252,6 +268,18 @@ button {
   cursor: pointer;
   outline: none;
   border: none;
+}
+
+button.mapboxgl-popup-close-button {
+  
+  padding: 0;
+  box-shadow: none;
+  color:#000;
+  background-color:transparent;
+}
+
+.mapboxgl-popup-content h3{
+  margin:0;
 }
 
 button:hover {
@@ -316,6 +344,29 @@ button:hover {
     -ms-transform: rotate(-45deg);
     transform: rotate(-45deg);
   }
+
+
+
+
+  input[type=radio].normalcheck.white+label::before, input[type=checkbox].normalcheck.white+label::before {
+    
+    background: #fff;
+  }
+  input[type=radio].normalcheck.white+label::before {
+    border: 1px solid #777;
+  }
+  input[type=checkbox].normalcheck.white+label::before {
+    border: 1px solid #777;
+    background: #fff;
+  }
+  input[type=radio].normalcheck.white:checked+label::after {
+    background: #333;
+  }
+  input[type=checkbox].normalcheck.white:checked+label::after {
+    border-left: 3px solid #333;
+    border-bottom: 3px solid #333;
+  }
+
 }
 
 /*画面を覆う*/
@@ -328,6 +379,70 @@ button:hover {
   bottom: 0;
   overflow: hidden;
 }
+
+#main .print-header {
+  display: none;
+  width: 650px;
+  border-collapse: collapse;
+
+}
+
+#main .print-header *{
+  font-size:11pt;
+}
+
+#main.print {
+  position:relative;
+  left:auto;
+  right:auto;
+  top:auto;
+  bottom:auto;
+  overflow:visible;
+  padding:18px;
+}
+@media print{
+  
+  #main.print {
+    padding: 0;
+  }
+  #main .no_print{
+    display:none;
+  }
+}
+
+#main.print #header{
+  display: none;
+}
+
+#main.print #left-panel {
+  display: none;
+}
+
+
+#main.print #context-menu {
+  display: none;
+}
+
+#main.print .content{
+  
+  position:relative;
+  left:auto;
+  right:auto;
+  top:auto;
+  bottom:auto;
+  width:650px;
+  height:900px;
+
+  border:1px solid #333;
+}
+
+
+
+
+#main.print .print-header {
+  display: block;
+}
+
 
 /*header*/
 
@@ -363,7 +478,23 @@ button:hover {
   background-repeat: no-repeat;
   background-position: 5px center;
   background-size: 14px 14px;
-  background-image: url('data:image/svg+xml,<?xml version="1.0" ?><svg height="18px" version="1.1" viewBox="0 0 18 18" width="18px" xmlns="http://www.w3.org/2000/svg" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" xmlns:xlink="http://www.w3.org/1999/xlink"><title/><desc/><defs/><g fill="none" fill-rule="evenodd" id="Page-1" stroke="none" stroke-width="1"><g fill="#ccc" id="Core" transform="translate(-339.000000, -381.000000)"><g id="search" transform="translate(339.000000, 381.000000)"><path d="M12.5,11 L11.7,11 L11.4,10.7 C12.4,9.6 13,8.1 13,6.5 C13,2.9 10.1,0 6.5,0 C2.9,0 0,2.9 0,6.5 C0,10.1 2.9,13 6.5,13 C8.1,13 9.6,12.4 10.7,11.4 L11,11.7 L11,12.5 L16,17.5 L17.5,16 L12.5,11 L12.5,11 Z M6.5,11 C4,11 2,9 2,6.5 C2,4 4,2 6.5,2 C9,2 11,4 11,6.5 C11,9 9,11 6.5,11 L6.5,11 Z" id="Shape"/></g></g></g></svg>');
+  background-image: url('data:image/svg+xml,<?xml version="1.0" ?><svg height="18px" version="1.1" viewBox="0 0 18 18" width="18px" xmlns="http://www.w3.org/2000/svg" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" xmlns:xlink="http://www.w3.org/1999/xlink"><title/><desc/><defs/><g fill="none" fill-rule="evenodd" id="Page-1" stroke="none" stroke-width="1"><g fill="rgba(222,222,222,1)" id="Core" transform="translate(-339.000000, -381.000000)"><g id="search" transform="translate(339.000000, 381.000000)"><path d="M12.5,11 L11.7,11 L11.4,10.7 C12.4,9.6 13,8.1 13,6.5 C13,2.9 10.1,0 6.5,0 C2.9,0 0,2.9 0,6.5 C0,10.1 2.9,13 6.5,13 C8.1,13 9.6,12.4 10.7,11.4 L11,11.7 L11,12.5 L16,17.5 L17.5,16 L12.5,11 L12.5,11 Z M6.5,11 C4,11 2,9 2,6.5 C2,4 4,2 6.5,2 C9,2 11,4 11,6.5 C11,9 9,11 6.5,11 L6.5,11 Z" id="Shape"/></g></g></g></svg>');
+}
+
+.-gsibv-tooltip {
+  position: absolute;
+  z-index: 99000;
+  
+  padding: 8px;
+  font-size: 8pt;
+  border-radius: 3px;
+  color: #fff;
+  z-index: 10;
+  border-radius: 3px;
+  background: rgba(55, 55, 55, 0.98);
+  box-shadow: inset 0px 0px 1px 1px rgba(255, 255, 255, 0.3);
+
+  max-width: 300px;
 }
 
 .search-result-frame {
@@ -531,7 +662,7 @@ button:hover {
     border-top:1px solid  rgba(55, 55, 55, 1);
     */
 }
-
+/*
 #context-menu::before {
   content: "  ";
   position: absolute;
@@ -545,6 +676,7 @@ button:hover {
   margin-right: 32px;
   box-shadow: 0px -1px 1px 1px rgba(0, 0, 0, 0.22);
 }
+*/
 
 #context-menu::after {
   content: "  ";
@@ -552,9 +684,8 @@ button:hover {
   background: rgba(60, 60, 60, 1);
   right: 0;
   top: -1px;
-  ;
   height: 1px;
-  left: 50%;
+  left: 0;
   z-index: 4;
   margin-left: 32px;
   box-shadow: 0px -1px 1px 1px rgba(0, 0, 0, 0.22);
@@ -563,14 +694,14 @@ button:hover {
 #context-menu .toggle-button {
   display: block;
   position: absolute;
-  width: 64px;
-  height: 24px;
-  line-height: 24px;
-  left: 50%;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  left: 0px;
   top: 0px;
   background-color: rgba(43, 43, 43, 0.9);
-  margin-top: -24px;
-  margin-left: -32px;
+  margin-top: -32px;
+  margin-left: 0;
   border-top: 1px solid rgba(60, 60, 60, 1);
   border-right: 1px solid rgba(60, 60, 60, 1);
   border-left: 1px solid rgba(60, 60, 60, 1);
@@ -584,27 +715,49 @@ button:hover {
 	-o-border-radius:  0 / 50px 25px 50px 25px / 0 / 0;
 	-ms-border-radius:  0 / 50px 25px 50px 25px / 0 / 0;
 	*/
-  border-radius: 6px 6px 0 0/ 6px 6px 0 0;
+  border-radius: 0 6px 0 0/ 0 6px 0 0;
   color: #fff;
   text-decoration: none;
   text-align: center;
-  background-image: url('data:image/svg+xml,<svg height="12" fill="rgba(255,255,255,0.8)" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2 L2 10 L22 10 z"/></svg>');
+  /*
+  background-image: url('data:image/svg+xml,<svg height="32" fill="rgba(255,255,255,0.8)" width="32" xmlns="http://www.w3.org/2000/svg"><path d="M10 6 L26 6 L26 22 z"/></svg>');
+  */
   
+  background-image: url(../image/system/footer_up2.png);
   background-repeat: no-repeat;
+  background-size: 26px 26px;
   background-position: center center;
 
 }
 
 #context-menu.-ma-expand .toggle-button {
   
-  background-image: url('data:image/svg+xml,<svg height="12" fill="rgba(255,255,255,0.8)" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M12 10 L2 2 L22 2 z"/></svg>');
+  margin-top: 0;
+  border:none;
+  border-radius: 0;
+  background-color:transparent;
+
+}
+#context-menu.-ma-expand::after {
+
+  margin-left: 0;
+}
+
+#context-menu.-ma-expand-full .toggle-button {
+  
+  /*
+  background-image: url('data:image/svg+xml,<svg height="32" fill="rgba(255,255,255,0.8)" width="32" xmlns="http://www.w3.org/2000/svg"><path d="M6 6 L6 26 L26 26 z"/></svg>');
+  */
+  background-image: url(../image/system/footer_down2.png);
 }
 
 
 #context-menu .context-menu-content {
   padding: 5px;
 }
-
+#context-menu.-ma-expand .context-menu-content {
+  padding-left:32px;
+}
 #context-menu table {
   width: 100%;
   border-collapse: collapse;
@@ -948,7 +1101,7 @@ loading
   left: 0;
   top: 36px;
   bottom: 0;
-  width: 300px;
+  width: 240px;
   background: rgba(43, 43, 43, 0.9);
   /*
 	-webkit-box-shadow: 1px 0px 1px -1px rgba(0,0,0,0.31);
@@ -957,7 +1110,17 @@ loading
     */
   z-index: 6;
   border-right: 1px solid rgba(55, 55, 55, 1);
-  margin-left: -300px;
+  margin-left: -240px;
+}
+
+
+#left-panel .scroll{
+  
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right:0;
 }
 
 
@@ -974,7 +1137,7 @@ loading
 }
 
 #left-panel .toggle-button {
-  display: block;
+  display: none;
   position: absolute;
   width: 24px;
   height: 28px;
@@ -1001,6 +1164,9 @@ loading
   text-decoration: none;
   text-align: center;
   line-height: 1em;
+}
+#left-panel.-ma-expand .toggle-button {
+  display: block;
 }
 
 #left-panel .toggle-button div {
@@ -1053,8 +1219,25 @@ loading
   color: #fff;
   font-size: 9pt;
   right: 2px;
-  width: 110px;
+  width: 112px;
   white-space: nowrap;
+  padding-left:0;
+  padding-right:12px;
+}
+
+#left-panel .header button.select-layer-button:before {
+  display: block;
+  position: absolute;
+  content: "";
+  background-image: url('data:image/svg+xml,<svg height="12" fill="rgba(255,255,255,0.8)" width="12" xmlns="http://www.w3.org/2000/svg"><path d="M4 2 V10 L8 6 z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center center;
+  transform: rotate(0);
+  width: 12px;
+  height: 12px;
+  top: 50%;
+  right: 0px;
+  margin-top: -6px;
 }
 
 #left-panel .header button.select-layer-button:after {
@@ -1063,7 +1246,7 @@ loading
 }
 
 #left-panel .header button.new-data-button {
-  right: 136px;
+  right: 139px;
   background-size: 17px 17px;
   background-image: url('data:image/svg+xml,<?xml version="1.0" ?>\
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20"  height="20" opacity="1" fill="rgba(255,255,255,1)" fill-opacity="1">\
@@ -1074,8 +1257,34 @@ loading
 }
 
 #left-panel .header button.open-data-button {
-  right: 114px;
+  right: 116px;
   background-size: 18px 18px;
+  background-image: url('data:image/svg+xml,<?xml version="1.0" ?>\
+    <svg height="20px" version="1.1" viewBox="0 0 512 512" width="20px" xmlns="http://www.w3.org/2000/svg" fill="rgba(255,255,255,1)">\
+<path d="M430.1,192H81.9c-17.7,0-18.6,9.2-17.6,20.5l13,183c0.9,11.2,3.5,20.5,21.1,20.5h316.2c18,0,20.1-9.2,21.1-20.5l12.1-185.3   C448.7,199,447.8,192,430.1,192z"/>\
+<path d="M426.2,143.3c-0.5-12.4-4.5-15.3-15.1-15.3c0,0-121.4,0-143.2,0c-21.8,0-24.4,0.3-40.9-17.4C213.3,95.8,218.7,96,190.4,96    c-22.6,0-75.3,0-75.3,0c-17.4,0-23.6-1.5-25.2,16.6c-1.5,16.7-5,57.2-5.5,63.4h343.4L426.2,143.3z"/>\
+></svg>');
+}
+
+
+.-gsibv-popupmenu-newfile {
+  background-repeat: no-repeat;
+  background-position: 2px center;
+  background-size: 18px 18px;
+  padding-left: 22px   !important;
+  background-image: url('data:image/svg+xml,<?xml version="1.0" ?>\
+  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20"  height="20" opacity="1" fill="rgba(255,255,255,1)" fill-opacity="1">\
+  <path d="M10.72 3.91L5.19 3.91L5.19 16.09L14.81 16.09L14.81 7.19L16.25 7.19L16.25 17.5L3.75 17.5L3.75 2.5L10.72 2.5L10.72 3.91ZM11.68 6.37L11.68 2.5L16.25 6.37L11.68 6.37Z" />\
+  <rect x="6.5" y="8.5" width="6" height="1.5" />\
+  <rect x="6.5" y="12" width="6" height="1.5" />\
+  </svg>');
+}
+
+.-gsibv-popupmenu-openfile {
+  background-repeat: no-repeat;
+  background-position: 2px center;
+  background-size: 18px 18px;
+  padding-left: 22px   !important;
   background-image: url('data:image/svg+xml,<?xml version="1.0" ?>\
     <svg height="20px" version="1.1" viewBox="0 0 512 512" width="20px" xmlns="http://www.w3.org/2000/svg" fill="rgba(255,255,255,1)">\
 <path d="M430.1,192H81.9c-17.7,0-18.6,9.2-17.6,20.5l13,183c0.9,11.2,3.5,20.5,21.1,20.5h316.2c18,0,20.1-9.2,21.1-20.5l12.1-185.3   C448.7,199,447.8,192,430.1,192z"/>\
@@ -1092,7 +1301,7 @@ loading
   left: 0;
   top: 0;
   right: 0;
-  height: 550px;
+  height: 560px;
 }
 
 #left-panel #recommend .list {
@@ -1100,7 +1309,7 @@ loading
   left: 0;
   top: 25px;
   right: 0;
-//  bottom: 25px;
+/*  bottom: 25px;*/
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -1138,6 +1347,96 @@ loading
     
   transform: rotate(90deg);
 }
+
+
+#left-panel #recommend button.style-add-button {
+  position: absolute;
+  right: 4px;
+  height:20px;
+  line-height: 20px;
+  bottom: 27px;
+  padding-left:20px;
+  width:146px;
+  text-align: left;
+  background-color: rgba(90, 90, 90, 0.3);
+
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  background-position: 2px 2px;
+  background-image: url('data:image/svg+xml,<?xml version="1.0" ?>\
+    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20"  height="20" opacity="1" fill="rgba(255,255,255,1)" fill-opacity="1">\
+    <path d="M10.72 3.91L5.19 3.91L5.19 16.09L14.81 16.09L14.81 7.19L16.25 7.19L16.25 17.5L3.75 17.5L3.75 2.5L10.72 2.5L10.72 3.91ZM11.68 6.37L11.68 2.5L16.25 6.37L11.68 6.37Z" />\
+    <rect x="6.5" y="8.5" width="6" height="1.5" />\
+    <rect x="6.5" y="12" width="6" height="1.5" />\
+    </svg>');
+}
+
+
+#left-panel #recommend button.style-add-button:hover {
+  background-color: #555;
+  opacity: 1;
+}
+
+#left-panel #recommend button.style-add-button:before {
+  display: block;
+  position: absolute;
+  content: "";
+  background-image: url('data:image/svg+xml,<svg height="12" fill="rgba(255,255,255,1)" width="12" xmlns="http://www.w3.org/2000/svg"><path d="M4 2 V10 L8 6 z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center center;
+  transform: rotate(0);
+  width: 12px;
+  height: 12px;
+  top: 50%;
+  right: 3px;
+  margin-top: -6px;
+}
+
+
+#left-panel #recommend button.select-layer-button {
+  position: absolute;
+  right: 4px;
+  height:20px;
+  line-height: 20px;
+  background-color: rgba(90, 90, 90, 0.3);
+  bottom: 4px;
+  padding-left:20px;
+  width:146px;
+  text-align: left;
+  background-size: 12px 12px;
+  background-repeat: no-repeat;
+  background-position: 4px 4px;
+  background-image: url('data:image/svg+xml,<?xml version="1.0" encoding="UTF-8"?>\
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" version="1.1">\
+  <rect stroke-width="5" stroke="rgba(255,255,255,0.9)" fill="rgba(0,0,0,0)" x="0" y="0" rx="5" ry="5" width="24" height="24" />\
+  <path fill="rgba(255,255,255,0.9)" d="M0 24 L8 10 L 24 24" />\
+  <circle fill="rgba(255,255,255,0.9)" cx="16" cy="8" r="3"/>\
+  </svg>');
+}
+
+#left-panel #recommend button.select-layer-button:before {
+  display: block;
+  position: absolute;
+  content: "";
+  background-image: url('data:image/svg+xml,<svg height="12" fill="rgba(255,255,255,1)" width="12" xmlns="http://www.w3.org/2000/svg"><path d="M4 2 V10 L8 6 z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center center;
+  transform: rotate(0);
+  width: 12px;
+  height: 12px;
+  top: 50%;
+  right: 3px;
+  margin-top: -6px;
+}
+
+
+
+#left-panel #recommend button.select-layer-button:hover {
+  background-color: #555;
+  opacity: 1;
+}
+
+
 
 #left-panel #recommend .list a.scroll {
   position: absolute;
@@ -1186,8 +1485,8 @@ loading
 
 #left-panel #recommend .list ul li {
   padding: 0;
-  width: 88px;
-  height: 88px;
+  width: 72px;
+  height: 72px;
   display: block;
   position: relative;
   border-radius: 3px;
@@ -1201,10 +1500,10 @@ loading
 }
 
 #left-panel #recommend .list ul li img {
-  width: 84px;
-  height: 84px;
+  width: 68px;
+  height: 68px;
   display: block;
-  position: absolute;
+  position: relative;
   left: 2px;
   top: 2px;
   border-radius: 3px;
@@ -1265,10 +1564,11 @@ loading
   color: #fff;
   font-size: 8pt;
   line-height: 20px;
-//  height: 25px;
+/*  height: 25px;*/
   padding-left: 15px;
   padding-right: 10px;
 }
+
 
 /*スタイルのダウンロード*/
 /*他に、
@@ -1311,7 +1611,7 @@ loading
 #left-panel #layer-list {
   position: absolute;
   left: 0;
-  top: 550px;
+  top: 565px;
   right: 0;
   bottom: 0;
 }
@@ -1324,6 +1624,11 @@ loading
   bottom: 2px;
   overflow-x: hidden;
   overflow-y: scroll;
+}
+
+
+.mobile #left-panel #layer-list .list {
+  overflow: unset;
 }
 
 #left-panel #layer-list .list ul {
@@ -1471,7 +1776,7 @@ loading
   background-size: 16px 16px;
   background-image: url('data:image/svg+xml,<?xml version="1.0" ?>\
     <svg width="24" height="24" stroke-linecap="round" stroke-width="3" stroke="rgba(255,255,255,1)" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">\
-    <path d="M6,6 L18,18 M18,6 L6,18 z"/>\
+    <path d="M6,6 L18,18 M18,6 L6,18"/>\
     </svg>');
 }
 
@@ -1507,6 +1812,30 @@ loading
 
 #left-panel #layer-list .list ul li.layer.-ma-edit-expand button.edit-button:before {
   transform: rotate(90deg);
+}
+
+
+
+#left-panel #layer-list .list ul li.layer button.save-button {
+  width: 42px;
+  height: 18px;
+  line-height: 18px;
+  bottom: 0;
+  right: 55px;
+  border-radius: 3px;
+  text-align: left;
+  padding-left: 16px;
+  background-position: 2px center;
+  background-repeat: no-repeat;
+  background-size: 12px 12px;
+  /*
+    background-image : url('data:image/svg+xml,<svg height="14px" version="1.1" viewBox="0 0 16 16" width="16px" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd" id="Icons with numbers" stroke="none" stroke-width="1"><g fill="#ffffff" id="Group" transform="translate(-720.000000, -432.000000)"><path d="M721,446 L733,446 L733,443 L735,443 L735,446 L735,448 L721,448 Z M721,443 L723,443 L723,446 L721,446 Z M726,433 L730,433 L730,440 L732,440 L728,445 L724,440 L726,440 Z M726,433" id="Rectangle 217"/></g></g></svg>');
+    */
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"  >\
+    <path fill="rgba(255,255,255,0.8)" d="M5.01 8.1L9.85 14.44L14.77 8.17L11.67 8.14L11.72 1.45L8.14 1.43L8.09 8.12L5.01 8.1Z"></path>\
+    <path stroke="rgba(255,255,255,0.8)" opacity="1" fill-opacity="0" stroke-width="3" d="M16.76 8.63L16.76 16.76L2.93 16.76L2.93 8.63"></path>\
+    </svg>');
+
 }
 
 #left-panel #layer-list .list ul li.layer button.opacity-button {
@@ -1550,7 +1879,14 @@ loading
   height: 18px;
   background-color: transparent;
   background-size: 16px 16px;
+  /*
   background-image: url('data:image/svg+xml,<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24" version="1.1"><g id="surface1"><path style=" stroke:none;fill-rule:nonzero;fill:rgba(255,255,255,1);fill-opacity:1;" d="M 14.570312 16.820312 L 14.570312 20.035156 C 14.570312 20.179688 14.519531 20.304688 14.410156 20.410156 C 14.304688 20.519531 14.179688 20.570312 14.035156 20.570312 L 10.820312 20.570312 C 10.679688 20.570312 10.554688 20.519531 10.445312 20.410156 C 10.339844 20.304688 10.285156 20.179688 10.285156 20.035156 L 10.285156 16.820312 C 10.285156 16.679688 10.339844 16.554688 10.445312 16.445312 C 10.554688 16.339844 10.679688 16.285156 10.820312 16.285156 L 14.035156 16.285156 C 14.179688 16.285156 14.304688 16.339844 14.410156 16.445312 C 14.519531 16.554688 14.570312 16.679688 14.570312 16.820312 Z M 18.804688 8.785156 C 18.804688 9.269531 18.734375 9.71875 18.597656 10.136719 C 18.457031 10.558594 18.300781 10.898438 18.128906 11.164062 C 17.953125 11.425781 17.707031 11.691406 17.390625 11.960938 C 17.074219 12.226562 16.816406 12.421875 16.621094 12.542969 C 16.425781 12.664062 16.152344 12.820312 15.804688 13.019531 C 15.4375 13.222656 15.132812 13.511719 14.886719 13.886719 C 14.640625 14.261719 14.519531 14.5625 14.519531 14.785156 C 14.519531 14.9375 14.464844 15.082031 14.355469 15.222656 C 14.25 15.359375 14.125 15.429688 13.980469 15.429688 L 10.769531 15.429688 C 10.632812 15.429688 10.519531 15.347656 10.425781 15.179688 C 10.332031 15.015625 10.285156 14.847656 10.285156 14.679688 L 10.285156 14.074219 C 10.285156 13.335938 10.574219 12.636719 11.15625 11.980469 C 11.738281 11.324219 12.375 10.839844 13.070312 10.527344 C 13.597656 10.285156 13.972656 10.035156 14.195312 9.777344 C 14.417969 9.519531 14.53125 9.179688 14.53125 8.757812 C 14.53125 8.382812 14.324219 8.054688 13.910156 7.769531 C 13.492188 7.480469 13.011719 7.339844 12.46875 7.339844 C 11.886719 7.339844 11.40625 7.46875 11.023438 7.726562 C 10.710938 7.949219 10.230469 8.464844 9.589844 9.269531 C 9.472656 9.410156 9.335938 9.480469 9.175781 9.480469 C 9.066406 9.480469 8.957031 9.445312 8.839844 9.375 L 6.644531 7.699219 C 6.527344 7.613281 6.457031 7.5 6.433594 7.367188 C 6.414062 7.230469 6.4375 7.105469 6.507812 6.992188 C 7.9375 4.617188 10.007812 3.429688 12.722656 3.429688 C 13.4375 3.429688 14.15625 3.566406 14.878906 3.84375 C 15.601562 4.121094 16.253906 4.492188 16.835938 4.957031 C 17.414062 5.417969 17.886719 5.988281 18.253906 6.664062 C 18.621094 7.335938 18.804688 8.042969 18.804688 8.785156 Z M 18.804688 8.785156 "/></g></svg>');
+  */
+  background-image: url('data:image/svg+xml,<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24" version="1.1"><g>\
+  <circle cx="12" cy="5" r="3" style="fill:rgba(255,255,255,1);" />\
+  <rect x="10" y="12" width="4" height="9" style="fill:rgba(255,255,255,1);" />\
+  </g></svg>');
+  
 }
 
 #left-panel #layer-list .list ul li.layer button.visible-button {
@@ -1668,7 +2004,7 @@ loading
 
 #left-panel #layer-list .list ul li.layer .layer-edit-list-frame .header>div {
   position: relative;
-  margin-right: 46px;
+  margin-right: 23px;
 }
 
 #left-panel #layer-list .list ul li.layer .layer-edit-list-frame .header button {
@@ -1717,7 +2053,7 @@ loading
   background-repeat: no-repeat;
   background-position: 5px center;
   background-size: 14px 14px;
-  background-image: url('data:image/svg+xml,<svg height="18px" version="1.1" viewBox="0 0 18 18" width="18px" xmlns="http://www.w3.org/2000/svg" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" xmlns:xlink="http://www.w3.org/1999/xlink"><g fill="none" fill-rule="evenodd" id="Page-1" stroke="none" stroke-width="1"><g fill="#ccc" id="Core" transform="translate(-339.000000, -381.000000)"><g id="search" transform="translate(339.000000, 381.000000)"><path d="M12.5,11 L11.7,11 L11.4,10.7 C12.4,9.6 13,8.1 13,6.5 C13,2.9 10.1,0 6.5,0 C2.9,0 0,2.9 0,6.5 C0,10.1 2.9,13 6.5,13 C8.1,13 9.6,12.4 10.7,11.4 L11,11.7 L11,12.5 L16,17.5 L17.5,16 L12.5,11 L12.5,11 Z M6.5,11 C4,11 2,9 2,6.5 C2,4 4,2 6.5,2 C9,2 11,4 11,6.5 C11,9 9,11 6.5,11 L6.5,11 Z" id="Shape"/></g></g></g></svg>');
+  background-image: url('data:image/svg+xml,<svg height="18px" version="1.1" viewBox="0 0 18 18" width="18px" xmlns="http://www.w3.org/2000/svg" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" xmlns:xlink="http://www.w3.org/1999/xlink"><g fill="none" fill-rule="evenodd" id="Page-1" stroke="none" stroke-width="1"><g fill="rgba(222,222,222,1)" id="Core" transform="translate(-339.000000, -381.000000)"><g id="search" transform="translate(339.000000, 381.000000)"><path d="M12.5,11 L11.7,11 L11.4,10.7 C12.4,9.6 13,8.1 13,6.5 C13,2.9 10.1,0 6.5,0 C2.9,0 0,2.9 0,6.5 C0,10.1 2.9,13 6.5,13 C8.1,13 9.6,12.4 10.7,11.4 L11,11.7 L11,12.5 L16,17.5 L17.5,16 L12.5,11 L12.5,11 Z M6.5,11 C4,11 2,9 2,6.5 C2,4 4,2 6.5,2 C9,2 11,4 11,6.5 C11,9 9,11 6.5,11 L6.5,11 Z" id="Shape"/></g></g></g></svg>');
 }
 
 .-gsibv-popup-menu {
@@ -1738,6 +2074,7 @@ loading
 
 .-gsibv-popup-menu ul li {
   display: block;
+  padding:2px;
 }
 
 .-gsibv-popup-menu ul li.separator {
@@ -1774,7 +2111,8 @@ loading
   padding: 0;
 }
 
-#left-panel #layer-list .list ul li.layer .layer-edit-list-frame dt.-ma-filter-nohit, #left-panel #layer-list .list ul li.layer .layer-edit-list-frame dd.-ma-filter-nohit {
+#left-panel #layer-list .list ul li.layer .layer-edit-list-frame dt.-ma-filter-nohit, 
+#left-panel #layer-list .list ul li.layer .layer-edit-list-frame dd.-ma-filter-nohit {
   display: none;
 }
 
@@ -1784,6 +2122,8 @@ loading
   min-height: 18px;
   border-radius: 3px;
 }
+
+
 
 #left-panel #layer-list .list ul li.layer .layer-edit-list-frame dt:last-of-type {
   border-bottom: none;
@@ -1803,6 +2143,11 @@ loading
   background-image: url('data:image/svg+xml,<svg height="16px" version="1.1" viewBox="0 0 16 16" width="16px" xmlns="http://www.w3.org/2000/svg" ><title/><defs/><g fill="none" fill-rule="evenodd" id="Icons with numbers" stroke="none" stroke-width="1"><g fill="rgba(255,255,255,1)" id="Group" transform="translate(-384.000000, -192.000000)"><path d="M385,203.950806 L389,208 L385,208 Z M392,196 L396,200 L389.978638,207.044189 L386,203 Z M394.084619,193.781497 C394.709458,193.156658 395.90929,193.343426 396.764518,194.198654 L397.538782,194.972918 C398.394011,195.828147 398.580778,197.027979 397.95594,197.652817 L396.720394,198.888363 L392.849074,195.017043 Z M394.084619,193.781497" id="Triangle 313"/></g></g></svg>');
   padding-top: 3px;
   padding-bottom: 3px;
+}
+
+
+#left-panel #layer-list .list ul li.layer .layer-edit-list-frame dt a.no-directory {
+  background-image:none;
 }
 
 #left-panel #layer-list .list ul li.layer .layer-edit-list-frame dt a:hover {
@@ -1847,6 +2192,32 @@ loading
   content:"";
   display:none;
 }
+
+
+#left-panel #layer-list .list ul li.layer .layer-edit-list-frame dt button.sort-button {
+  position: absolute;
+  text-decoration: none;
+  color: #fff;
+  padding: 0;
+  left: auto;
+  right: 39px;
+  top: 50%;
+  margin: 0;
+  margin-top: -8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-size: 10px 10px;
+  background-position: 50% 50%;
+  background-image: url('data:image/svg+xml,<svg height="16px" version="1.1" viewBox="0 0 16 16" width="16px" xmlns="http://www.w3.org/2000/svg" ><g fill="rgba(255,255,255,1)" stroke="none"><path d="M6 8 L6 16 L10 15 L10 8Z M0 2 L16 2 L8 10Z" /></g></svg>');
+
+}
+
+#left-panel #layer-list .list ul li.layer .layer-edit-list-frame dt button.sort-button.active {
+  background-color: rgb(79, 178, 218);
+}
+
+
 
 #left-panel #layer-list .list ul li.layer .layer-edit-list-frame dt button.visible-button {
   position: absolute;
@@ -1951,7 +2322,6 @@ loading
 .-gisbv-popup-content .mapboxgl-popup-content {
   border-radius: 8px;
   padding: 10px;
-  max-width: 300px;
   box-shadow: 0px 0px 3px 3px rgba(0, 0, 0, 0.2);
 }
 
@@ -2793,7 +3163,7 @@ loading
   border-radius: 50%;
   background-position: center center;
   background-repeat: no-repeat;
-  background-image: url('data:image/svg+xml,<?xml version="1.0" ?><svg width="18" height="18" stroke-linecap="round" stroke-width="2" stroke="rgba(255,255,255,1)" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path d="M6,6 L12,12 M12,6 L6,12 z"/></svg>');
+  background-image: url('data:image/svg+xml,<?xml version="1.0" ?><svg width="18" height="18" stroke-linecap="round" stroke-width="2" stroke="rgba(255,255,255,1)" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path d="M6,6 L12,12 M12,6 L6,12"/></svg>');
 }
 
 .-gsibv-dialog .container .contents-frame {
@@ -2802,6 +3172,7 @@ loading
   left: 0px;
   right: 0px;
   bottom: 0px;
+  overflow: hidden;
 }
 
 .-gsibv-dialog.has-footer .container .contents-frame {
@@ -2838,7 +3209,108 @@ loading
 .-gsibv-dialog.alert .contents {
   padding: 6px 8px 12px 8px;
 }
+.-gsibv-dialog.confirm {
+  left: 50%;
+  top: 50%;
+  min-width: 380px;
+}
 
+
+.mobile .-gsibv-dialog.confirm  {
+  min-width: 280px;
+}
+
+.-gsibv-dialog.confirm .contents {
+  max-height:300px;
+  overflow-y: auto;
+  padding: 6px 8px 12px 8px;
+  background-color:#fff;
+  color:#000;
+  border-radius:2px;
+}
+
+.-gsibv-dialog.dsloret {
+  left: 50%;
+  top: 50%;
+  width: 80%;
+  max-height:90%;
+}
+
+.-gsibv-dialog.dsloret .header {
+  height:auto;
+  font-size:110%;
+}
+
+.-gsibv-dialog.dsloret .header .close-button{
+  top:2px;
+  margin-top:0;
+}
+
+.-gsibv-dialog.dsloret .contents {
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  right:0;
+  overflow: auto;
+  padding: 6px 8px 12px 8px;
+  background-color:#fff;
+  color:#000;
+  border-radius:2px;
+}
+
+.-gsibv-dialog.dsloret .contents .message {
+  position: relative;
+}
+
+
+.-gsibv-dialog.dsloret .contents .message table{
+	border-collapse: collapse;
+  border:0;
+}
+
+.-gsibv-dialog.dsloret .contents .message table td{
+  vertical-align: top;
+}
+.-gsibv-dialog.dsloret .contents .message table *{
+  border:0;
+  padding:0;
+}
+
+.-gsibv-dialog.dsloret .contents .message table.inner{
+  border-collapse: collapse;
+  min-width:280px;
+  max-width: 280px;
+}
+
+.-gsibv-dialog.dsloret .contents .message table.inner th{
+	background-color:rgba(32,32,32,0.8);
+	background-color:#f4f4f4;
+	color:#222;
+	padding: 0.2em 0.4em 0.2em 0.4em;
+	border: 1px solid #442;
+  width:80px;
+  text-align: left;
+  font-size:10.5pt;
+}
+.-gsibv-dialog.dsloret .contents .message table.inner th.table-header{
+  text-align: center;
+}
+
+
+.-gsibv-dialog.dsloret .contents .message table.inner td{
+	padding: 0.2em 0.6em 0.2em 0.6em;
+	border: 1px solid #442;
+  font-size:10.5pt;
+}
+
+.-gsibv-dialog.dsloret .contents .message table td img {
+  border: 1px solid #442;
+}
+
+.-gsibv-dialog.confirm .footer {
+  padding-top:3px;
+}
 
 .-gsibv-dialog.help .header {
   padding-left: 23px;
@@ -3327,6 +3799,7 @@ loading
 
 .-gsibv-dialog.layertree .container .contents ul li{
   display:block;
+  position: relative;
   margin:0;
   padding:0;
   border-bottom:1px dotted #555;
@@ -3349,21 +3822,92 @@ loading
   padding:4px 0 4px 20px;
   color:#666;
 }
-
-
 .-gsibv-dialog.layertree .container .contents ul li a{
   display:block;
   color:#fff;
   text-decoration: none;
   padding:4px 0 4px 24px;
   word-break: break-all;
+  position: relative;
+}
+.-gsibv-dialog.layertree .container .contents ul li.hasinfo a{
+  display:block;
+  color:#fff;
+  text-decoration: none;
+  padding:4px 0 4px 24px;
+  word-break: break-all;
+  position: relative;
+  margin-right:26px;
+}
+.-gsibv-dialog.layertree .container .contents ul li.hasarea a{
+  display:block;
+  color:#fff;
+  text-decoration: none;
+  padding:4px 0 4px 24px;
+  word-break: break-all;
+  position: relative;
+  margin-right:48px;
 }
 
 .-gsibv-dialog.layertree .container .contents ul li a:hover{
   box-shadow: inset 0 0 1px 1px rgb(79, 178, 218);
 }
 
+.-gsibv-dialog.layertree .container .contents ul li a.info{
+  position:absolute;
+  display:block;
+  color:#fff;
+  text-decoration: none;
+  padding:0;
+  word-break: break-all;
+  width:20px;
+  height:20px;
+  line-height: 20px;
+  top:50%;
+  margin-top:-10px;
+  margin-right: 0px;
+  border-radius: 50%;
+  text-align: center;
+  background-color:rgb(29, 65, 122);
+  color:#fff;
+}
+.-gsibv-dialog.layertree .container .contents ul li a.area{
+  position:absolute;
+  display:block;
+  color:#fff;
+  text-decoration: none;
+  padding:0;
+  word-break: break-all;
+  /*width:30px;*/
+  width:20px;
+  height:20px;
+  line-height: 20px;
+  top:50%;
+  margin-top:-10px;
+  margin-right: 0px;
+  border-radius: 5px;
+  border-radius: 50%;
+  text-align: center;
+  /*background-color:rgb(206, 0, 0);*/
+  color:#fff;
+  font-size:9px;
+  /*border: 1px solid #ccc;*/
+  height: 20px;
+  width: 20px;
+  color: #eee;
+  background-color:#fff;
+  background-image: url(../image/system/area.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+}
 
+.-gsibv-mapboxctrl-leftpanelbutton {
+
+	background-repeat: no-repeat;
+	background-position: center;
+  background-image:url(../image/thumb/std.png);
+}
 
 .-gsibv-mapboxctrl-reset-pitch {
 	background-repeat: no-repeat;
@@ -3418,6 +3962,17 @@ loading
 
 }
 
+.-gsibv-colorpicker .clear-button {
+  position: absolute;
+  right:6px;
+  bottom:6px;
+  height: 18px;
+  line-height: 18px;
+  font-size:9pt;
+  color:#fff;
+}
+
+
 .-gsibv-colorpicker .sample {
 
   position: absolute;
@@ -3455,4 +4010,865 @@ loading
 }
 .-gsibv-colorpicker .input-frame  table td{
   padding:0;
+}
+
+
+
+
+.-gsibv-layerinfowindow {
+  z-index: 11000;
+  position:absolute;
+  background-color: rgba(255,255,255,0.9);
+  box-shadow: 0 0 3px 3px rgba(0, 0, 0, 0.2);
+  color:#000;
+  border-radius: 3px;
+  font-size: 9pt;
+  padding:5px;
+}
+
+
+.-gsibv-layerinfowindow-content{
+  
+  position:relative;
+  max-width:300px;
+  max-height:400px;
+  overflow-y: auto;
+}
+
+
+
+.-gsibv-mapboxctrl-gps {
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size:24px 24px;
+  background-image:url(../image/control/gps_off.png);
+  width:40px;
+  height:40px;
+  border-radius: 50%;
+  background-color: #fff;
+}
+.-gsibv-mapboxctrl-gps:hover {
+  background-color: #fff  !important; 
+}
+
+
+.-gsibv-mapboxctrl-gps.on {
+  background-image:url(../image/control/gps_on.png);
+  background-color:rgb(79, 178, 218);
+}
+.-gsibv-mapboxctrl-gps.on:hover {
+  background-color:rgb(79, 178, 218)  !important; 
+}
+
+
+.-gsibv-mapboxctrl-gps-mark {
+  position:absolute;
+  background-color:rgb(79, 178, 218);
+  border:1px solid #ddd;
+  border-radius: 50%;
+  width:20px;
+  height:20px;
+  top:50%;
+  left:50%;
+  margin-left:-10px;
+  margin-top:-10px;
+  z-index: 10;
+}
+
+.-gsibv-relief-contents {
+  position: absolute  !important; 
+  left:0;
+  top:0;
+  bottom:0;
+  right:0;
+}
+
+.-gsibv-relief-contents .-header {
+  position:absolute;
+  left:0;
+  top:0;
+  right:0;
+
+}
+
+.-gsibv-relief-contents .-header .-toolbar{
+  
+  padding: 1px 0 1px 1px;
+}
+
+
+.-gsibv-relief-contents .-header .-toolbar button{
+
+  height:24px;
+  margin-right:1px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  vertical-align: bottom;
+}
+
+
+
+.-gsibv-relief-contents .-header .-toolbar button.open{
+
+  width:24px;
+  background-size: 18px 18px;
+  background-image: url('data:image/svg+xml,<?xml version="1.0" ?>\
+    <svg height="20px" version="1.1" viewBox="0 0 512 512" width="20px" xmlns="http://www.w3.org/2000/svg" fill="rgba(255,255,255,1)">\
+<path d="M430.1,192H81.9c-17.7,0-18.6,9.2-17.6,20.5l13,183c0.9,11.2,3.5,20.5,21.1,20.5h316.2c18,0,20.1-9.2,21.1-20.5l12.1-185.3   C448.7,199,447.8,192,430.1,192z"/>\
+<path d="M426.2,143.3c-0.5-12.4-4.5-15.3-15.1-15.3c0,0-121.4,0-143.2,0c-21.8,0-24.4,0.3-40.9-17.4C213.3,95.8,218.7,96,190.4,96    c-22.6,0-75.3,0-75.3,0c-17.4,0-23.6-1.5-25.2,16.6c-1.5,16.7-5,57.2-5.5,63.4h343.4L426.2,143.3z"/>\
+></svg>');
+}
+
+.-gsibv-relief-contents .-header .-toolbar button.save{
+
+  width:24px;
+  background-size: 18px 18px;
+background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"  >\
+    <path fill="rgba(255,255,255,1)" d="M5.01 8.1L9.85 14.44L14.77 8.17L11.67 8.14L11.72 1.45L8.14 1.43L8.09 8.12L5.01 8.1Z"></path>\
+    <path stroke="rgba(255,255,255,1)" opacity="1" fill-opacity="0" stroke-width="3" d="M16.76 8.63L16.76 16.76L2.93 16.76L2.93 8.63"></path>\
+    </svg>');
+}
+
+
+.-gsibv-relief-contents .-header .-toolbar2{
+  
+  padding: 2px 0 3px 1px;
+}
+
+
+.-gsibv-relief-contents .-header .-toolbar2 button{
+  margin-left: 5px;;
+}
+
+.-gsibv-relief-contents .-content {
+  position:absolute;
+  left:0;
+  top:50px;
+  bottom:26px;
+  right:0;
+  border-radius: 3px;
+
+}
+.-gsibv-relief-contents .-content .listcontainer {
+
+  position:absolute;
+  left:2px;
+  top:2px;
+  bottom:2px;
+  right:2px;
+  overflow:auto;
+}
+
+
+.-gsibv-relief-contents .-content .listcontainer table.colors{
+  margin: 0 0 0 8px;
+  
+  position:relative;
+}
+
+.-gsibv-relief-contents .-content .listcontainer table td{
+
+  line-height: 22px;
+  overflow-y: visible;
+}
+.-gsibv-relief-contents .-content .listcontainer table td.gradationbar{
+  position:relative;
+  width:16px;
+
+}
+.-gsibv-relief-contents .-content .listcontainer table td.gradationbar .bar{
+  position: absolute;
+  background: url("./image/system/transparent_bg.png");
+  border:1px soide #aaa;
+  left:1px;
+  right:1px;
+  top:1px;
+  bottom:1px;
+  overflow:hidden;
+}
+
+.-gsibv-relief-contents .-content .listcontainer table td.gradationbar .bar canvas{
+  border-radius: 3px;
+}
+
+.-gsibv-relief-contents .-content .listcontainer table td a.button{
+  height:22px;
+  width:22px;
+  line-height: 22px;
+  vertical-align: top;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+.-gsibv-relief-contents .-content .listcontainer table td a.color{
+  display: block;
+  height:22px;
+  width:38px;
+  line-height: 22px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  border-radius: 3px;
+}
+
+
+.-gsibv-relief-contents .-content .listcontainer table td a.color.transparent{
+  background-color:transparent;
+  background-repeat: repeat;
+
+  background-image: url('data:image/svg+xml,<svg height="4" fill="rgba(255,255,255,0.2)" viewBox="0 0 4 4" width="4" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="2" height="2" /><rect x="2" y="2" width="2" height="2" /></svg>');
+}
+
+.-gsibv-relief-contents .-content .listcontainer table td a.button.remove{
+  
+  background-size: 16px 16px;
+  background-image: url('data:image/svg+xml,<?xml version="1.0" ?>\
+    <svg width="24" height="24" stroke-linecap="round" stroke-width="3" stroke="rgba(255,255,255,1)" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">\
+    <path d="M6,6 L18,18 M18,6 L6,18 z"/>\
+    </svg>');
+}
+
+.-gsibv-relief-contents .-content .listcontainer table td a.button.append{
+  margin-bottom:-22px;
+  position: absolute;
+  background-size: 16px 16px;
+  background-image: url('data:image/svg+xml,<?xml version="1.0" ?>\
+    <svg width="24" height="24" stroke-linecap="round" stroke-width="3" stroke="rgba(255,255,255,1)" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">\
+    <path d="M6,12 L18,12 M12,6 L12,18 z"/>\
+    </svg>');
+}
+
+.-gsibv-relief-contents .-content .listcontainer table td input.elevation{
+  width:5em;
+  line-height: 22px;
+  height:22px;
+  padding-left:2px;
+}
+
+.-gsibv-relief-contents .-footer {
+  position:absolute;
+  left:0;
+  bottom:0;
+  right:0;
+  vertical-align: bottom;
+}
+.-gsibv-relief-contents  .-tani{
+  padding-left:8px;
+  font-size:9px;
+}
+
+.-gsibv-relief-contents .-footer .-container{
+  padding:2px;
+}
+
+.-gsibv-relief-contents .-footer button{
+  display:block;
+  width:100%;
+  line-height: 22px;
+  text-align: center;
+
+}
+
+
+.-gsibv-relief-newpanel {
+  position: absolute;
+  left:0;
+  right:0;
+  top:0;
+  bottom:0;
+} 
+.-gsibv-relief-contents .-loading-panel {
+
+  position: absolute;
+  left:0;
+  right:0;
+  top:0;
+  bottom:0;
+  background:rgba(55, 55, 55, 0.95);
+}
+
+.-gsibv-relief-contents .-loading-panel::after {
+  content: "標高を取得しています";
+  color:#fff;
+  display:block;
+  position:absolute;
+  width:150px;
+  line-height:24px;
+  top:50%;
+  left:50%;
+  text-align:center;
+  margin-top:-12px;
+  margin-left:-75px;
+  background-repeat: no-repeat;
+  background-position: 0px center;
+  padding-left:20px;
+  background-image: url(../image/loading2.gif);
+}
+.-gsibv-relief-newpanel .-container{
+  
+  position: absolute;
+  left:4px;
+  right:4px;
+  top:4px;
+  bottom:4px;
+  padding:6px;
+  border-radius: 3px;
+  background:rgba(55, 55, 55, 0.95);
+}
+
+
+.-gsibv-relief-newpanel .-container dl{
+  margin:0;
+  padding:0;
+}
+.-gsibv-relief-newpanel .-container dt{
+  margin:0;
+  padding:0;
+}
+.-gsibv-relief-newpanel .-container dd{
+  margin:4px 0 12px 0;
+  padding:0 0 0 12px;
+}
+
+
+.-gsibv-relief-newpanel .-container dd.disable{
+  opacity: 0.3;
+}
+
+.-gsibv-relief-newpanel .-container dd table td input{
+  width:5em;
+  padding-left:3px;
+  margin-right:2px;
+}
+
+
+.-gsibv-relief-newpanel .-container dd table td a.color{
+
+  display: block;
+  height:22px;
+  width:38px;
+  line-height: 22px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  border-radius: 3px;
+}
+
+.-gsibv-relief-newpanel .-container dd table td a.color.transparent{
+  background-color:transparent;
+  background-repeat: repeat;
+
+  background-image: url('data:image/svg+xml,<svg height="4" fill="rgba(255,255,255,0.2)" viewBox="0 0 4 4" width="4" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="2" height="2" /><rect x="2" y="2" width="2" height="2" /></svg>');
+}
+
+.-gsibv-relief-newpanel .-container .option-frame {
+  margin-bottom:12px;
+}
+.-gsibv-relief-newpanel .-container .button-frame  {
+  text-align: center;
+}
+.-gsibv-relief-newpanel .-container .button-frame button {
+  width:45%;
+  margin:0 1px 0 1px;
+}
+
+
+.-gsibv-relief-patternselectpanel {
+	position: absolute;
+	z-index: 10000000;
+	background: rgba(55, 55, 55, 0.95);
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+  border-radius: 3px;  
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.2);
+
+}
+
+.-gsibv-relief-patternselectpanel ul {
+	list-style: none;
+	padding: 0px;
+	margin: 0px;
+}
+
+.-gsibv-relief-patternselectpanel ul li {
+	display: block;
+	padding: 0px;
+	margin: 0px;
+	border-bottom: 1px dotted #666;
+}
+
+.-gsibv-relief-patternselectpanel ul li a {
+	display: block;
+	padding: 0px;
+	margin: 0px;
+	padding: 2px;
+}
+
+.-gsibv-relief-patternselectpanel ul li a:hover {
+box-shadow: 0 0 1px 1px rgb(79, 178, 218);
+
+}
+
+.-gsibv-relief-patternselectpanel ul li a canvas {
+	border: 1px solid #666;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
+
+
+
+
+
+/***********************************************
+作図
+***********************************************/
+
+.-gsibv-sakuzu-dialog {
+
+}
+
+
+.-gsibv-sakuzu-dialog .contents {
+  position: absolute !important;
+  left : 0;
+  top: 0;
+  right:0;
+  bottom:0;
+}
+.-gsibv-sakuzu-dialog .controls {
+  position: relative;
+  
+  width:100%;
+  padding:3px 0 3px 2px;
+}
+
+.-gsibv-sakuzu-dialog .controls .separator{
+  
+  display: inline-block;
+  width:1px;
+  height:16px;
+	background: rgba(0,0,0,0.31);
+  margin-right:3px;
+  margin-bottom:4px;
+}
+
+.-gsibv-sakuzu-dialog .controls button{
+  display: inline-block;
+  width:24px;
+  height:24px;
+  margin-right: 3px;
+  padding:0;
+  background-color: transparent;
+  background-position: center center;
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+
+}
+.-gsibv-sakuzu-dialog .controls button:hover {
+  background-color: #666;
+  opacity: 1;
+}
+
+.-gsibv-sakuzu-dialog .controls button.active:hover{
+  background-color:rgba(79, 178, 218,0.9);
+}
+
+.-gsibv-sakuzu-dialog .controls button.active{
+  background-color:rgb(79, 178, 218);
+  
+}
+
+.-gsibv-sakuzu-dialog .controls button.disable{
+  opacity:0.2;
+  cursor: default;
+}
+
+.-gsibv-sakuzu-dialog .controls button.disable:hover{
+  background-color:transparent;
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+
+.-gsibv-sakuzu-dialog .controls button.save {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"  >\
+  <path fill="rgba(255,255,255,1)" d="M5.01 8.1L9.85 14.44L14.77 8.17L11.67 8.14L11.72 1.45L8.14 1.43L8.09 8.12L5.01 8.1Z"></path>\
+  <path stroke="rgba(255,255,255,1)" opacity="1" fill-opacity="0" stroke-width="3" d="M16.76 8.63L16.76 16.76L2.93 16.76L2.93 8.63"></path>\
+  </svg>');
+}
+  
+.-gsibv-sakuzu-dialog .controls button.open {
+  background-image: url('data:image/svg+xml,<?xml version="1.0" ?>\
+    <svg height="20px" version="1.1" viewBox="0 0 512 512" width="20px" xmlns="http://www.w3.org/2000/svg" fill="rgba(255,255,255,1)">\
+<path d="M430.1,192H81.9c-17.7,0-18.6,9.2-17.6,20.5l13,183c0.9,11.2,3.5,20.5,21.1,20.5h316.2c18,0,20.1-9.2,21.1-20.5l12.1-185.3   C448.7,199,447.8,192,430.1,192z"/>\
+<path d="M426.2,143.3c-0.5-12.4-4.5-15.3-15.1-15.3c0,0-121.4,0-143.2,0c-21.8,0-24.4,0.3-40.9-17.4C213.3,95.8,218.7,96,190.4,96    c-22.6,0-75.3,0-75.3,0c-17.4,0-23.6-1.5-25.2,16.6c-1.5,16.7-5,57.2-5.5,63.4h343.4L426.2,143.3z"/>\
+></svg>');
+}
+
+.-gsibv-sakuzu-dialog .controls button.marker {
+  background-size: 24px 24px;
+  background-image:url(../image/sakuzu/icon_mark.png);
+}
+.-gsibv-sakuzu-dialog .controls button.line {
+  background-size: 24px 24px;
+  background-image:url(../image/sakuzu/icon_line.png);
+}
+.-gsibv-sakuzu-dialog .controls button.polygon {
+  background-size: 24px 24px;
+  background-image:url(../image/sakuzu/icon_polygon.png);
+}
+
+
+.-gsibv-sakuzu-dialog .list-frame {
+  position: absolute;
+  left:0;
+  right:0;
+  top:30px;
+  bottom:0;
+}
+
+.-gsibv-sakuzu-dialog .list-frame ul {
+  list-style: none;
+  margin:0;
+  padding:0;
+  display: block;
+}
+
+.-gsibv-sakuzu-dialog .list-frame li {
+  display: block;
+  position: relative;
+  padding: 4px 1px 3px 1px;
+  border-bottom: 1px dotted #555;
+}
+
+.-gsibv-sakuzu-dialog .list-frame li.active {
+  background-color: rgba(79, 178, 218,0.2);
+
+}
+
+
+.-gsibv-sakuzu-dialog .list-frame li.active::after {
+  content: "　";
+  display: block;
+  position:absolute;
+  left:1px;
+  top:4px;
+  height:18px;
+  width:18px;
+  border-radius: 50%;
+  background-size: 18px 18px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-image:url(../image/sakuzu/icon_edit.png);
+}
+
+
+
+.-gsibv-sakuzu-dialog .list-frame li.active > button.view {
+  display:none;
+}
+
+.-gsibv-sakuzu-dialog .list-frame li > .title{
+  position:relative;
+  
+  line-height:18px;
+  margin:0px 90px 2px 24px;
+  word-break: break-all;
+}
+
+.-gsibv-sakuzu-dialog .list-frame li > .num{
+  position:absolute;
+  line-height:18px;
+  height:18px;
+  top:4px;
+  right:72px;
+  z-index: 1;
+  font-size:9pt;
+  padding:0 5px 0 5px;
+  border-radius: 8px;
+  background-color:rgb(79, 178, 218);
+  border:none;
+  color:#fff;
+  text-align: center;
+}
+
+.-gsibv-sakuzu-dialog .list-frame li > button{
+  
+  height:18px;
+  position: absolute;
+  top:4px;
+  right:1px;
+  border-radius: 50%;
+  background-color:transparent;
+  border:none;
+  background-position: center center;
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  z-index:1;
+}
+.-gsibv-sakuzu-dialog .list-frame li > button:hover {
+  background-color: #666;
+  opacity: 1;
+}
+
+.-gsibv-sakuzu-dialog .list-frame li > button.disable {
+  opacity:0.2;
+  cursor: default;
+}
+.-gsibv-sakuzu-dialog .list-frame li > button.disable:hover {
+  background-color:transparent;
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.-gsibv-sakuzu-dialog .list-frame li > button.edit{
+  width:32px;
+  font-size:10px;
+  right:36px;
+  border-radius: 3px;
+}
+.-gsibv-sakuzu-dialog .list-frame li > button.edit::after {
+  content: "編集";
+  color:#fff;
+  height:18px;
+  position: absolute;
+  width:32px;
+  font-size:10px;
+  left:0px;
+  top:0px;
+  white-space: nowrap;
+  line-height: 18px;
+}
+.-gsibv-sakuzu-dialog .list-frame li > button.view {
+  left:1px;
+  width:18px;
+  right: auto;
+  background-image: url('data:image/svg+xml,<svg fill="none" height="22" stroke="rgba(255,255,255,1)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="22" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>');
+
+}
+.-gsibv-sakuzu-dialog .list-frame li > button.view.hidden {
+  background-image: url('data:image/svg+xml,<svg fill="none" height="22" stroke="rgba(128,128,128,1)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="22" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><path d="M22,2 L2,22 z"/></svg>');
+
+}
+/*
+.-gsibv-sakuzu-dialog .list-frame li > button.remove{
+  width:18px;
+  background-image: url('data:image/svg+xml,<?xml version="1.0" ?>\
+    <svg width="24" height="24" stroke-linecap="round" stroke-width="3" stroke="rgba(255,255,255,1)" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">\
+    <path d="M6,6 L18,18 M18,6 L6,18"/>\
+    </svg>');
+
+}
+*/
+
+
+.-gsibv-sakuzu-dialog .list-frame li > button.remove{
+width:32px;
+font-size:10px;
+border-radius: 3px;
+}
+.-gsibv-sakuzu-dialog .list-frame li > button.remove::after {
+content: "削除";
+color:#fff;
+height:18px;
+position: absolute;
+width:32px;
+font-size:10px;
+left:0px;
+top:0px;
+white-space: nowrap;
+line-height: 18px;
+}
+
+
+
+.draw-edit-panel {
+
+  padding:3px 3px 5px 3px;
+
+}
+
+.draw-edit-panel table {
+  width:100%;
+}
+
+.draw-edit-panel th {
+  color:#fff;
+  font-size:8pt;
+  font-weight: normal;
+  white-space: nowrap;
+  width:10px;
+  padding-right:8px;
+  text-align: left;
+}
+
+.draw-edit-panel td {
+  vertical-align: middle;
+  padding:0;
+}
+
+.draw-edit-panel td select,
+.draw-edit-panel td input{
+  line-height: 20px;
+  height:20px;
+  width:100px;
+  margin:1px 0 1px 0;
+}
+
+.draw-edit-panel td textarea {
+  width:100%;
+  height:50px;
+}
+
+.draw-edit-panel td select.radius-unit {
+  width:auto;
+}
+
+.draw-edit-panel td input.title{
+  width:100%;
+}
+
+.draw-edit-panel td .color-panel {
+  position: relative;
+  background-color: #5a5a5a;
+  margin:1px 0 1px 0;
+  width:56px;
+  height:20px;
+  line-height: 20px;
+  border-radius: 3px;
+  border: none;
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  background-image: url('data:image/svg+xml,<svg height="4" fill="rgba(255,255,255,0.2)" viewBox="0 0 4 4" width="4" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="2" height="2" /><rect x="2" y="2" width="2" height="2" /></svg>');
+
+}
+
+.draw-edit-panel td .color-panel .inner {
+  position: absolute;
+  left:0;
+  right:0;
+  top:0;
+  bottom:0;
+  border-radius: 3px;
+
+}
+
+
+.draw-edit-panel td.opacity-frame {
+  padding:2px 8px 2px 8px;
+}
+.draw-edit-panel td .opacity-slider {
+  position: relative;
+  width:100%;
+  height:16px;
+  line-height: 16px;
+}
+
+
+.draw-edit-controls {
+
+}
+
+
+.draw-edit-controls button{
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+  color: #fff;
+  background-color: #5a5a5a;
+  border-radius: 3px;
+  padding: 1px 6px 1px 6px;
+  border-radius: 3px;
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.2);
+  font-size: 9pt;
+  cursor: pointer;
+  outline: none;
+  border: none;
+}
+
+.draw-edit-panel td .icon-panel{
+  display: inline-block;
+  height:20px;
+  min-width: 20px;
+  cursor: pointer;
+}
+
+.draw-edit-panel td .icon-panel img{
+  height:20px;
+  vertical-align: bottom;
+}
+
+
+.-sakuzu-marker-icon-selector {
+  position: absolute;
+  z-index:20020;
+  background: #fff;
+  width:210px;
+  height:220px;
+  overflow-y:auto;
+  padding:2px;
+  border-radius: 3px;
+  box-shadow: 0 0 3px 3px rgba(0, 0, 0, 0.2);
+  background-color: #444;
+}
+
+.-sakuzu-marker-icon-selector div{
+  display:inline-block;
+  vertical-align: bottom;
+  padding:2px;
+}
+
+.-sakuzu-marker-icon-selector div img{
+  vertical-align: bottom;
+  height:20px;
+  cursor: pointer;
+}
+
+
+.-sakuz-draw-tooltip {
+  position:absolute;
+  z-index:1000;
+  display: inline-block;
+  min-width:120px;
+  background:rgba(43, 43, 43, 0.7);
+  margin-left:6px;
+
+  padding:4px;
+  border-radius: 5px;
+}
+
+.-sakuz-draw-tooltip::before {
+  content:"";
+  position:absolute;
+  top:12px;
+  left:-12px;
+  margin-top:-6px;
+  border:6px solid transparent;
+  border-right:6px solid rgba(43, 43, 43, 0.7);
+}
+
+.-sakuz-draw-tooltip div.distance{
+  color:#f8d5e4;
+}
+
+.-sakuz-draw-tooltip p{
+  margin:0;
+  padding:0;
+  color:rgba(255,255,255,0.8);
+  font-size:9pt;
+  white-space: nowrap;
+}
+
+
+.-sakuz-draw-tooltip.error {
+  background:rgba(242, 222, 222,0.8);
+}
+.-sakuz-draw-tooltip.error::before {
+  border-right:6px solid rgba(242, 222, 222,0.8);
+
+}
+.-sakuz-draw-tooltip.error p{
+  color:rgb(185, 74, 72);
+}
+
+
+.-sakuz-draw-tooltip p .mini{
+  font-size:8pt;
 }

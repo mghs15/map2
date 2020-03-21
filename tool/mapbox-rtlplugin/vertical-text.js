@@ -97,7 +97,7 @@ verticalizedCharacterMap = {
 };
 function applyArabicShaping(input) {
     
-    var m = input.match(/<gsi\-vertical>(.+)<\/gsi\-vertical>/);
+    var m = input.match(/<gsi\-vertical>(.*)<\/gsi\-vertical>/);
     
     if ( m ) {
         var chars = m[1].split('');

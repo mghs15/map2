@@ -201,9 +201,8 @@ GSIBV.UI.LayerTreeView.LayerBase = class extends MA.Class.Base {
     this._titleElement.innerHTML = this._layer.title;
     MA.DOM.addClass(this._titleElement, "-title");
 
-    this._a.append(this._titleElement);
-    this._container.append(this._a);
-
+    this._a.appendChild(this._titleElement);
+    this._container.appendChild(this._a);
     MA.DOM.on(this._a, "click", MA.bind(this._onClick, this));
 
   }
@@ -241,6 +240,11 @@ GSIBV.UI.LayerTreeView.DirectoryItem = class extends GSIBV.UI.LayerTreeView.Laye
   _createElement() {
     super._createElement();
     MA.DOM.addClass(this._container, "-directory");
+    
+    if (this._layer.iconUrl && this._layer.iconUrl != "") {
+      this._a.style.backgroundImage = 'url("' + this._layer.iconUrl + '")';
+    }
+
     this._numElement = MA.DOM.create('div');
     MA.DOM.addClass(this._numElement, "-num");
     this._numElement.innerHTML = this._layer.length;

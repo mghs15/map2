@@ -139,6 +139,7 @@ GSIBV.UI.Dialog.OpenDataDialog = class extends GSIBV.UI.Dialog.Modal {
     }
     if (!this._files || this._files.length <= 0) {
       var dialog = new GSIBV.UI.Dialog.Alert();
+      dialog.autoDestroy = true;
       dialog.show("エラー", "ファイルが選択されていません", [
         { "id": "ok", "title": "閉じる" }
       ]);

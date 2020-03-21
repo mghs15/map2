@@ -3,6 +3,17 @@ GSIBV.CONFIG = {};
 // 編集不可フラグ
 //GSIBV.CONFIG.ReadOnly = true;
 
+// PC版URL
+GSIBV.CONFIG.URL = "./";
+// モバイル版URL
+GSIBV.CONFIG.MOBILE_FILENAME = "index_m.html";
+GSIBV.CONFIG.MOBILEURL = "./" + GSIBV.CONFIG.MOBILE_FILENAME;
+
+
+
+// モバイルフラグ
+GSIBV.CONFIG.MOBILE = false;
+GSIBV.CONFIG.GPS_FLYTO_ZOOM = 14;
 
 // 画面操作不可時には追加を多くし、操作可能になったら休みを多くする
 GSIBV.CONFIG.LayerAppend = {
@@ -126,10 +137,15 @@ GSIBV.CONFIG.Sprite = {
 };
 
 
-//ベクトルタイルの読み込むズーム設定
+//ベクトルタイルの読み込むズーム設定(※廃止)
 GSIBV.CONFIG.VectorTileSourceList = [
   {"minzoom":4,"maxzoom":17} // ZL4～17までそれぞれのZLのタイル使用
 ];
+
+//ベクトルタイルの読み込むズーム設定(※廃止)
+GSIBV.CONFIG.VectorTileSource = {"minzoom":4,"maxzoom":17};
+
+
 /*
 //ZL14以降はZL14のタイルを使用する例
 GSIBV.CONFIG.VectorTileSourceList = [
@@ -155,8 +171,22 @@ GSIBV.CONFIG.RECOMMEND = [
     "title": "標準地図",
     "thumbnail": "./image/thumb/std.png",
     "url": "./data/std.json",
-    "html": "標準地図<div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>"
+    "html": "基本となる地図<div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>",
+    "description": "標準地図",
+    "maxNativeZoom" : 16
   },
+  /*
+  {
+    "id": "vpale_test",
+    "type": "binaryvector",
+    "title": "淡色テスト",
+    "thumbnail": "./image/thumb/pale.png",
+    "url": "./data/pale_test.json",
+    "html": "淡い配色の地図<div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>",
+    "description": "淡色テスト",
+    "maxNativeZoom" : 16
+  },
+  */
   /*
   {
     "id": "std",
@@ -197,7 +227,9 @@ GSIBV.CONFIG.RECOMMEND = [
     "title": "淡色地図",
     "thumbnail": "./image/thumb/pale.png",
     "url": "./data/pale.json",
-    "html": "淡色地図<div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>"
+    "html": "淡い配色の地図<div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>",
+    "description": "淡色地図",
+    "maxNativeZoom" : 16
   },
 
   {
@@ -206,7 +238,9 @@ GSIBV.CONFIG.RECOMMEND = [
     "title": "白地図",
     "thumbnail": "./image/thumb/blank.png",
     "url": "./data/blank.json",
-    "html": "白地図<div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>"
+    "html": "白黒の地図<div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>",
+    "description": "白地図",
+    "maxNativeZoom" : 16
   },
 
   /*
@@ -224,29 +258,33 @@ GSIBV.CONFIG.RECOMMEND = [
     "id": "photo",
     "type": "raster",
     "title": "写真",
+    "description": "写真",
     "thumbnail": "./image/thumb/ort.png",
-    "url": "https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg",
+    "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg",
     "html": "<div class=\"gsi_layerinfo_subtitle\">ズームレベル2～8:「世界衛星モザイク画像」<br>ズームレベル9～13:「全国ランドサットモザイク画像」<br>ズームレベル14～18:「シームレス空中写真」<br>シームレス空中写真は、国土地理院が保有する複数種別の空中写真から、各地区における最新の写真を抽出・組み合わせて作成した写真レイヤです。</div><a target=\"_blank\" href=\"https://cyberjapandata.gsi.go.jp/legend/seamlessphoto.pdf\">（詳細解説）</a><div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>"
   },  
   {
     "id": "photolabel",
     "type": "layerset",
     "title": "写真＋注記",
-    "thumbnail": "./image/thumb/photo_label.png",
+    "description": "写真＋注記",
+    "thumbnail": "./image/thumb/ort_label.png",
     "url": "",
     "layers": [
       {
         "id": "photo2",
         "type": "raster",
         "title" : "写真",
-        "url": "https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg",
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg",
         "html": "<div class=\"gsi_layerinfo_subtitle\">ズームレベル2～8:「世界衛星モザイク画像」<br>ズームレベル9～13:「全国ランドサットモザイク画像」<br>ズームレベル14～18:「シームレス空中写真」<br>シームレス空中写真は、国土地理院が保有する複数種別の空中写真から、各地区における最新の写真を抽出・組み合わせて作成した写真レイヤです。</div><a target=\"_blank\" href=\"https://cyberjapandata.gsi.go.jp/legend/seamlessphoto.pdf\">（詳細解説）</a><div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>"
       },
       {
         "id": "vlabel",
         "type": "binaryvector",
         "title" : "注記",
-        "url": "./data/label.json"
+        "url": "./data/label.json",
+        "html" : "標準地図から注記だけ抜き出したもの</a><div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>",
+        "maxNativeZoom" : 16
       }
     ]
   },
@@ -254,33 +292,41 @@ GSIBV.CONFIG.RECOMMEND = [
     "id": "lvlabel",
     "type": "binaryvector",
     "title": "大きい文字",
+    "description": "標準地図（大きい文字）",
     "thumbnail": "./image/thumb/l_label.png",
     "url": "./data/llabel.json",
-    "html": "標準地図（大きい文字）<div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>"
+    "html": "標準地図の文字を大きくしたもの<div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>",
+    "maxNativeZoom" : 16
   },
   {
     "id": "v2std",
     "type": "binaryvector",
     "title": "標準地図②",
-    "thumbnail": "./image/thumb/std.png",
+    "description": "標準地図（立体交差あり）",
+    "thumbnail": "./image/thumb/std2.png",
     "url": "./data/std2.json",
-    "html": "標準地図<div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>"
+    "html": "基本となる地図（立体交差あり）<div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>",
+    "maxNativeZoom" : 16
   },
   {
     "id": "v2pale",
     "type": "binaryvector",
     "title": "淡色地図②",
-    "thumbnail": "./image/thumb/pale.png",
+    "description": "淡色地図（立体交差あり）",
+    "thumbnail": "./image/thumb/pale2.png",
     "url": "./data/pale2.json",
-    "html": "淡色地図<div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>"
+    "html": "淡い配色の地図（立体交差あり）<div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>",
+    "maxNativeZoom" : 16
   },
   {
     "id": "v2blank",
     "type": "binaryvector",
     "title": "白地図②",
-    "thumbnail": "./image/thumb/blank.png",
+    "description": "白地図（立体交差あり）",
+    "thumbnail": "./image/thumb/blank2.png",
     "url": "./data/blank2.json",
-    "html": "白地図<div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>"
+    "html": "白黒の地図（立体交差あり）<div class=\"gsi_layerinfo_copy\">(c)国土地理院</div>",
+    "maxNativeZoom" : 16
   }
 
   /*
@@ -358,15 +404,27 @@ GSIBV.CONFIG.MENU = [
     "title": "地理院地図で表示"
   },
   {
-  	"id":"centercross",
+    "id":"centercross",
+    "type":"check",
   	"title":"中心十字線"
+  },
+  {
+    "id":"draw",
+  	"title":"作図"
+  },
+  {
+    "id":"print",
+  	"title":"印刷"
+  },
+  {
+    "id":"to-mobile",
+    "title": "スマホ版で表示"
   }
-
+  
 ];
 
 
 GSIBV.CONFIG.GSIMAPLAYERS = [
-
   {
     "url": 'https://maps.gsi.go.jp/layers_txt/layers1.txt'
   },
@@ -380,6 +438,133 @@ GSIBV.CONFIG.GSIMAPLAYERS = [
     "url": 'https://maps.gsi.go.jp/layers_txt/layers4.txt'
   },
   {
-    "url": 'https://maps.gsi.go.jp/layers_txt/layers_topic_chirikyoiku.txt'
+    "url": 'https://maps.gsi.go.jp/layers_txt/layers5.txt'
+  },
+  {
+    "url": 'https://maps.gsi.go.jp/layers_txt/layers6.txt'
+  },
+  {
+    "url": 'https://maps.gsi.go.jp/layers_txt/layers7.txt'
   }
 ];
+
+// 確認表示が必要なレイヤー
+GSIBV.CONFIG.CONFIRM_LAYERS = {
+  "kokuarea" : { // このグループの一意のID
+    "title" : "留意事項", // 確認ダイアログに表示するタイトル
+
+    // 表示するメッセージ
+    "message" : "航空法第132条で規定する無人航空機の飛行禁止空域のうち、航空法施行規則第236条第1号から第3号までに掲げる空域（空港等の周辺空域）を表示します。緑色の面は、上空での飛行が禁止される制限表面を表します。紫色の面は、上空及びその下の空域での飛行が禁止される進入表面及び転移表面並びに上空の空域で飛行が禁止される空港等の敷地を表します。<br>" +
+                "なお、この情報には誤差が含まれている場合があります。また空港等の敷地については工事等により変更がある場合がありますので、境界付近等正確な空域については空港等の管理者に確認願います。<br>" +
+                  "詳細については、<a target='_blank' href='http://www.mlit.go.jp/koku/koku_tk10_000003.html'>国土交通省ホームページ</a>で確認してください。",
+    "withBlend" : false, // 合成するかどうか
+    "layers" : [ // レイヤーのIDを配列で指定
+      "kokuarea"
+    ]
+  },
+  "red" : {
+    "title" : "ご利用上の注意", 
+    "message" : "赤色立体地図及びオルソ立体地図はアジア航測株式会社の特許（第3670274号等）を使用して作成したものです。" + 
+                "赤色立体地図及びオルソ立体地図を利用される場合は、<a target='_blank' href='http://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html'>国土地理院コンテンツ利用規約</a>に記載のとおり、" + 
+                "<a target='_blank' href='https://www.rrim.jp/researcher/'>アジア航測株式会社の許諾条件</a>を確認してご利用下さい。",
+    "withBlend" : true,
+    "layers" : [
+      "red",
+      "20190121_sekisyokurittai_kusatsushiranesan",
+      "20190121_olsorittai_kusatsushiranesan",
+      "oosimared",
+      "miyakejimared",
+      "20180906hokkaido_atsuma_sekishoku",
+      "tarumaered",
+      "20180130_kusatsushiranesan_sekishokurittai",
+      "20180309_sekisyokurittai_kirishima",
+      "kuchinoerabured",
+      "2018_sekisyokurittai_azumayama",
+      "20190807asama_sekisyoku"
+    ]
+  }
+};
+
+
+GSIBV.CONFIG.PAPERSIZE = {
+  "A4_portrait": { w: 650, h: 900 },  //A4縦
+  "A4_landscape": { w: 950, h: 550 }, //A4横
+
+  "A3_portrait": { w: 950, h: 1350 },  //A3縦
+  "A3_landscape": { w: 1400, h: 900 },  //A3横
+
+  "A2_portrait": { w: 1400, h: 2000, large:true },  //A2縦
+  "A2_landscape": { w: 2050, h: 1350, large:true },  //A2横
+
+  "A1_portrait": { w: 2050, h: 2950, large:true },  //A1縦
+  "A1_landscape": { w: 3000, h: 2000, large:true },  //A1横
+
+  "A0_portrait": { w: 3000, h: 4270, large:true },  //A0縦
+  "A0_landscape": { w: 4320, h: 2950, large:true }  //A0横
+};
+
+GSIBV.CONFIG.HANREILIST = {
+  "lcm25k_2012" : {
+    "url" : "./data/hanrei/lcm25k_2012.txt"
+  },
+  "soil-inventory" : {
+    "url" : "./data/hanrei/legend.csv",
+    "layer" : {
+      "url" : "https://soil-inventory.dc.affrc.go.jp/tile/figure/{z}/{x}/{y}.png",
+      "minZoom": 6,
+      "maxZoom": 18,
+      "maxNativeZoom": 15
+    }
+  }
+};
+
+
+GSIBV.CONFIG.FREERELIEF_COLORPATTERNS = [
+  {
+    "title" : "デフォルト",
+    "colors" : [
+      "#0000FF",
+      "#0095FF",
+      "#00EEFF",
+      "#91FF00",
+      "#FFFF00",
+      "#FF8C00",
+      "#FF4400"
+    ]
+  },
+  {
+    "title" : "黒→白",
+    "colors" : [
+      {"r":70,"g":70,"b":70},
+      {"r":101,"g":101,"b":101},
+      {"r":132,"g":132,"b":132},
+      {"r":163,"g":163,"b":163},
+      {"r":193,"g":193,"b":193},
+      {"r":224,"g":224,"b":224},
+      {"r":255,"g":255,"b":255}]
+  },
+  {
+    "title" : "青→白",
+    "colors" : [
+      {"r":0,"g":0,"b":255},
+      {"r":43,"g":43,"b":255},
+      {"r":85,"g":85,"b":255},
+      {"r":128,"g":128,"b":255},
+      {"r":170,"g":170,"b":255},
+      {"r":213,"g":213,"b":255},
+      {"r":255,"g":255,"b":255}]
+  },
+  {
+    "title" : "赤→白",
+    "colors" : [
+      {"r":255,"g":0,"b":0},
+      {"r":255,"g":43,"b":43},
+      {"r":255,"g":85,"b":85},
+      {"r":255,"g":128,"b":128},
+      {"r":255,"g":170,"b":170},
+      {"r":255,"g":213,"b":213},
+      {"r":255,"g":255,"b":255}
+    ]
+  }
+];
+

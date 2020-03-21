@@ -14,7 +14,13 @@ String.prototype.toHalfWidth = function () {
   return result;
 };
 
+MA.isArray = function(obj) {
+  return Array.isArray( obj );
+};
 
+MA.isString = function(obj) {
+  return ( typeof obj == "string" );
+};
 
 /***************************************
     MA.ready
@@ -118,6 +124,17 @@ MA.saveFile = function( fileName, mimeType, content ) {
 };
 
 /***************************************
+    MA.getScreenSize
+***************************************/
+
+MA.getScreenSize = function () {
+  return {
+    width: window.innerWidth ? window.innerWidth : document.body.clientWidth,
+    height: window.innerHeight ? window.innerHeight : document.body.clientHeight
+  };
+};
+
+/***************************************
     MA.IdGenerator
 ***************************************/
 MA.IdGenerator = class {
@@ -139,6 +156,27 @@ MA.IdGenerator = class {
 MA.IdGenerator.instance = new MA.IdGenerator();
 MA.getId = function( prefix ) {
   return prefix + MA.IdGenerator.instance.generate( prefix );
+};
+
+MA.getTimestampText = function( prefix ) {
+  var now = new Date();
+
+  var year = now.getFullYear(); 
+  var month = now.getMonth() + 1;
+  var day = now.getDate();
+  var hour = now.getHours();
+  var min = now.getMinutes();
+  var sec = now.getSeconds();
+  var msec = now.getMilliseconds();
+  var result =
+    year + '' +
+    ('00' + month).slice(-2) +
+    ('00' + day).slice(-2) +
+    ('00' + hour).slice(-2) +
+    ('00' + min).slice(-2) +
+    ('00' + sec).slice(-2) +
+    msec;
+  return (prefix ? prefix : "" ) +result;
 };
 
 /***************************************
@@ -412,6 +450,29 @@ MA.DOM.fadeIn = function (target, ms, maxOpacity, callback) {
   }, 1);
 };
 
+/***************************************
+    MA.DOM.zoomFadeIn
+    zoomとフェードイン   
+***************************************/
+MA.DOM.zoomFadeIn = function (target, ms, maxOpacity, callback) {
+  target.style.opacity = 0;
+  target.style.transform = "scale(0.7)";
+  target.style.display = '';
+  setTimeout(function () {
+    target.style.transition = "opacity " + ms + "ms, transform " + ms +"ms";
+    var handler = function (e) {
+      target.removeEventListener('transitionend', handler);
+      target.style.display = '';
+      if ( callback ) callback();
+
+    };
+    target.addEventListener('transitionend', handler);
+    target.style.opacity = (maxOpacity ? maxOpacity : 1.0);
+    target.style.transform = "scale(1)";
+  }, 1);
+};
+
+
 
 /***************************************
     MA.DOM.fadeOut
@@ -432,6 +493,29 @@ MA.DOM.fadeOut = function (target, ms, callback) {
   }, 1);
 };
 
+
+/***************************************
+    MA.DOM.zoomFadeOut
+    フェードアウト  
+***************************************/
+MA.DOM.zoomFadeOut = function (target, ms, callback) {
+
+  setTimeout(function () {
+    target.style.transition = "opacity " + ms + "ms, transform " + ms +"ms";
+    //target.style.transition = "opacity " + ms + "ms";
+    var handler = function (e) {
+      target.removeEventListener('transitionend', handler);
+      target.style.display = 'none';
+      //target.style.opacity = 1;
+      if ( callback ) callback();
+    };
+    target.addEventListener('transitionend', handler);
+    target.style.opacity = 0.0;
+    target.style.transform = "scale(0.7)";
+  }, 1);
+};
+
+
 /***************************************
     MA.DOM.isChild
     エレメントを含むかどうか 
@@ -450,6 +534,76 @@ MA.DOM.isChild = function (parent, target) {
 
 };
 
+
+
+MA.lineIntersects = function(ax, ay, bx, by, cx, cy, dx, dy) {
+    var ta = (cx - dx) * (ay - cy) + (cy - dy) * (cx - ax);
+    var tb = (cx - dx) * (by - cy) + (cy - dy) * (cx - bx);
+    var tc = (ax - bx) * (cy - ay) + (ay - by) * (ax - cx);
+    var td = (ax - bx) * (dy - ay) + (ay - by) * (ax - dx);
+  
+    return tc * td < 0 && ta * tb < 0;
+    //return tc * td <= 0 && ta * tb <= 0; // 端点を含む場合
+};
+
+
+MA.isPointInPolygon = function (point, polygon) {
+  var wn = 0;
+
+  for (var i = 0; i < polygon.length - 1; i++) {
+    if ((polygon[i][1] <= point[1]) && (polygon[i + 1][1] > point[1])) {
+      var vt = (point[1] - polygon[i][1]) / (polygon[i + 1][1] - polygon[i][1]);
+      if (point[0] < (polygon[i][0] + (vt * (polygon[i + 1][0] - polygon[i][0])))) {
+
+        ++wn;
+
+      }
+    }
+    else if ((polygon[i][1] > point[1]) && (polygon[i + 1][1] <= point[1])) {
+      var vt = (point[1] - polygon[i][1]) / (polygon[i + 1][1] - polygon[i][1]);
+      if (point[0] < (polygon[i][0] + (vt * (polygon[i + 1][0] - polygon[i][0])))) {
+
+        --wn;
+
+      }
+    }
+  }
+  return (wn != 0);
+
+};
+
+
+MA.isPolygonInPolygon = function (inner,outer) {
+  
+  for (var i = 0; i < inner.length; i++) {
+    if( !MA.isPointInPolygon( inner[i],outer )) {
+      return false;
+    }
+
+  }
+
+  return true;
+
+};
+
+
+MA.polygonIntersects = function(poly1, poly2 ) {
+  for (var i = 0; i < poly1.length-1; i++) {
+    
+    for (var j = 0; j < poly2.length-1; j++) {
+      if ( MA.lineIntersects(
+        poly1[i][0], poly1[i][1],
+        poly1[i+1][0], poly1[i+1][1],
+        poly2[j][0], poly2[j][1],
+        poly2[j+1][0], poly2[j+1][1],
+      ) ) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
 
 /***************************************
     MA.Color
@@ -770,7 +924,7 @@ MA.Color = class extends MA.Class.Base {
     var result = "";
     color = MA.Color.fix( color );
     if ( color.r != undefined) {
-      if ( color.a )
+      if ( color.a || color.a == 0 )
         result = "rgba(" + color.r + "," + color.g + "," + color.b + "," + color.a + ")"; 
       else
         result = "rgb(" + color.r + "," + color.g + "," + color.b +")"; 
@@ -899,3 +1053,42 @@ MA.HTTPRequest = class extends MA.Class.Base {
   }
 
 }
+
+
+/***************************************
+  CSVパース
+***************************************/
+MA.Util.parseCSV = function( str, delimiter ){
+	var rows = [], row = [], i, len, v, s = "", q, c;
+    for(i=0,len=str.length; i<len; i++) {
+        v = str.charAt(i);
+        if (q) {
+            if (v === '"') {
+                if (str.charAt(i+1) === '"') {
+                    i++;
+                    s += v;
+                } else { 
+                    q = false;
+                }
+            } else { 
+                s += v;
+            }
+        } else {
+            if (v === '"' && !s) { 
+                q = true;
+            } else if (v === delimiter) {
+                row.push(s); s = "";
+            } else if (v === '\r' || v === '\n') {
+                row.push(s); s = "";
+                rows.push(row); row = [];
+                if (v === '\r' && str.charAt(i+1) === '\n') {i++;}
+            } else {
+                s += v;
+            }
+        }
+    }
+    if (s || v === ',' || !s && v === '"') {row.push(s);}
+    if (row.length) {rows.push(row);}
+    if (!s && (v === '\r' || v === '\n')) {rows.push([]);}
+    return rows;
+};

@@ -33,12 +33,22 @@ GSIBV.UI.MainMenu = class extends MA.Class.Base {
   }
 
   _onButtonClick() {
-    if (!this._popuMenu) {
+    if (!this._popupMenu) {
       this._popupMenu = new GSIBV.UI.Popup.Menu();
+      this._popupMenu.parentContainer = this._button;
+
       this._popupMenu.on( "select", MA.bind(this._onMenuItemClick,this));
 
+    } else if (this._popupMenu.isVisible ) {
+      this._popupMenu.hide();
+      return;
     }
 
+    for( var i=0; i<this._menu.length; i++ ) {
+      if ( this._menu[i].id == "centercross" ) {
+        this._menu[i].checked = this._app._map.centerCrossVisible;
+      }
+    }
     this._popupMenu.items = this._menu;
     this._popupMenu.show(this._button);
   }
@@ -57,6 +67,20 @@ GSIBV.UI.MainMenu = class extends MA.Class.Base {
         break;
       case "centercross":
         this._app._map.centercrosschange();
+        break;
+      case "to-pc":
+        var url = this._app.getPCUrl();
+        location.href = url;
+        break;
+      case "to-mobile":
+        var url = this._app.getMobileUrl();
+        location.href = url;
+        break;
+      case "print":
+        this._app.print();
+        break;
+      case "draw":
+        this._app.startSakuzu();
         break;
     }
   }

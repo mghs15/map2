@@ -15,7 +15,7 @@ GSIBV.Map.Layer.FILTERS.push(function (l) {
 
     });
   }
-
+  /*
   if (l.url.match(/\{z\}/i) && l.url.match(/\.pbf$/i)) {
     return new GSIBV.Map.Layer.BinaryVectorTile({
       "id": l.id,
@@ -28,6 +28,7 @@ GSIBV.Map.Layer.FILTERS.push(function (l) {
 
     });
   }
+  */
 
 
   return null;
@@ -48,6 +49,7 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
       this._title = (options.title ? options.title : "");
       this._url = (options.url ? options.url : "");
       this._isUserFileLayer = ( options.user ? true : false );
+      this._maxNativeZoom = options.maxNativeZoom;
     }
   }
 
@@ -212,7 +214,6 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
     this.updataLoading();
     container.style.display = 'block';
   }
-
 
   updataLoading() {
     
@@ -591,7 +592,9 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
     this._request = null;
 
     this.fire("load");
-    this._data = new GSIBV.VectorTileData(e.params.response);
+    this._data = new GSIBV.VectorTileData(e.params.response,{
+      maxNativeZoom : this._maxNativeZoom
+    });
     this._data.on("change", MA.bind(this._onDataChange, this));
     if ( this._title != undefined) this._data.title = this._title;
     this._addLayers();
@@ -666,7 +669,6 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
       
       l.list.push( mapboxLayer);
       map.addLayer(mapboxLayer, nextId);
-      
     }
     
     //map.repaint = true;
@@ -724,17 +726,23 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
 
       // ソースを追加
       var source = this._data.source;
+      var sourceId = source.id;
+      var s = JSON.parse(JSON.stringify( source.mapboxSource ) );
+      if (!map.getSource(sourceId + "-" + s.minzoom + "-" + s.maxzoom )) {
+        //console.log(sourceId + "-" + sources[i].minzoom + "-" + sources[i].maxzoom );
+        map.addSource(sourceId + "-" + s.minzoom + "-" + s.maxzoom, s );
+      }
+      /*
       var sources = source.mapboxSource;
       var sourceId = source.id;
       for( var i=0; i<sources.length; i++ ) {
-        if (!map.getSource(sourceId + "-" + sources[i].minzoom + "-" + sources[i].maxzoom )) {
+        var s = JSON.parse(JSON.stringify( sources[i] ) );
+        if (!map.getSource(sourceId + "-" + s.minzoom + "-" + s.maxzoom )) {
           //console.log(sourceId + "-" + sources[i].minzoom + "-" + sources[i].maxzoom );
-          var s = JSON.parse(JSON.stringify( sources[i] ) );
-          
-          map.addSource(sourceId + "-" + sources[i].minzoom + "-" + sources[i].maxzoom, s );
+          map.addSource(sourceId + "-" + s.minzoom + "-" + s.maxzoom, s );
         }
       } 
-      
+      */
       
       // 描画順に並んだレイヤーリスト生成
       if (!this._groupList) {
@@ -893,9 +901,12 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
           "finish layers(" + this._addMapboxLayerList.length + ")" , 
           ( (new Date()).getTime() - this._startTime ) +"ms"
         );
+        
 
         /* 190803 ------------------------------------------------------------------------- */
         /* Mapbox Style Spec準拠のStyleへの変換スクリプト --------------------------------- */
+        
+        console.log(this);
         
         /* 事前準備 */
         var myobject1 = {};
@@ -922,9 +933,11 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
                 var verticalFrag = document.getElementById("verticalFragCheck").checked; //縦書きの対応をする場合はtrue
                 
                 //縦書きの対応（レイヤを縦書き用・横書き用に分離し、text-writing-modeの適用） --- 191223
+                var textField = JSON.parse( JSON.stringify( this._addMapboxLayerList[i]["mapboxlayer"]["layout"] ) );
+               
                 if(verticalFrag){
-                    var textField = JSON.parse( JSON.stringify( this._addMapboxLayerList[i]["mapboxlayer"]["layout"] ) );
-                    
+                //縦書き・横書きを区別する場合
+                
                     //<gsi-vertical>がレイヤに含まれている場合に処理を行う
                     if (jsonLayerContent.indexOf('<gsi-vertical>') > 0 ) {
                         //test
@@ -948,7 +961,7 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
                         
                         
                         //HorizontalとVertical、それぞれの条件をセット
-                        //メモ：　最初は、["!=",["get", "arrng"],2]としていて、validation？のエラーが出て困った。
+                        //メモ：　最初は、["!=",["get", "arrng"],2]としていて、validation？のエラーが出て困った。←styleの新旧方式を混在させないこと。
                         
                         var jsonLayerFilterH = ["!=","arrng",2];
                         var jsonLayerFilterV = ["==","arrng",2];
@@ -1013,8 +1026,44 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
                         console.log(jsonLayerContent);
                         */
                     }
-                }//縦書きの対応のスクリプト ここまで
+                    
+                    //縦書きの対応のスクリプト ここまで
+                    
+                }else{
+                    
+                //縦書き・横書きを区別しない場合は、<gsi-vertical>を削除する
                 
+                    //<gsi-vertical>がレイヤに含まれている場合に処理を行う
+                    if (jsonLayerContent.indexOf('<gsi-vertical>') > 0 ) {
+                        
+                        /* JSON文字列をパースする。*/
+                        var jsonLayerObject = JSON.parse(jsonLayerContent);
+                        
+                        //text-fieldを変換                        
+                        if(textField["text-field"]){
+                        
+                            /*-------
+                            縦書きを含むtext-fieldは以下のような形式なので、決め打ちで3番目の配列を取り出し、それでtext-field全体を置き換える。
+                            "text-field":[
+                               "case",
+                               ["!=",["get","arrng"],2],
+                               ["get","knj"], //ここを取り出したい。
+                               ["concat","<gsi-vertical>",["get","knj"],"</gsi-vertical>"]//ここも取り出したい。
+                            ]
+                            -------*/
+                            
+                            var textFieldName = textField["text-field"][2];
+                            
+                            //引数なしのslice()で配列の値渡し。
+                            jsonLayerObject["layout"]["text-field"] = textFieldName.slice();
+                            console.log(jsonLayerObject);
+                        }
+                        
+                        //JSON文字列に変換
+                        jsonLayerContent = JSON.stringify(jsonLayerObject);
+                        
+                    }
+                }
                 mystring1 = mystring1 + comma + "\n" + jsonLayerContent; //190803 + 191122
         }
         console.log( mystring1 ); //ここは必要
@@ -1044,10 +1093,12 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
 	    mystring1 = mystring1.replace(/std\/\/\//g, ""); // sprite
 	    mystring1 = mystring1.replace(/pale\/\/\//g, ""); // sprite
 	    
+	    /* 200321 縦書き対応処理のelse文中で、<gsi-vertical>とconcatを削除。
 	    if(!verticalFrag){ //縦書き対応している場合は不要
 	        mystring1 = mystring1.replace(/<gsi-vertical>/g, ""); //gsi-vertical
 	        mystring1 = mystring1.replace(/<\/gsi-vertical>/g, ""); //gsi-vertical
 	    }
+	    */
 	    
 	    var mystring1json = "{\"version\": 8,\"name\": \"Vector\",\"metadata\": {}," + setSourceId + ", \"sprite\": \"https://cyberjapandata.gsi.go.jp/vector/sprite/" + spriteType + "\", \"glyphs\": \"https://cyberjapandata.gsi.go.jp/xyz/noto-jp/{fontstack}/{range}.pbf\",\"layers\": [" + mystring1 + "  ],\"id\": \"gsi-bv\"}";
 
@@ -1070,7 +1121,8 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
         
         /* 190803 ここまで ------------------------------------------------------------------------- */
 
-
+        
+        
         this.fire("finish");
         return;
       } else {

@@ -3,7 +3,7 @@ MA.Util.AddressSearcher = class extends MA.Class.Base {
   constructor() {
     super();
     this._addressSearchUrl = 'https://msearch.gsi.go.jp/address-search/AddressSearch';
-    this._getAddressUrl = 'http://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress';
+    this._getAddressUrl = 'https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress';
   }
 
   get resultList() { return this._list; }
@@ -53,7 +53,7 @@ MA.Util.AddressSearcher = class extends MA.Class.Base {
     for (var i = 0; i < list.length; i++) {
       var item = list[i];
       var addressCode = item.properties["addressCode"];
-      var addr = GSIBV.MUNI_ARRAY[addressCode];
+      var addr = GSI.MUNI_ARRAY[addressCode];
 
       if (addr) {
         var addr = addr.split(',');
@@ -93,8 +93,8 @@ MA.Util.AddressSearcher = class extends MA.Class.Base {
     var data = { "req": req, "item": item };
     req.on("load", MA.bind(function (data, e) {
       try {
-        var addressCode = e.params.response.results["muniCd"];
-        var addr = GSIBV.MUNI_ARRAY[addressCode];
+        var addressCode = parseInt(e.params.response.results["muniCd"]);
+        var addr = GSI.MUNI_ARRAY[addressCode];
         if (addr) {
           var addr = addr.split(',');
           data.item.properties["pref"] = { "code": addr[0], "title": addr[1] };

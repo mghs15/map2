@@ -50,6 +50,8 @@ GSIBV.LayerInfo = class extends GSIBV.LayerInfoBase {
     this._html = "";
     this._url = "";
     this._legendUrl = "";
+    this._area = null;
+    this._opacity = null;
   }
 
   get id() { return this._id; }
@@ -61,6 +63,8 @@ GSIBV.LayerInfo = class extends GSIBV.LayerInfoBase {
   get html() { return this._html; }
   get legendUrl() { return this._legendUrl; }
   get url() { return this._url; }
+  get area() { return this._area; }
+  get opacity() { return this._opacity; }
 
   get layer() {
     if (this._layer) return this._layer;
@@ -118,6 +122,8 @@ GSIBV.LayerInfo = class extends GSIBV.LayerInfoBase {
     dest._url = this._url;
     dest._id = this._id;
     dest._legendUrl = this._legendUrl;
+    dest._area = this._area;
+    dest._opacity = this._opacity;
   }
 
 }

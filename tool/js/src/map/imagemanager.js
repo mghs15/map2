@@ -32,6 +32,11 @@ GSIBV.Map.ImageManager = class extends MA.Class.Base {
     return (this._images[key] && this._images[key].data ? this._images[key].data : null);
   }
 
+  static get(map) {
+    GSIBV.Map.ImageManager.create(map);
+    return GSIBV.Map.ImageManager.instance; 
+  }
+  
   static create(map) {
     if (!GSIBV.Map.ImageManager.instance) {
       GSIBV.Map.ImageManager.instance =
@@ -52,8 +57,8 @@ GSIBV.Map.ImageManager = class extends MA.Class.Base {
         img: img,
         key: key
       };
-      MA.DOM.on(img, "load", MA.bind(this._onImageLoad, this, image));
-      MA.DOM.on(img, "error", MA.bind(this._onImageLoadError, this, image));
+      MA.DOM.on(img, "load", MA.bind(this._onImageLoad, this, image, url));
+      MA.DOM.on(img, "error", MA.bind(this._onImageLoadError, this, image, url));
       this._images[key] = image;
       img.src = url;
     } else {
@@ -63,8 +68,29 @@ GSIBV.Map.ImageManager = class extends MA.Class.Base {
     //},this,url), 2000);
 
   }
+  
+  add(key, img, url) {
+    if ( this._images[key] ) return;
 
-  _onImageLoad(image) {
+    
+    var image = {
+      url: url,
+      img: img,
+      key: key
+    };
+
+    this._images[key] = image;
+    this._onImageLoad( image, url );
+  }
+
+  remove( key ) {
+    if ( !this._images[key] ) return;
+    if( this._map.hasImage(key) ) this._map.removeImage(key);
+    delete this._images[key];
+
+  }
+
+  _onImageLoad(image, url) {
     var canvas = document.createElement('canvas');
     var w = image.img.width;
     var h = image.img.height;
@@ -91,8 +117,9 @@ GSIBV.Map.ImageManager = class extends MA.Class.Base {
     //delete icon[ "img" ];
     this.fire("load", image);
   }
-  _onImageLoadError(image) {
+  _onImageLoadError(image, url) {
     delete this._images[image.key];
     this.fire("load", null);
+    this.fire("error", {url:url});
   }
 }

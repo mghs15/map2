@@ -106,7 +106,8 @@ GSIBV.Map.Layer.FILTERS.push(function (l) {
     });
   }
 
-  if (l.url.match(/\{z\}/i) && l.url.match(/\.(geojson|txt)$/i)) {
+  var url = l.url.split("?")[0];
+  if (url.match(/\{z\}/i) && url.match(/\.(geojson|txt)$/i)) {
     return new GSIBV.Map.Layer.TileGeoJSON({
       "id": l.id,
       "title": l.title,
@@ -294,6 +295,8 @@ GSIBV.Map.Layer.TileGeoJSON = class extends GSIBV.Map.Layer {
     var imageManager = GSIBV.Map.ImageManager.instance;
     imageManager.off("load", this._iconLoadHandler);
     this._iconLoadHandler = null;
+    imageManager.off("error", this._iconLoadErrorHandler);
+    this._iconLoadErrorHandler = null;
 
     map.map.off("moveend", this._onMapMoveHandler);
 
@@ -328,6 +331,9 @@ GSIBV.Map.Layer.TileGeoJSON = class extends GSIBV.Map.Layer {
     var imageManager = GSIBV.Map.ImageManager.instance;
     imageManager.off("load", this._iconLoadHandler);
     this._iconLoadHandler = null;
+    
+    imageManager.off("error", this._iconLoadErrorHandler);
+    this._iconLoadErrorHandler = null;
 
     if (!this._tiles) return;
 
@@ -353,7 +359,9 @@ GSIBV.Map.Layer.TileGeoJSON = class extends GSIBV.Map.Layer {
       this._tileZoom = zoom;
     }
     if (this._maxNativeZoom && this._maxNativeZoom < zoom) zoom = this._maxNativeZoom;
-    if (this._maxNativeZoom && this._maxNativeZoom > zoom) zoom = this._maxNativeZoom;
+    if ( this._minzoom > 14 ) {
+      if (this._maxNativeZoom && this._maxNativeZoom > zoom) zoom = this._maxNativeZoom;
+    }
     if (this._minNativeZoom && this._minNativeZoom > zoom) zoom = this._minNativeZoom;
 
     zoom = Math.floor(zoom);
@@ -584,7 +592,9 @@ GSIBV.Map.Layer.TileGeoJSON = class extends GSIBV.Map.Layer {
           this._addToMap(tile, false);
           if (!this._iconLoadHandler) {
             this._iconLoadHandler = MA.bind(this._onIconLoad, this);
+            this._iconLoadErrorHandler = MA.bind(this._onIconLoadError, this);
             imageManager.on("load", this._iconLoadHandler);
+            imageManager.on("error", this._iconLoadErrorHandler);
           }
           this._loadIconTiles.push({ loadIcons: loadIcons, tile: tile });
 
@@ -730,14 +740,24 @@ GSIBV.Map.Layer.TileGeoJSON = class extends GSIBV.Map.Layer {
 
   }
 
+  _onIconLoadError(e) {
+    this._onIconLoad(e);
+  }
+
   _onIconLoad(e) {
+    if ( !e.params)return;
+
     var url = e.params.url;
     var imageManager = GSIBV.Map.ImageManager.instance;
+
 
     if (!this._loadIconTiles || this._loadIconTiles.length <= 0) {
       imageManager.off("load", this._iconLoadHandler);
       this._iconLoadHandler = null;
-
+      
+      imageManager.off("error", this._iconLoadErrorHandler);
+      this._iconLoadErrorHandler = null;
+      
       return;
     }
     var loadIconTiles = [];

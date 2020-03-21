@@ -2,7 +2,7 @@ GSIBV.UI.Dialog.LayerTree = class extends GSIBV.UI.Dialog.Modeless {
 
   constructor(options) {
     super(options);
-    this._position = {left:302,top:266};
+    this._position = {left:242,top:266};
     this._resizable = true;
     this._current = null;
   }
@@ -19,6 +19,15 @@ GSIBV.UI.Dialog.LayerTree = class extends GSIBV.UI.Dialog.Modeless {
   }
 
   set current( current ) {
+
+    if ( current && current.title == "指定緊急避難場所") {
+      if ( !GSIBV.application.showEvacConfirm( MA.bind( function(current){
+        this.current = current;
+      },this, current))) {
+        return;
+      }
+    }
+
     this._current = current;
     if ( this._current == undefined) this._current = this._layersJSON.root;
     this._current .off("change", this._layerJSONChangeHanler );
@@ -162,6 +171,39 @@ GSIBV.UI.Dialog.LayerTree = class extends GSIBV.UI.Dialog.Modeless {
           li.style.backgroundImage = "url(" +item.iconUrl + ')';
         }
 
+        var buttonCount = 0;
+        if ( item.html ) {
+          var infoButton = MA.DOM.create("a");
+          infoButton.setAttribute("href","javascript:void(0);");
+          //areaButton.setAttribute("title","javascript:void(0);");
+          infoButton.innerHTML = "i";
+          MA.DOM.addClass(infoButton,"info");
+          li.appendChild(infoButton);
+          buttonCount++;
+          infoButton.style.right ="4px";
+
+          MA.DOM.on( infoButton, "click", MA.bind( this._onInfoButtonClick, this, li, item ));
+        }
+        if ( item.area ) {
+
+          var areaButton = MA.DOM.create("a");
+          areaButton.setAttribute("href","javascript:void(0);");
+          //areaButton.setAttribute("title","javascript:void(0);");
+          areaButton.innerHTML = "";
+          MA.DOM.addClass(areaButton,"area");
+          areaButton.style.right =( buttonCount == 0 ? "4px" : "26px" );
+          li.appendChild(areaButton);
+          buttonCount++;
+
+          MA.DOM.on( areaButton, "click", MA.bind( this._onAreaButtonClick, this, item ));
+        }
+
+        if ( buttonCount == 1) {
+          MA.DOM.addClass(li,"hasinfo");
+        } else if ( buttonCount == 2) {
+          MA.DOM.addClass(li,"hasarea");
+        }
+
         MA.DOM.on( a, "click", MA.bind( this._onItemClick, this, item ));
         li.appendChild( a );
         MA.DOM.removeClass(li,"wait");
@@ -172,9 +214,25 @@ GSIBV.UI.Dialog.LayerTree = class extends GSIBV.UI.Dialog.Modeless {
     }
     this._updateScroll();
 
-
+    this._updateHint();
   }
   
+  _updateHint() {
+
+    try {
+      for( var key in GSIBV.CONFIG.LANG.JA.UI.LAYERTREE_HINT ) {
+        var value = GSIBV.CONFIG.LANG.JA.UI.LAYERTREE_HINT[key];
+        
+        var list = MA.DOM.find(this._listContainer,key);
+        for( var i=0; i<list.length; i++ ) {
+          list[i].setAttribute( "title", value );
+        }
+      }
+    } catch(ex) {
+
+    }
+  }
+
   _createHeader(headerContainer) {
     this._titleContainer = MA.DOM.create("div");
     this._titleContainer.innerHTML = '地図や写真を追加';
@@ -193,6 +251,24 @@ GSIBV.UI.Dialog.LayerTree = class extends GSIBV.UI.Dialog.Modeless {
       this.fire("select", { "layerInfo": item });
     }
   }
-};
 
+  _onInfoButtonClick( li, item) {
+
+    this._showInfo(li,item);
+  }
+  _onAreaButtonClick( item) {
+    this.fire("area", { "area": item.area });
+  }
+
+  _showInfo(li,item) {
+    if ( !this._infoWindow ) {
+      this._infoWindow = new GSIBV.UI.Dialog.LayerInfoWindow();
+    }
+    var pos = MA.DOM.offset(li);
+    var size = MA.DOM.size(li);
+    pos.left += size.width;
+    this._infoWindow.show( item, pos );
+  }
+  
+};
 

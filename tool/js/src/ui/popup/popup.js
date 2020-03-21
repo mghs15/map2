@@ -101,7 +101,19 @@ GSIBV.UI.Popup.Menu = class extends MA.Class.Base {
     this._items = items;
     this._initMenuItems();
   }
+  
+  set parentContainer( container) {
+    this._parentContainer = container;
+  }
+
+  
+  get isVisible() {
+    if ( !this._container)return false;
+    return ! ( this._container.style.display == "none");
+
+  }
   show(ownerButton, pos)  {
+    this._showing = true;
     this._ownerButton = ownerButton;
     this._position = pos;
 
@@ -115,6 +127,7 @@ GSIBV.UI.Popup.Menu = class extends MA.Class.Base {
 
   hide() {
 
+    this._showing = false;
     if (!this._bodyMouseDownHandler) return;
 
     this._destroyMouseDownHandler();
@@ -161,14 +174,45 @@ GSIBV.UI.Popup.Menu = class extends MA.Class.Base {
       a.appendChild(label);
 
       MA.DOM.on(check,"click", MA.bind(function(item,check){
+        if ( !this._showing ) return;
         this.fire( "select", {"item":item, "checked":check.checked} );
         this.hide();
       },this,item,check));
 
+      
+    } else if ( item.type == "radio") {
+        var id = MA.getId( "gsi-popup-menu-radio" );
+        var name = MA.getId( "gsi-popup-menu-radio-" + item.name );
+        var check = MA.DOM.create("input");
+        MA.DOM.addClass(check, "normalcheck")
+        check.setAttribute("type", "radio");
+        check.setAttribute("id", id);
+        check.setAttribute("name", name);
+        if ( item.checked) {
+          check.setAttribute("checked", true);
+        }
+        var label = MA.DOM.create("label");
+        label.setAttribute("for", id);
+  
+        label.innerHTML = item.title;
+        a.appendChild(check);
+        a.appendChild(label);
+  
+        MA.DOM.on(check,"click", MA.bind(function(item,check){
+          if ( !this._showing ) return;
+          this.fire( "select", {"item":item, "checked":check.checked} );
+          this.hide();
+        },this,item,check));
+  
+
+
     } else {
       a.innerHTML = item.title;
-
+      if ( item.class ) {
+        MA.DOM.addClass(a, item.class );
+      }
       MA.DOM.on(a,"click", MA.bind(function(item){
+        if ( !this._showing ) return;
         this.fire( "select", {"item":item} );
         this.hide();
       },this,item));
@@ -179,6 +223,8 @@ GSIBV.UI.Popup.Menu = class extends MA.Class.Base {
 
   _adjust() {
 
+    this._container.style.left = '0px';
+    this._container.style.top = '0px';
     this._container.style.visibility = 'hidden';
     this._container.style.display = '';
     var menuSize = MA.DOM.size(this._container);
@@ -197,8 +243,13 @@ GSIBV.UI.Popup.Menu = class extends MA.Class.Base {
     if ( this._ownerButton ) {
       pos = MA.DOM.offset(this._ownerButton);
       var size = MA.DOM.size(this._ownerButton);
-      left = (pos.left + size.width - menuSize.width);
-      top = (pos.top + size.height);
+      if ( this._position == "right") {
+        left = (pos.left + size.width+6);
+        top = (pos.top-10);
+      } else {
+        left = (pos.left + size.width - menuSize.width);
+        top = (pos.top + size.height);
+      }
     } else if ( this._position ) {
       left = this._position.left;
       top = this._position.top;
@@ -236,12 +287,13 @@ GSIBV.UI.Popup.Menu = class extends MA.Class.Base {
       var target = e.target;
 
       while (target) {
-        if (target == this._container) {
+        if (target == this._container || target == this._parentContainer) {
           return;
         }
         target = target.parentNode;
       }
     }
+
     this.hide();
   }
   _create() {

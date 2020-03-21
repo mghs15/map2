@@ -8,6 +8,19 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
     };
   }
 
+  set zIndex(zIndex) {
+    this._zIndex = zIndex;
+  }
+
+  set noAlpha(noAlpha) {
+    this._noAlpha = noAlpha;
+    this._size.height = 185;
+  }
+
+  set useClearButton( useClearButton) {
+    this._useClearButton = useClearButton;
+  }
+
   destroy() {
 
     if ( this._bodyMouseDownHandler ) {
@@ -38,7 +51,7 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
     this._svSelector.h = hsv.h;
     this._svSelector.setSV(hsv.s, hsv.v, true);
     this._hSelector.setHue( hsv.h, true );
-    this._opacitySelector.setOpacity( hsv.a, true );
+    if ( this._opacitySelector )this._opacitySelector.setOpacity( hsv.a, true );
     this._updateSample();
 
   }
@@ -77,9 +90,10 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
     }
     
     left = pos.left;
-    if ( left + size.width > windowSize.width) {
-      left = windowSize.width - size.width;
+    if ( left + this._size.width > windowSize.width - 4) {
+      left = windowSize.width - this._size.width - 4;
     }
+    
     if ( top != undefined ) {
       this._container .style.bottom = "auto";
       this._container .style.top = top + "px";
@@ -137,6 +151,9 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
     this._container = MA.DOM.create("div");
     this._container.style.display = 'none';
     MA.DOM.addClass( this._container, "-gsibv-colorpicker" );
+    if ( this._zIndex  ) {
+      this._container.style.zIndex = this._zIndex;
+    }
 
     var hsv = {h:0,s:0,v:0,a:1};
     if ( this._color ) {
@@ -147,7 +164,8 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
       
     this._createColorSVSelect(hsv);
     this._createColorHSelect(hsv);
-    this._createOpacitySelect(hsv);
+    if ( !this._noAlpha )
+      this._createOpacitySelect(hsv);
     this._createSample();
     this._createInput();
 
@@ -160,6 +178,17 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
     MA.DOM.select("#main")[0].appendChild( this._container);
 
     MA.DOM.on( this._closeButton, "click", MA.bind( this.hide, this ) );
+
+    if ( this._useClearButton ) {
+      this._clearButton = MA.DOM.create("a");
+      this._clearButton.innerHTML = "透明";
+      this._clearButton.setAttribute("href","javascript:void(0);");
+
+      MA.DOM.on( this._clearButton, "click", MA.bind( this._onClearClick, this ) );
+      MA.DOM.addClass(this._clearButton,"button");
+      MA.DOM.addClass(this._clearButton,"clear-button");
+      this._container .appendChild( this._clearButton);
+    }
 
   }
 
@@ -264,7 +293,9 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
     this._rInput = createRow( table, "r:","int",0,255);
     this._gInput = createRow( table, "g:","int",0,255);
     this._bInput = createRow( table, "b:","int",0,255);
-    this._aInput = createRow( table, "a:","float",0,1);
+    
+    if ( !this._noAlpha )
+      this._aInput = createRow( table, "a:","float",0,1);
 
     var tr=MA.DOM.create("tr");
     var td=MA.DOM.create("td");
@@ -277,7 +308,7 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
     this._rInput.on("change", this._rgbChangeHandler );
     this._gInput.on("change", this._rgbChangeHandler );
     this._bInput.on("change", this._rgbChangeHandler );
-    this._aInput.on("change", this._rgbChangeHandler );
+    if ( this._aInput ) this._aInput.on("change", this._rgbChangeHandler );
 
     this._hexChangeHandler = MA.bind(this._onHexInputChange,this);
     this._hexInput = new GSIBV.UI.Input.HexColor( input);
@@ -290,6 +321,17 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
     frame.appendChild(table);
     this._container.appendChild(frame);
   }
+
+  _onClearClick() {
+    this.setColor(undefined);
+    this._updateInput();
+    //this._refreshRGBInputValue();
+    //this._refreshSample();
+    this._updateSample();
+    this.fire("change", { color: this._color ? this._color.clone(): undefined });
+
+  }
+
   _onSVChange(e) {
     this._fireChange();
 
@@ -310,7 +352,7 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
     var r = this._rInput.value;
     var g = this._gInput.value;
     var b = this._bInput.value;
-    var a = this._aInput.value;
+    var a = ( this._aInput ? this._aInput.value : 1 );
     if ( a == undefined) {
       a = 1;
     }
@@ -333,7 +375,7 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
     this._rInput.off("change", this._rgbChangeHandler);
     this._gInput.off("change", this._rgbChangeHandler);
     this._bInput.off("change", this._rgbChangeHandler);
-    this._aInput.off("change", this._rgbChangeHandler);
+    if ( this._aInput ) this._aInput.off("change", this._rgbChangeHandler);
     var hex = this._hexInput.value;
     if ( hex == undefined || hex == "" ){
       this.setColor(undefined);
@@ -364,20 +406,20 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
       this._rInput.value = "";
       this._gInput.value = "";
       this._bInput.value = "";
-      this._aInput.value = "";
+      if ( this._aInput) this._aInput.value = "";
     } else {
       var rgb  = MA.Color.fix( this._color.getRGB() );
       this._rInput.value = rgb.r;
       this._gInput.value = rgb.g;
       this._bInput.value = rgb.b;
-      this._aInput.value = rgb.a;
+      if ( this._aInput) this._aInput.value = rgb.a;
     }
     this._fireChange(true);
     
     this._rInput.on("change", this._rgbChangeHandler);
     this._gInput.on("change", this._rgbChangeHandler);
     this._bInput.on("change", this._rgbChangeHandler);
-    this._aInput.on("change", this._rgbChangeHandler);
+    if ( this._aInput) this._aInput.on("change", this._rgbChangeHandler);
   }
   _fireChange (withoutUpdateInput) {
     if ( this._color == undefined ) this._color = new MA.Color();
@@ -385,7 +427,7 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
       h: this._hSelector.h,
       s: this._svSelector.s,
       v: this._svSelector.v,
-      a: this._opacitySelector.opacity
+      a: ( this._opacitySelector ? this._opacitySelector.opacity : 1 )
     });
     if (!withoutUpdateInput )this._updateInput();
     //this._refreshRGBInputValue();
@@ -396,7 +438,7 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
 
   _updateSample() {
     if ( this._color == undefined) {
-      this._sampleElement.style.backgroundColor = 'none';
+      this._sampleElement.style.backgroundColor = 'transparent';
     }else {
       var rgb  = MA.Color.fix( this._color.getRGB() );
       this._sampleElement.style.backgroundColor = 'rgba(' + rgb.r + "," + rgb.g + "," + rgb.b + "," + rgb.a + ")" ;
@@ -407,14 +449,14 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
     this._rInput.off("change", this._rgbChangeHandler);
     this._gInput.off("change", this._rgbChangeHandler);
     this._bInput.off("change", this._rgbChangeHandler);
-    this._aInput.off("change", this._rgbChangeHandler);
+    if ( this._aInput) this._aInput.off("change", this._rgbChangeHandler);
     this._hexInput.off("change", this._hexChangeHandler);
 
     if ( this._color == undefined) {
       this._rInput.value = '';
       this._gInput.value = '';
       this._bInput.value = '';
-      this._aInput.value = '';
+      if ( this._aInput) this._aInput.value = '';
       this._hexInput.value = '';
       return;
     }
@@ -423,13 +465,13 @@ GSIBV.UI.ColorPicker = class extends MA.Class.Base {
     this._rInput.value = rgb.r;
     this._gInput.value = rgb.g;
     this._bInput.value = rgb.b;
-    this._aInput.value = rgb.a;
+    if ( this._aInput) this._aInput.value = rgb.a;
     this._hexInput.value = MA.Color.toHTMLHex(rgb);
 
     this._rInput.on("change", this._rgbChangeHandler);
     this._gInput.on("change", this._rgbChangeHandler);
     this._bInput.on("change", this._rgbChangeHandler);
-    this._aInput.on("change", this._rgbChangeHandler);
+    if ( this._aInput) this._aInput.on("change", this._rgbChangeHandler);
     this._hexInput.on("change", this._hexChangeHandler);
   }
 };

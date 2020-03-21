@@ -9,6 +9,9 @@ MA.UI.Slider = class extends MA.Class.Base {
     super();
     this._element = element;
     this._value = (options && options.value != undefined ? options.value : 1);
+    if (options && options.handleSize) {
+      this._handleSize = options.handleSize;
+    }
   }
 
   create() {
@@ -59,7 +62,7 @@ MA.UI.Slider = class extends MA.Class.Base {
 
     var size = MA.DOM.size(this._element);
 
-    this._handleSize = size.height - 2;
+    if ( !this._handleSize ) this._handleSize = size.height - 2;
     this._handleHalfSize = Math.round(this._handleSize / 2);
 
     // ハンドル生成

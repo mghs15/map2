@@ -8,26 +8,32 @@
     グループ管理
 ***********************************************/
 GSIBV.VectorTileData = class extends MA.Class.Base {
-  constructor(json) {
+  constructor(json, options) {
     super();
     this._root = new GSIBV.VectorTileData.Directory(this);
 
+    if ( json.maxNativeZoom ) this._maxNativeZoom = json.maxNativeZoom;
+    if ( options && options.maxNativeZoom ) this._maxNativeZoom = options.maxNativeZoom;
+
+
     this._tiles = [
-      "https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf"
-//      "https://maps.gsi.go.jp/xyz/mapboxtestdata0311/{z}/{x}/{y}.pbf"
+      //"https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf"
+      "https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap_tmp/{z}/{x}/{y}.pbf"
     ];
 
     if ( json ) {
       this._origJSON = JSON.parse( JSON.stringify(json) );
     }
     this.fromJSON(json);
-    this._source = GSIBV.VectorTileSource.Manager.manager.getSource(this._tiles);
+    this._source = GSIBV.VectorTileSource.Manager.manager.getSource(
+      this._tiles, undefined, this._maxNativeZoom );
 
   }
 
   get root() { return this._root; }
   get source() { return this._source; }
   get groupList() { return this._groupList; }
+  get maxNativeZoom() { return this._maxNativeZoom; }
 
   get title() { return this._title;}
   set title(title) { this._title = title;}
@@ -59,6 +65,9 @@ GSIBV.VectorTileData = class extends MA.Class.Base {
     result["title"] = this._title;
     result["group"] = this._groupList.toData();
     
+    if (this._maxNativeZoom) {
+      result["maxNativeZoom"] = this._maxNativeZoom;
+    }
 
     return result;
   }
@@ -735,6 +744,17 @@ GSIBV.VectorTileData.Item = class extends GSIBV.VectorTileData.ItemBase {
       var layer = new GSIBV.VectorTileData.Layer(this._owner, this);
       layer.fromJSON( jsonItem, json.visible );
       this._layerList.push( layer );
+      continue;
+      if ( this.owner.maxNativeZoom ) {
+        if ( layer.minzoom <= this.owner.maxNativeZoom-1) {
+          if ( layer.maxzoom >= this.owner.maxNativeZoom-1) {
+            //layer._maxzoom = 17// this.owner.maxNativeZoom;
+          }
+          this._layerList.push( layer );
+        }
+      } else {
+        this._layerList.push( layer );
+      }
     }
 
     var group = this.group;

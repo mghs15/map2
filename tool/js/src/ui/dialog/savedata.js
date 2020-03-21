@@ -155,6 +155,7 @@ GSIBV.UI.Dialog.SaveDataDialog = class extends GSIBV.UI.Dialog.Modal {
   _showConfirmDialog(msg, title, fileName) {
     
     var dialog = new GSIBV.UI.Dialog.Alert();
+    dialog.autoDestroy = true;
     dialog.on("buttonclick",MA.bind(function(title, fileName,e){
         if ( e.params.id == "ok" ) {
           if ( title == "") title = this._makeTitle();

@@ -112,6 +112,11 @@ GSIBV.UI.RecommendSelector = class extends GSIBV.UI.Base {
       this._liHash[layerInfo.id] = { "layerInfo": layerInfo, "li": li };
 
       //check._layerInfo = layerInfo;
+      //MA.DOM.find(li, "a")[0].setAttribute('title', 
+      //  layerInfo.description ? layerInfo.description : layerInfo.title);
+      GSIBV.application.tooltipManager.add( MA.DOM.find(li, "a")[0],
+          layerInfo.description ? layerInfo.description : layerInfo.title );
+      //MA.DOM.find(li, "a")[0].title = layerInfo.description ? layerInfo.description : layerInfo.title;
 
       MA.DOM.on(MA.DOM.find(li, "a")[0], "click", MA.bind(this._onClick, this, li, layerInfo));
 
@@ -207,7 +212,6 @@ GSIBV.UI.RecommendSelector = class extends GSIBV.UI.Base {
 
     if ( layerInfo.layers && layerInfo.layers.length > 0 )  {
       for( var i=0; i<layerInfo.layers.length; i++ ) {
-        
         this.fire("change", {
           "layerInfo": layerInfo.layers[i],
           "visible": !visible
@@ -241,7 +245,10 @@ GSIBV.UI.RecommendSelector.LayerInfo = class extends GSIBV.LayerInfo {
     this._type = data.type;
     this._url = data.url;
     this._html = data.html;
+    this._description = data.description;
     this._legendUrl = data.legendUrl;
+    this._minZoom = data.minZoom;
+    this._maxNativeZoom = data.maxNativeZoom;
     this._layers = [];
 
     if ( data.layers ) {
@@ -254,6 +261,7 @@ GSIBV.UI.RecommendSelector.LayerInfo = class extends GSIBV.LayerInfo {
 
   get thumbnail() { return this._thumbnaile; }
   get type() { return this._type; }
+  get description() { return this._description; }
   get layers() { return this._layers;}
   get entries() { return this._layers;}
 }
