@@ -1,4 +1,10 @@
 # 地理院地図Vectorのスタイルを<br>シンプルなMapbox GL JSで実装する試み
+
+<span style="color:#FF0000;">当レポジトリは、以下のレポジトリに移動しました。今後、このレポジトリ「map2」は更新しません。</span>
+https://github.com/mghs15/gsi-vector-style-converter
+
+<hr>
+
 - 実装例　https://mghs15.github.io/map2/map.html
 - [改良版](https://github.com/mghs15/map2#fill-pattern%E7%94%A8%E3%81%AE%E7%94%BB%E5%83%8F%E3%81%AE%E8%AA%AD%E3%81%BF%E8%BE%BC%E3%81%BF)　（fill-patternの実現）
 - Mapboxのサービスと合わせた例　https://mghs15.github.io/map2/map2.html
